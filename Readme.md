@@ -2,6 +2,10 @@
 
 ## Server
 
+### Heroku
+
+https://slack-taller2.herokuapp.com/
+
 ### Instalación
 
 - Instalar Node.js
@@ -11,6 +15,9 @@
 ### Ejecución
 
 - node app.js  (en la terminal en /src)
+- o node src/app.js
+
+-localhost:3000
 
 ### Otros
 
