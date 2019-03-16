@@ -3,7 +3,7 @@ var Message = require('../models/Message');
 class MessagesController{
 
 	index(req, res){
-		res.send("Hello world");
+		res.send("Hello world from heroku");
 	}
 
 	show(req, res){
