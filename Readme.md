@@ -31,6 +31,14 @@ https://travis-ci.org/taller-2-slk-2019/Server
 
 - https://www.chaijs.com/
 
+### Base de datos
+
+- http://docs.sequelizejs.com/
+
+- Migraciones: npx sequelize db:migrate
+
+- Modelos: npx sequelize model:generate --name User --attributes firstName:string,lastName:string,email:string
+
 ### Otros
 
 - Api REST: https://juanda.gitbooks.io/webapps/content/api/arquitectura-api-rest.html

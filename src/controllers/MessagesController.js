@@ -1,29 +1,27 @@
-var Message = require('../models/Message');
+var Message = require('../db/sequelize').Message;
 
 class MessagesController{
 
-	index(req, res){
-		res.send("Hello world from heroku and travis");
-	}
+    index(req, res){
+        res.send("Hello world from heroku and travis");
+    }
 
-	show(req, res){
-		var m = new Message("Hello World from message");
-		console.log("Created message");
-		console.log(m);
-		console.log(JSON.stringify(m));
-		res.send(m.getMessage());
-	}
+    async show(req, res){
+        var m = await Message.findByPk(req.params.id);
+        console.log(m.getName());
+        console.log(JSON.stringify(m));
+        res.send(m);
+    }
 
-	create(req, res){
-		console.log('name', req.body.name);
-		console.log('age', req.body.age);
-		res.send(req.body);
-	}
+    async create(req, res){
+        await Message.create(req.body);
+        res.send(req.body);
+    }
 
-	delete(req, res){
-		console.log('delete: ', req.params.id);
-		res.send(req.params);
-	}
+    delete(req, res){
+        console.log('delete: ', req.params.id);
+        res.send(req.params);
+    }
 }
 
 module.exports = new MessagesController();
