@@ -1,10 +1,10 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "description": "",
+  "description": "slack taller 2",
   "main": "app.js",
   "scripts": {
-    "test": "test"
+    "test": "echo 'hola'"
   },
   "keywords": [
     "taller2"
