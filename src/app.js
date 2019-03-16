@@ -10,8 +10,15 @@ var messagesRouter = require('./routes/messages');
 app.use('/messages', messagesRouter);
 
 
-app.listen(80, function () {
-  console.log('App listening in port 80');
+app.get('/', function(req, res){
+	res.send("Welcome to Taller2-Slack");
+});
+
+
+var port = 3000;
+
+app.listen(port, function () {
+  console.log(`App listening in port ${port}`);
 });
 
 module.exports = app;
