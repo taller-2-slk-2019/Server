@@ -6,6 +6,10 @@
 
 https://slack-taller2.herokuapp.com/
 
+### Travis
+
+https://travis-ci.org/taller-2-slk-2019/Server
+
 ### Instalación
 
 - Instalar Node.js
@@ -18,6 +22,14 @@ https://slack-taller2.herokuapp.com/
 - o node src/app.js
 
 - localhost:3000
+
+### Testing
+
+- npm test
+
+- https://mochajs.org/
+
+- https://www.chaijs.com/
 
 ### Otros
 

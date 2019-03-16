@@ -3,8 +3,11 @@
   "version": "1.0.0",
   "description": "slack taller 2",
   "main": "app.js",
+  "directories": {
+    "test": "test"
+  },
   "scripts": {
-    "test": "echo 'hola'"
+    "test": "mocha"
   },
   "keywords": [
     "taller2"
@@ -14,5 +17,9 @@
   "dependencies": {
     "body-parser": "^1.18.3",
     "express": "^4.16.4"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^6.0.2"
   }
 }
