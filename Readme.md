@@ -37,6 +37,8 @@ https://travis-ci.org/taller-2-slk-2019/Server
 
 - Migraciones: npx sequelize db:migrate
 
+- Crear base local: npx sequelize db:create
+
 - Modelos: npx sequelize model:generate --name User --attributes firstName:string,lastName:string,email:string
 
 ### Otros

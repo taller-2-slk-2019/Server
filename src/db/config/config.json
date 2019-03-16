@@ -1,10 +1,10 @@
 {
   "development": {
-    "username": "root",
-    "password": null,
+    "username": "postgres",
+    "password": "123456",
     "database": "slack_server",
     "host": "127.0.0.1",
-    "dialect": "mysql",
+    "dialect": "postgres",
     "logging": false
   },
   "test": {
@@ -12,15 +12,16 @@
     "password": null,
     "database": "slack_server_test",
     "host": "127.0.0.1",
-    "dialect": "mysql",
+    "dialect": "postgres",
     "logging": false
   },
   "production": {
-    "username": "root",
-    "password": null,
-    "database": "database_production",
-    "host": "127.0.0.1",
-    "dialect": "mysql",
+    "username": "df85nfninooaqq",
+    "password": "2606eab752a3bd58f359f09646097cbf15de54eb8087c671057b8a212124c254",
+    "database": "df85nfninooaqq",
+    "host": "ec2-50-19-109-120.compute-1.amazonaws.com",
+    "port": "5432",
+    "dialect": "postgres",
     "logging": false
   }
 }
