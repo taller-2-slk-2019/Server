@@ -8,7 +8,7 @@ module.exports = {
     logging: false
   },
   test: {
-    username: process.env.TRAVIS ? 'root' : "postgres",
+    username: "postgres",
     password: process.env.TRAVIS ? null : "123456",
     database: "slack_server_test",
     host: "127.0.0.1",
