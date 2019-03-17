@@ -5,5 +5,6 @@ before_install:
   - npm i -g npm@6.4.1
 services:
   - postgresql
-before_script:
-  - psql -c "CREATE USER postgres WITH PASSWORD '123456';" -U postgres
+env:
+  - TEST_DB_USER=root
+  - TEST_DB_PASSWORD=null

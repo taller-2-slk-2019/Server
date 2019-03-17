@@ -8,8 +8,8 @@ module.exports = {
     logging: false
   },
   test: {
-    username: "postgres",
-    password: "123456",
+    username: process.env.TEST_DB_USER || "postgres",
+    password: ('TEST_DB_PASWORD' in Object.keys(process.env) ? process.env.TEST_DB_PASSWORD : "123456"),
     database: "slack_server_test",
     host: "127.0.0.1",
     dialect: "postgres",
