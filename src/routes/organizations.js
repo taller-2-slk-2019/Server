@@ -1,0 +1,8 @@
+var express = require('express');
+var router = express.Router();
+
+var organizationsController = require('../controllers/OrganizationsController');
+
+router.post('/create', organizationsController.create);
+
+module.exports = router;

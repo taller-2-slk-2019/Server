@@ -9,6 +9,9 @@ app.use(bodyParser.json());
 var usersRouter = require('./routes/users');
 app.use('/users', usersRouter);
 
+var organizationsRouter = require('./routes/organizations');
+app.use('/organizations', organizationsRouter);
+
 
 app.get('/', function(req, res){
     res.send("Welcome to Taller2-Slack");

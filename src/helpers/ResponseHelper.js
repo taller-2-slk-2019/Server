@@ -1,5 +1,6 @@
 var sendErrorResponse = function(res, err){
-    console.log("Error: " + err.message);
+    console.log('-----------------------------------------------------------------------');
+    console.log(err.stack);
     var response = { success: false, error : err.message };
     res.send(response);
 }
