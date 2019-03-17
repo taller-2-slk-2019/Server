@@ -1,9 +1,20 @@
-var Message = require('../db/sequelize').Message;
+var User = require('../db/sequelize').User;
+var Organization = require('../db/sequelize').Organization;
+var UserRole = require('../db/sequelize').UserRole;
+var UserOrganizations = require('../db/sequelize').UserOrganizations;
 
 class MessagesController{
 
-    index(req, res){
-        res.send("Hello world from heroku and travis");
+    async index(req, res){
+        var org = await Organization.findByPk(1, 
+            { include: [
+                { model: User }
+            ]}
+        );
+
+        //var orgs = await user.getOrganizations();
+
+        res.send(org);
     }
 
     async show(req, res){
