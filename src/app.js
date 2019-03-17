@@ -1,15 +1,13 @@
 var express = require('express');
 var app = express();
 
-var sequelize = require('./db/sequelize');
-
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 
 
 //Set routers
-var messagesRouter = require('./routes/messages');
-app.use('/messages', messagesRouter);
+var usersRouter = require('./routes/users');
+app.use('/users', usersRouter);
 
 
 app.get('/', function(req, res){
