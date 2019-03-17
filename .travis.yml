@@ -8,3 +8,5 @@ services:
 env:
   - TEST_DB_USER=root
   - TEST_DB_PASSWORD=null
+before_script:
+  - psql -c 'create databaseslack_server_test;' -U postgres
