@@ -6,7 +6,7 @@ var sendErrorResponse = function(res, err){
 }
 
 var sendSuccessResponse = function(res, data){
-    res.send(data);
+    res.status(200).send(data);
 }
 
 module.exports = {

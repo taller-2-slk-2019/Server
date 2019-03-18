@@ -6,6 +6,14 @@
 
 https://slack-taller2.herokuapp.com/
 
+### Documentación
+
+https://slack-taller2.herokuapp.com/doc
+
+- Raml: https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md/
+
+- npm i -g raml2html
+
 ### Travis
 
 https://travis-ci.org/taller-2-slk-2019/Server
