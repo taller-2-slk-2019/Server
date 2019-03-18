@@ -1,0 +1,49 @@
+User:
+  type: object
+  properties:
+    id: integer
+    name: string
+    surname: string
+    email: string
+    picture: string
+    updatedAt: datetime
+    createdAt: datetime
+    latitude?: number
+    longitude?: number
+
+UserRequest:
+  type: object
+  properties:
+    name: string
+    surname: string
+    email: string
+    picture?: string
+
+Organization:
+    type: object
+    properties:
+        id: integer
+        name: string
+        picture: string
+        latitude: number
+        longitude: number
+        description: string
+        welcome: string
+        updatedAt: datetime
+        createdAt: datetime
+
+OrganizationRequest:
+    type: object
+    properties:
+        name: string
+        picture: string
+        latitude: number
+        longitude: number
+        description: string
+        welcome: string
+        creatorId: integer
+
+Error:
+    type: object
+    properties:
+        error: string

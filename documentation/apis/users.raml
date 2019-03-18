@@ -1,0 +1,15 @@
+/register:
+    post:
+        body:
+            type: UserRequest
+            example: !include examples/usersRegisterRequest.json
+        responses:
+            200:
+                body:
+                    type: User
+                    example: !include examples/usersRegisterResponse.json
+            500:
+                body:
+                    type: Error
+                    example: !include examples/error.json
+

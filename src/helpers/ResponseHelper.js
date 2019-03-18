@@ -1,13 +1,12 @@
 var sendErrorResponse = function(res, err){
     console.log('-----------------------------------------------------------------------');
     console.log(err.stack);
-    var response = { success: false, error : err.message };
-    res.send(response);
+    var response = { error : err.message };
+    res.status(500).send(response);
 }
 
 var sendSuccessResponse = function(res, data){
-    var response = { success: true, data : data };
-    res.send(response);
+    res.send(data);
 }
 
 module.exports = {

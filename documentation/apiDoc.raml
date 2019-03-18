@@ -1,0 +1,14 @@
+#%RAML 1.0
+title: Slack Api
+baseUri: https://slack-taller2.herokuapp.com/
+mediaType:  application/json
+types:
+  !include types.raml
+
+/users:
+  !include apis/users.raml
+
+/organizations:
+  !include apis/organizations.raml
+      
+  

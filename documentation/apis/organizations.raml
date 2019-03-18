@@ -1,0 +1,14 @@
+/create:
+    post:
+        body:
+            type: OrganizationRequest
+            example: !include examples/organizationsCreateRequest.json
+        responses:
+            200:
+                body:
+                    type: Organization
+                    example: !include examples/organizationsCreateResponse.json
+            500:
+                body:
+                    type: Error
+                    example: !include examples/error.json
