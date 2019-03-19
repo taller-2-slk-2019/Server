@@ -43,6 +43,25 @@ OrganizationRequest:
         welcome: string
         creatorId: integer
 
+Channel:
+    type: object
+    properties:
+        id: integer
+        name: string
+        description: string
+        welcome: string
+        updatedAt: datetime
+        createdAt: datetime
+
+ChannelRequest:
+    type: object
+    properties:
+        name: string
+        description: string
+        welcome: string
+        creatorId: integer
+        organizationId: integer
+
 Error:
     type: object
     properties:

@@ -18,6 +18,9 @@ app.use('/users', usersRouter);
 var organizationsRouter = require('./routes/organizations');
 app.use('/organizations', organizationsRouter);
 
+var channelsRouter = require('./routes/channels');
+app.use('/channels', channelsRouter);
+
 
 app.get('/', function(req, res){
     res.send("Welcome to Taller2-Slack");

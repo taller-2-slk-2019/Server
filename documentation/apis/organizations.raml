@@ -9,6 +9,4 @@
                     type: Organization
                     example: !include examples/organizationsCreateResponse.json
             500:
-                body:
-                    type: Error
-                    example: !include examples/error.json
+                !include errorResponse.raml

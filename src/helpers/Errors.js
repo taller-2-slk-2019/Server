@@ -5,6 +5,14 @@ class UserNotFoundError extends Error {
     }
 }
 
+class OrganizationNotFoundError extends Error {
+    constructor(organizationId) {
+        super("Organization not found: " + organizationId);
+        this.name = this.constructor.name;
+    }
+}
+
 module.exports = {
-    UserNotFoundError: UserNotFoundError
+    UserNotFoundError: UserNotFoundError,
+    OrganizationNotFoundError: OrganizationNotFoundError,
 }

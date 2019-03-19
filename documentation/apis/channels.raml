@@ -1,0 +1,12 @@
+/create:
+    post:
+        body:
+            type: ChannelRequest
+            example: !include examples/channelsCreateRequest.json
+        responses:
+            200:
+                body:
+                    type: Channel
+                    example: !include examples/ChannelCreateResponse.json
+            500:
+                !include errorResponse.raml

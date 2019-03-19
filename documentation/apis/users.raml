@@ -9,7 +9,5 @@
                     type: User
                     example: !include examples/usersRegisterResponse.json
             500:
-                body:
-                    type: Error
-                    example: !include examples/error.json
+                !include errorResponse.raml
 

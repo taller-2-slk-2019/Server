@@ -18,6 +18,10 @@ class OrganizationDao{
         return org;
     }
 
+    async findById(id){
+        return await Organization.findByPk(id);
+    }
+
 }
 
 module.exports = new OrganizationDao();
