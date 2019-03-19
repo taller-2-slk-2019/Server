@@ -1,3 +1,4 @@
+var logger = require('logops');
 var ChannelDao = require('../daos/ChannelDao');
 var { sendSuccessResponse, sendErrorResponse } = require('../helpers/ResponseHelper');
 
@@ -14,8 +15,9 @@ class ChannelsController{
         }
 
         try{
-            var org = await ChannelDao.create(data);
-            sendSuccessResponse(res, org);
+            var channel  = await ChannelDao.create(data);
+            logger.info(`Channel created (${channel.id}) in organization {$data.organizationId} by user ${data.creatorId}`);
+            sendSuccessResponse(res, channel);
             
         } catch (err){
             sendErrorResponse(res, err)

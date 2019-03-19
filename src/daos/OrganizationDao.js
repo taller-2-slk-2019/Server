@@ -2,7 +2,7 @@ var sha1 = require('sha1');
 var UserDao = require('./UserDao');
 var models = require('../database/sequelize');
 var Organization = models.Organization;
-var { UserNotFoundError } = require('../helpers/Errors');
+var { UserAlreadyInvitedError, UserAlreadyInOrganizationError, UserNotFoundError } = require('../helpers/Errors');
 
 class OrganizationDao{
 
@@ -24,7 +24,24 @@ class OrganizationDao{
             { include : [models.User, models.Channel] });
     }
 
-    async inviteUser(organization, user){
+    async inviteUser(organizationId, userId){
+        var organization = await this.findById(organizationId);
+
+        var existingUser = (await organization.getUsers()).find((usr) => usr.id == userId);
+        if (existingUser){
+            throw new UserAlreadyInOrganizationError(organization.id, userId);
+        }
+
+        var invitedUser = (await organization.getInvitedUsers()).find((usr) => usr.id == userId);
+        if (invitedUser){
+            throw new UserAlreadyInvitedError(organization.id, userId);
+        }
+
+        var user = await UserDao.findById(userId);
+        if (!user){
+            throw new UserNotFoundError(userId);
+        }
+
         var token = sha1(Date.now());
         await organization.addInvitedUser(user, { through: {token: token } });
         return token;

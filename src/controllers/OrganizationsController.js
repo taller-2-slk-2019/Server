@@ -1,7 +1,6 @@
-var UserDao = require('../daos/UserDao');
+var logger = require('logops');
 var OrganizationDao = require('../daos/OrganizationDao');
 var { sendSuccessResponse, sendErrorResponse } = require('../helpers/ResponseHelper');
-var { UserAlreadyInvitedError, UserAlreadyInOrganizationError, UserNotFoundError } = require('../helpers/Errors');
 
 class OrganizationsController{
 
@@ -28,6 +27,7 @@ class OrganizationsController{
 
         try{
             var org = await OrganizationDao.create(data);
+            logger.info("Organization created: " + org.id);
             sendSuccessResponse(res, org);
             
         } catch (err){
@@ -37,24 +37,12 @@ class OrganizationsController{
 
     async inviteUser(req, res, next){
         try{
-            var organization = await OrganizationDao.findById(req.params.id);
+            var organizationId = req.params.id;
             var userId = req.params.userId;
-            var user = (await organization.getUsers()).find((usr) => usr.id == userId);
-            if (user){
-                throw new UserAlreadyInOrganizationError(organization.id, userId);
-            }
 
-            user = (await organization.getInvitedUsers()).find((usr) => usr.id == userId);
-            if (user){
-                throw new UserAlreadyInvitedError(organization.id, userId);
-            }
+            var token = await OrganizationDao.inviteUser(organizationId, userId);
 
-            user = await UserDao.findById(userId);
-            if (!user){
-                throw new UserNotFoundError(userId);
-            }
-
-            var token = await OrganizationDao.inviteUser(organization, user);
+            logger.info(`User ${userId} invited to organization ${organizationId} with token: ${token}`);
             sendSuccessResponse(res, { invitationToken: token });
 
         } catch (err){
