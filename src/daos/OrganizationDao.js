@@ -5,6 +5,8 @@ var models = require('../database/sequelize');
 var Organization = models.Organization;
 var OrganizationUserInvitation = models.OrganizationUserInvitation;
 var { UserAlreadyInvitedError, UserAlreadyInOrganizationError, UserNotFoundError, InvalidOrganizationInvitationTokenError } = require('../helpers/Errors');
+var UserRoleCreator = require('../models/userRoles/UserRoleCreator');
+var UserRoleMember = require('../models/userRoles/UserRoleMember');
 
 class OrganizationDao{
 
@@ -16,7 +18,7 @@ class OrganizationDao{
         }
 
         var org = await Organization.create(organization);
-        await org.addUser(user, { through: {role: 'creator' } }); //TODO change this to a constant in role class
+        await org.addUser(user, { through: {role: (new UserRoleCreator()).name } });
 
         return org;
     }
@@ -66,7 +68,7 @@ class OrganizationDao{
         var org = await this.findById(invitation.OrganizationId);
         var user = await UserDao.findById(invitation.UserId);
 
-        await org.addUser(user, { through: {role: 'member' } }); //TODO change this to a constant in role class);
+        await org.addUser(user, { through: {role: (new UserRoleMember()).name } });
         await invitation.destroy();
 
         logger.info(`User ${user.id} accepted invitation to organization ${org.id}`);
