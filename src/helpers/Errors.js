@@ -26,9 +26,17 @@ class UserAlreadyInOrganizationError extends Error {
     }
 }
 
+class InvalidOrganizationInvitationTokenError extends Error {
+    constructor(token) {
+        super("Invalid token to be invited to an organization: " + token);
+        this.name = this.constructor.name;
+    }
+}
+
 module.exports = {
     UserNotFoundError: UserNotFoundError,
     OrganizationNotFoundError: OrganizationNotFoundError,
     UserAlreadyInvitedError: UserAlreadyInvitedError,
     UserAlreadyInOrganizationError: UserAlreadyInOrganizationError,
+    InvalidOrganizationInvitationTokenError: InvalidOrganizationInvitationTokenError,
 }

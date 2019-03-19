@@ -1,8 +1,10 @@
 var sha1 = require('sha1');
+var logger = require('logops');
 var UserDao = require('./UserDao');
 var models = require('../database/sequelize');
 var Organization = models.Organization;
-var { UserAlreadyInvitedError, UserAlreadyInOrganizationError, UserNotFoundError } = require('../helpers/Errors');
+var OrganizationUserInvitation = models.OrganizationUserInvitation;
+var { UserAlreadyInvitedError, UserAlreadyInOrganizationError, UserNotFoundError, InvalidOrganizationInvitationTokenError } = require('../helpers/Errors');
 
 class OrganizationDao{
 
@@ -34,7 +36,11 @@ class OrganizationDao{
 
         var invitedUser = (await organization.getInvitedUsers()).find((usr) => usr.id == userId);
         if (invitedUser){
-            throw new UserAlreadyInvitedError(organization.id, userId);
+            if (invitedUser.OrganizationUserInvitation.hasExpired()){
+                await organization.removeInvitedUser(userId);
+            } else {
+                throw new UserAlreadyInvitedError(organization.id, userId);
+            }
         }
 
         var user = await UserDao.findById(userId);
@@ -46,6 +52,26 @@ class OrganizationDao{
         await organization.addInvitedUser(user, { through: {token: token } });
         return token;
     }
+
+    async acceptUserInvitation(token){
+        var invitation = await OrganizationUserInvitation.findOne(
+            {
+                where: {token: token},
+            });
+
+        if (!invitation || invitation.hasExpired()){
+            throw new InvalidOrganizationInvitationTokenError(token);
+        }
+
+        var org = await this.findById(invitation.OrganizationId);
+        var user = await UserDao.findById(invitation.UserId);
+
+        await org.addUser(user, { through: {role: 'member' } }); //TODO change this to a constant in role class);
+        await invitation.destroy();
+
+        logger.info(`User ${user.id} accepted invitation to organization ${org.id}`);
+    }
+
 
 }
 

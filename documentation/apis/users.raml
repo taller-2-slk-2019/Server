@@ -20,3 +20,16 @@
                     example: !include examples/usersRegisterResponse.json
             500:
                 !include errorResponse.raml
+
+/organizations/acceptInvitation/{token}:
+    patch:
+        responses:
+            200:
+                body:
+                    type: object
+                    properties:
+                        accepted: boolean
+                    example: 
+                        accepted: true
+            500:
+                !include errorResponse.raml

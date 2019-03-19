@@ -7,5 +7,7 @@ router.get('/:id', usersController.getProfile);
 
 router.post('/register', usersController.register);
 
+router.patch('/organizations/acceptInvitation/:token', usersController.acceptOrganizationInvitation);
+
 
 module.exports = router;
