@@ -4,8 +4,15 @@ var { sendSuccessResponse, sendErrorResponse } = require('../helpers/ResponseHel
 class UsersController{
 
     async register(req, res, next){
+        var data = {
+            name: req.body.name,
+            surname: req.body.surname,
+            email: req.body.email,
+            picture: req.body.picture ? req.body.picture : 'default.jpg'
+        }
+
         try{
-            var user = await UserDao.create(req.body);
+            var user = await UserDao.create(data);
             sendSuccessResponse(res, user);
             
         } catch (err){

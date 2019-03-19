@@ -1,6 +1,7 @@
 var UserDao = require('./UserDao');
 var models = require('../database/sequelize');
 var Organization = models.Organization;
+var { UserNotFoundError } = require('../helpers/Errors');
 
 class OrganizationDao{
 
@@ -8,7 +9,7 @@ class OrganizationDao{
         var user = await UserDao.findById(organization.creatorId);
 
         if (!user){
-            throw new Error("Creator doesn't exist");
+            throw new UserNotFoundError(organization.creatorId);
         }
 
         var org = await Organization.create(organization);

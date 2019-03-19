@@ -4,8 +4,18 @@ var { sendSuccessResponse, sendErrorResponse } = require('../helpers/ResponseHel
 class OrganizationsController{
 
     async create(req, res, next){
+        var data = {
+            name: req.body.name,
+            picture: req.body.picture,
+            latitude: req.body.latitude,
+            longitude: req.body.longitude,
+            description: req.body.description,
+            welcome: req.body.welcome,
+            creatorId: req.body.creatorId
+        }
+
         try{
-            var org = await OrganizationDao.create(req.body);
+            var org = await OrganizationDao.create(data);
             sendSuccessResponse(res, org);
             
         } catch (err){

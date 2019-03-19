@@ -9,7 +9,7 @@ describe('"UserDao Tests"', () => {
 
     describe('Register User without picture', () => {
 
-        var data = {name: "Pepe", surname: "Perez", email:"pepe@gmail.com"};
+        var data = {name: "Pepe", surname: "Perez", email:"pepe@gmail.com", picture: "default"};
         var user;
 
         beforeEach(async () => {
