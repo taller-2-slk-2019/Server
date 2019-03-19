@@ -1,3 +1,13 @@
+/{id}:
+    get:
+        responses:
+            200:
+                body:
+                    type: UserProfile
+                    example: !include examples/usersGetProfileResponse.json
+            500:
+                !include errorResponse.raml
+
 /register:
     post:
         body:
@@ -10,4 +20,3 @@
                     example: !include examples/usersRegisterResponse.json
             500:
                 !include errorResponse.raml
-

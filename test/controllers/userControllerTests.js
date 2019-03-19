@@ -49,5 +49,42 @@ describe('"UserController Tests"', () => {
             expect(response).to.have.property('email', "pepe@gmail.com");
         });
     });
+    
+    describe('Method: Get Information User', () => {
+
+        var req = mockRequest({});
+        req.params.id = 1
+        var res;
+        var expected;
+
+        beforeEach(async () => {
+            res = mockResponse();
+        	await UserController.getProfile(req, res);
+        });
+
+        it('response status must be 200', async () => {
+            expect(res.status).to.have.been.calledWith(200);
+        });
+        
+        it('user must not be null', async () => {
+            var response = res.send.args[0][0];
+            expect(response).to.not.be.null;
+        });
+        
+        it('user name must be Pepe', async () => {
+            var response = res.send.args[0][0];
+            expect(response).to.have.property('name', "Pepe");
+        });
+        
+        it('user surname and must be Perez', async () => {
+            var response = res.send.args[0][0];
+            expect(response).to.have.property('surname', "Perez");
+        });
+
+        it('user email and must be pepe@gmail.com', async () => {
+            var response = res.send.args[0][0];
+            expect(response).to.have.property('email', "pepe@gmail.com");
+        });
+    });
 
 });
