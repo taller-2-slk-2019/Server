@@ -20,6 +20,17 @@ class UsersController{
         }
     }
 
+	async getProfile(req, res, next) {
+		var id = req.params.id
+	    try{
+            var user = await UserDao.findById(id);
+            sendSuccessResponse(res, user);
+            
+        } catch (err){
+            sendErrorResponse(res, err)
+        }
+    }
+
 }
 
 module.exports = new UsersController();
