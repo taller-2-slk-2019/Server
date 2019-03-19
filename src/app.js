@@ -1,6 +1,8 @@
 var express = require('express');
 var app = express();
 
+var logger = require('logops');
+
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 
@@ -29,7 +31,7 @@ app.get('/doc', function(req, res){
 var port = process.env.PORT || 3000;
 
 app.listen(port, function () {
-    console.log(`App listening in port ${port}`);
+    logger.info('App listening in port %i', port);
 });
 
 module.exports = app;

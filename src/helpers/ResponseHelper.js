@@ -1,6 +1,7 @@
+var logger = require('logops');
+
 var sendErrorResponse = function(res, err){
-    console.log('-----------------------------------------------------------------------');
-    console.log(err.stack);
+    logger.error(err);
     var response = { error : err.message };
     res.status(500).send(response);
 }
