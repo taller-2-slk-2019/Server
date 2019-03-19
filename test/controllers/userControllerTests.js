@@ -50,16 +50,19 @@ describe('"UserController Tests"', () => {
         });
     });
     
-    describe('Method: Get Information User', () => {
+    describe('Method: Get Profile', () => {
 
         var req = mockRequest({});
-        req.params.id = 1
         var res;
         var expected;
 
+        before(async () => {
+            req.params.id = (await User.findOne()).id;
+        });
+
         beforeEach(async () => {
             res = mockResponse();
-        	await UserController.getProfile(req, res);
+            await UserController.getProfile(req, res);
         });
 
         it('response status must be 200', async () => {
