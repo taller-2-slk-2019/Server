@@ -7,4 +7,6 @@ router.get('/:id', organizationsController.get);
 
 router.post('/create', organizationsController.create);
 
+router.patch('/:id/inviteUser/:userId', organizationsController.inviteUser);
+
 module.exports = router;

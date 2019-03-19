@@ -20,3 +20,16 @@
                     example: !include examples/organizationsCreateResponse.json
             500:
                 !include errorResponse.raml
+
+/{id}/inviteUser/{userId}:
+    patch:
+        responses:
+            200:
+                body:
+                    type: object
+                    properties:
+                        invitationToken: string
+                    example: 
+                        invitationToken: "a8a9189b251514048dd3959b9ea376533e3499ff"
+            500:
+                !include errorResponse.raml

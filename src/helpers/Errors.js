@@ -12,7 +12,23 @@ class OrganizationNotFoundError extends Error {
     }
 }
 
+class UserAlreadyInvitedError extends Error {
+    constructor(organizationId, userId) {
+        super(`User ${userId} is already invited to organization ${organizationId}`);
+        this.name = this.constructor.name;
+    }
+}
+
+class UserAlreadyInOrganizationError extends Error {
+    constructor(organizationId, userId) {
+        super(`User ${userId} already belongs to organization ${organizationId}`);
+        this.name = this.constructor.name;
+    }
+}
+
 module.exports = {
     UserNotFoundError: UserNotFoundError,
     OrganizationNotFoundError: OrganizationNotFoundError,
+    UserAlreadyInvitedError: UserAlreadyInvitedError,
+    UserAlreadyInOrganizationError: UserAlreadyInOrganizationError,
 }

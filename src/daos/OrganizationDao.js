@@ -1,3 +1,4 @@
+var sha1 = require('sha1');
 var UserDao = require('./UserDao');
 var models = require('../database/sequelize');
 var Organization = models.Organization;
@@ -21,6 +22,12 @@ class OrganizationDao{
     async findById(id){
         return await Organization.findByPk(id, 
             { include : [models.User, models.Channel] });
+    }
+
+    async inviteUser(organization, user){
+        var token = sha1(Date.now());
+        await organization.addInvitedUser(user, { through: {token: token } });
+        return token;
     }
 
 }

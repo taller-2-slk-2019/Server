@@ -213,8 +213,6 @@ pre code {
                 "role": "creator",
                 "createdAt": "2019-01-01T03:00:00.000Z",
                 "updatedAt": "2019-01-01T03:00:00.000Z",
-                "OrganizationId": 1,
-                "UserId": 1
             }
         }
     ],
@@ -227,8 +225,6 @@ pre code {
             "welcome": "welcome to the org!",
             "createdAt": "2019-03-19T19:09:34.278Z",
             "updatedAt": "2019-03-19T19:09:34.278Z",
-            "CreatorId": 1,
-            "OrganizationId": 1
         },
         {
             "id": 10,
@@ -238,19 +234,6 @@ pre code {
             "welcome": "welcome to the org!",
             "createdAt": "2019-03-19T19:09:53.672Z",
             "updatedAt": "2019-03-19T19:09:53.672Z",
-            "CreatorId": 1,
-            "OrganizationId": 1
-        },
-        {
-            "id": 11,
-            "name": "org",
-            "visibility": "public",
-            "description": "description for organization",
-            "welcome": "welcome to the org!",
-            "createdAt": "2019-03-19T19:10:33.009Z",
-            "updatedAt": "2019-03-19T19:10:33.009Z",
-            "CreatorId": 1,
-            "OrganizationId": 1
         }
     ]
 }</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/500" target="_blank">500</a></h2><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>error</strong>: <em><span class="required">required</span>(string)</em></li></ul><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
@@ -273,6 +256,10 @@ pre code {
     "welcome": "welcome to the org!",
     "updatedAt": "2019-03-18T19:36:23.706Z",
     "createdAt": "2019-03-18T19:36:23.706Z"
+}</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/500" target="_blank">500</a></h2><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>error</strong>: <em><span class="required">required</span>(string)</em></li></ul><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
+    "error": "some error message"
+}</code></pre></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_organizations__id__inviteuser__userid_"><span class="parent">/organizations</span>/{id}/inviteUser/{userId}</a> <span class="methods"><a href="#organizations__id__inviteuser__userid__patch"><span class="badge badge_patch">patch</span></a></span></h4></div><div id="panel_organizations__id__inviteuser__userid_" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#organizations__id__inviteuser__userid__patch'" class="list-group-item"><span class="badge badge_patch">patch</span><div class="method_description"></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="organizations__id__inviteuser__userid__patch"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_patch">patch</span> <span class="parent">/organizations</span>/{id}/inviteUser/{userId}</h4></div><div class="modal-body"><ul class="nav nav-tabs"><li class="active"><a href="#organizations__id__inviteuser__userid__patch_request" data-toggle="tab">Request</a></li><li><a href="#organizations__id__inviteuser__userid__patch_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="organizations__id__inviteuser__userid__patch_request"><h3>URI Parameters</h3><ul><li><strong>id</strong>: <em><span class="required">required</span>(string)</em></li><li><strong>userId</strong>: <em><span class="required">required</span>(string)</em></li></ul></div><div class="tab-pane" id="organizations__id__inviteuser__userid__patch_response"><h2>HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>invitationToken</strong>: <em><span class="required">required</span>(string)</em></li></ul><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
+  "invitationToken": "a8a9189b251514048dd3959b9ea376533e3499ff"
 }</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/500" target="_blank">500</a></h2><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>error</strong>: <em><span class="required">required</span>(string)</em></li></ul><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
     "error": "some error message"
 }</code></pre></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default"><div class="panel-heading"><h3 id="channels" class="panel-title">/channels</h3></div><div class="panel-body"><div class="panel-group"><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_channels_create"><span class="parent">/channels</span>/create</a> <span class="methods"><a href="#channels_create_post"><span class="badge badge_post">post</span></a></span></h4></div><div id="panel_channels_create" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#channels_create_post'" class="list-group-item"><span class="badge badge_post">post</span><div class="method_description"></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="channels_create_post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post</span> <span class="parent">/channels</span>/create</h4></div><div class="modal-body"><ul class="nav nav-tabs"><li class="active"><a href="#channels_create_post_request" data-toggle="tab">Request</a></li><li><a href="#channels_create_post_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="channels_create_post_request"><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em><span class="required">required</span>(string)</em></li><li><strong>description</strong>: <em><span class="required">required</span>(string)</em></li><li><strong>welcome</strong>: <em><span class="required">required</span>(string)</em></li><li><strong>creatorId</strong>: <em><span class="required">required</span>(integer)</em></li><li><strong>organizationId</strong>: <em><span class="required">required</span>(integer)</em></li></ul><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
