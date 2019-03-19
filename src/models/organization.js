@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
 
   Organization.associate = function(models) {
     Organization.belongsToMany(models.User, { through: models.UserOrganizations });
+    Organization.hasMany(models.Channel);
   };
 
   return Organization;

@@ -11,6 +11,18 @@ User:
     latitude?: number
     longitude?: number
 
+UserRole:
+  type: object
+  properties:
+    role: string
+    updatedAt: datetime
+    createdAt: datetime
+
+UserWithRole:
+    type: User
+    properties:
+        UserOrganizations: UserRole
+
 UserRequest:
   type: object
   properties:
@@ -31,6 +43,12 @@ Organization:
         welcome: string
         updatedAt: datetime
         createdAt: datetime
+
+OrganizationProfile:
+    type: Organization
+    properties:
+        Users: UserWithRole[]
+        Channels: Channel[]
 
 OrganizationRequest:
     type: object

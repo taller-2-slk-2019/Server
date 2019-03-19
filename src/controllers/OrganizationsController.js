@@ -3,6 +3,16 @@ var { sendSuccessResponse, sendErrorResponse } = require('../helpers/ResponseHel
 
 class OrganizationsController{
 
+    async get(req, res, next){
+        var id = req.params.id;
+        try {
+            var org = await OrganizationDao.findById(id);
+            sendSuccessResponse(res, org);
+        } catch (err){
+            sendErrorResponse(res, err)
+        }
+    }
+
     async create(req, res, next){
         var data = {
             name: req.body.name,

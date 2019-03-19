@@ -19,7 +19,8 @@ class OrganizationDao{
     }
 
     async findById(id){
-        return await Organization.findByPk(id);
+        return await Organization.findByPk(id, 
+            { include : [models.User, models.Channel] });
     }
 
 }

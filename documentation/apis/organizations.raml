@@ -1,3 +1,13 @@
+/{id}:
+    get:
+        responses:
+            200:
+                body:
+                    type: OrganizationProfile
+                    example: !include examples/organizationsGetByIdResponse.json
+            500:
+                !include errorResponse.raml
+
 /create:
     post:
         body:
