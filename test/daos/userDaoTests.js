@@ -3,7 +3,12 @@ const chaiAsPromised = require('chai-as-promised');
 const expect = chai.expect;
 chai.use(chaiAsPromised);
 
+var SequelizeValidationError = require('../../src/database/sequelize').Sequelize.SequelizeValidationError;
+
 var UserDao = require('../../src/daos/UserDao');
+
+var models = require('../../src/database/sequelize');
+var User = models.User;
 
 describe('"UserDao Tests"', () => {
 
@@ -37,23 +42,62 @@ describe('"UserDao Tests"', () => {
 
         it('empty user must not be registered', async () => {
             var data = {};
-            expect(UserDao.create(data)).to.eventually.be.rejected;
+            expect(UserDao.create(data)).to.eventually.be.rejectedWith(SequelizeValidationError);
         });
 
         it('user must not be registered without name', async () => {
             var data = {surname: "Perez", email:"pepe@gmail.com"};
-            expect(UserDao.create(data)).to.eventually.be.rejected;
+            expect(UserDao.create(data)).to.eventually.be.rejectedWith(SequelizeValidationError);
         });
 
         it('user must not be registered without surname', async () => {
             var data = {name: "Pepe", email:"pepe@gmail.com"};
-            expect(UserDao.create(data)).to.eventually.be.rejected;
+            expect(UserDao.create(data)).to.eventually.be.rejectedWith(SequelizeValidationError);
         });
 
         it('user must not be registered without email', async () => {
             var data = {name: "Pepe", surname: "Perez"};
-            expect(UserDao.create(data)).to.eventually.be.rejected;
+            expect(UserDao.create(data)).to.eventually.be.rejectedWith(SequelizeValidationError);
         });
+    });
+
+    describe('Method: Find by id', () => {
+        var data = {name: "Pepe", surname: "Perez", email:"pepe@gmail.com", picture: "default"};
+        var expected;
+        var user;
+
+        before(async () => {
+            expected = await User.create(data);
+            user = await UserDao.findById(expected.id);
+        });
+
+        it('user must not be null', async () => {
+            expect(user).to.not.be.null;
+        });
+        
+        it('user must have correct id', async () => {
+            expect(user).to.have.property('id', expected.id);
+        });
+        
+        it('user name must be Pepe', async () => {
+            expect(user).to.have.property('name', "Pepe");
+        });
+
+        it('user must be null if id does not exist', async () => {
+            user = await UserDao.findById(9999999);
+            expect(user).to.be.null;
+        });
+
+        it('user must be null if id is 0', async () => {
+            user = await UserDao.findById(-1);
+            expect(user).to.be.null;
+        });
+
+        it('user must be null if id is 0', async () => {
+            user = await UserDao.findById(-1);
+            expect(user).to.be.null;
+        });
+
     });
 
 });

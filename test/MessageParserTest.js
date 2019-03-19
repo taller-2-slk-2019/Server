@@ -58,6 +58,11 @@ describe('"Message Parser Tests"', () => {
             var msg = "Hello @ how are you? I am good";
             expect(messageParser.getMentionedUsers(msg)).to.be.an('array').that.is.empty;
         });
+
+        it('must return empty array for message with @ inside a word', async () => {
+            var msg = "Hello pepe@pepe how are you? I am good";
+            expect(messageParser.getMentionedUsers(msg)).to.be.an('array').that.is.empty;
+        });
     });
 
 });

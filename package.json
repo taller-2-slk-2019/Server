@@ -10,7 +10,7 @@
     "db:reset": "npx sequelize db:migrate:undo:all",
     "db:migrate": "npx sequelize db:migrate",
     "db": "npm run db:reset && npm run db:migrate",
-    "test": "set NODE_ENV=test&& npm run db && mocha --recursive"
+    "test": "set NODE_ENV=test&& set LOGOPS_LEVEL=FATAL&& npm run db && mocha --recursive"
   },
   "keywords": [
     "taller2"

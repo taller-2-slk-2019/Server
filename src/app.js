@@ -2,6 +2,7 @@ var express = require('express');
 var app = express();
 
 var logger = require('logops');
+logger.format = logger.formatters.dev;
 
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
