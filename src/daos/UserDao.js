@@ -17,6 +17,7 @@ class UserDao{
     }
     
     async update(user, id){
+        var old_user = await this.findById(id);
         await User.update(user, {where: {id: id}});
     }
 

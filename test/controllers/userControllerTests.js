@@ -11,7 +11,6 @@ var UserController = require('../../src/controllers/UsersController');
 var models = require('../../src/database/sequelize');
 var User = models.User;
 var {UserNotFoundError } = require('../../src/helpers/Errors');
-var UserDao = require('../../src/daos/UserDao');
 
 describe('"UserController Tests"', () => {
 
@@ -159,17 +158,17 @@ describe('"UserController Tests"', () => {
         });
         
         it('user name must be Pepe', async () => {
-            var updated_user = await UserDao.findById(id);
+            var updated_user = await User.findByPk(id);
             expect(updated_user).to.have.property('name', "Pepe");
         });
         
         it('user surname and must be Rodriguez', async () => {
-            var updated_user = await UserDao.findById(id);
+            var updated_user = await User.findByPk(id);
             expect(updated_user).to.have.property('surname', "Rodriguez");
         });
 
         it('user email and must be pepe_rodriguez@gmail.com', async () => {
-            var updated_user = await UserDao.findById(id);
+            var updated_user = await User.findByPk(id);
             expect(updated_user).to.have.property('email', "pepe_rodriguez@gmail.com");
         });
     });
@@ -221,12 +220,12 @@ describe('"UserController Tests"', () => {
         });
         
         it('user latitude must be 1.234', async () => {
-            var updated_user = await UserDao.findById(id);
+            var updated_user = await User.findByPk(id);
             expect(updated_user.latitude).to.equal(1.234);
         });
         
         it('user longitude and must be 2.128', async () => {
-            var updated_user = await UserDao.findById(id);
+            var updated_user = await User.findByPk(id);
             expect(updated_user.longitude).to.equal(2.128);
         });
     });

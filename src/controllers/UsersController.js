@@ -42,7 +42,6 @@ class UsersController{
         }
         try{
             var id = req.params.id
-            var user = await UserDao.findById(id);
             await UserDao.update(data, id);
             logger.info("User " + id + " updated");
             sendEmptySuccessResponse(res);
@@ -51,8 +50,7 @@ class UsersController{
             sendErrorResponse(res, err)
         }
     }
-    ///////////////////////////// Refactorizar esta con la de profile?
-    ///////////////////////////////// Cambiar ruta? <----- ahora no podes cambiar lat y long porque llama a la otra funcion
+
     async updateLocation(req, res, next) {
         var data = {
             latitude: req.body.latitude,
@@ -60,8 +58,6 @@ class UsersController{
         }
         try{
             var id = req.params.id
-            var user = await UserDao.findById(id);
-
             await UserDao.update(data, id);
             logger.info("Location from user " + id + " updated");
             sendEmptySuccessResponse(res);

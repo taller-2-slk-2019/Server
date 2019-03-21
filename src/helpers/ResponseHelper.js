@@ -11,7 +11,7 @@ var sendSuccessResponse = function(res, data){
 }
 
 var sendEmptySuccessResponse = function(res){
-    sendSuccessResponse(res, {accepted: true});
+    sendSuccessResponse(res, {success: true});
 }
 
 module.exports = {

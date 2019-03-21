@@ -1,9 +1,0 @@
-{
-    "name": "org", 
-    "picture": "picture", 
-    "latitude": 1234.434, 
-    "longitude": 123.432, 
-    "description": "description for organization", 
-    "welcome": "welcome to the org!", 
-    "creatorId": 1
-}

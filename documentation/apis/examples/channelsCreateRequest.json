@@ -1,8 +1,0 @@
-{
-    "name": "channel",
-    "visibility": "public",
-    "description": "description for channel", 
-    "welcome": "welcome to the org!", 
-    "creatorId": 1,
-    "organizationId": 1
-}
