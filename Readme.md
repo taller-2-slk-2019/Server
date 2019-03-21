@@ -8,7 +8,7 @@ https://slack-taller2.herokuapp.com/
 
 ### Documentación
 
-https://slack-taller2.herokuapp.com/doc
+https://taller-2-slk-2019.github.io
 
 - Raml: https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md/
 
