@@ -1,7 +1,7 @@
 var logger = require('logops');
 var UserDao = require('../daos/UserDao');
 var OrganizationDao = require('../daos/OrganizationDao');
-var { sendSuccessResponse, sendErrorResponse } = require('../helpers/ResponseHelper');
+var { sendSuccessResponse, sendErrorResponse, sendEmptySuccessResponse } = require('../helpers/ResponseHelper');
 
 class UsersController{
 
@@ -12,9 +12,9 @@ class UsersController{
             email: req.body.email,
             picture: req.body.picture ? req.body.picture : 'default.jpg'
         }
-
         try{
             var user = await UserDao.create(data);
+            logger.info("User created: " + user.id);
             sendSuccessResponse(res, user);
             
         } catch (err){
@@ -32,13 +32,51 @@ class UsersController{
             sendErrorResponse(res, err);
         }
     }
+    
+    async updateProfile(req, res, next) {
+        var data = {
+            name: req.body.name,
+            surname: req.body.surname,
+            email: req.body.email,
+            picture: req.body.picture ? req.body.picture : 'default.jpg'
+        }
+        try{
+            var id = req.params.id
+            var user = await UserDao.findById(id);
+            await UserDao.update(data, id);
+            logger.info("User " + id + " updated");
+            sendEmptySuccessResponse(res);
+
+        } catch (err){
+            sendErrorResponse(res, err)
+        }
+    }
+    ///////////////////////////// Refactorizar esta con la de profile?
+    ///////////////////////////////// Cambiar ruta? <----- ahora no podes cambiar lat y long porque llama a la otra funcion
+    async updateLocation(req, res, next) {
+        var data = {
+            latitude: req.body.latitude,
+            longitude: req.body.longitude,
+        }
+        try{
+            var id = req.params.id
+            var user = await UserDao.findById(id);
+
+            await UserDao.update(data, id);
+            logger.info("Location from user " + id + " updated");
+            sendEmptySuccessResponse(res);
+            
+        } catch (err){
+            sendErrorResponse(res, err)
+        }
+    }
 
     async acceptOrganizationInvitation(req, res, next){
         var token = req.params.token;
 
         try{
             await OrganizationDao.acceptUserInvitation(token);
-            sendSuccessResponse(res, {accepted: true});
+            sendEmptySuccessResponse(res);
         } catch (err){
             sendErrorResponse(res, err);
         }

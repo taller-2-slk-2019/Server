@@ -13,10 +13,6 @@ class OrganizationDao{
     async create(organization){
         var user = await UserDao.findById(organization.creatorId);
 
-        if (!user){
-            throw new UserNotFoundError(organization.creatorId);
-        }
-
         var org = await Organization.create(organization);
         await org.addUser(user, { through: {role: (new UserRoleCreator()).name } });
 
@@ -24,8 +20,12 @@ class OrganizationDao{
     }
 
     async findById(id){
-        return await Organization.findByPk(id, 
+        var org = await Organization.findByPk(id, 
             { include : [models.User, models.Channel] });
+        if (!org){
+            throw new OrganizationNotFoundError(id);
+        }
+        return org;
     }
 
     async inviteUser(organizationId, userId){
@@ -46,9 +46,6 @@ class OrganizationDao{
         }
 
         var user = await UserDao.findById(userId);
-        if (!user){
-            throw new UserNotFoundError(userId);
-        }
 
         var token = sha1(Date.now());
         await organization.addInvitedUser(user, { through: {token: token } });

@@ -3,8 +3,28 @@
         responses:
             200:
                 body:
-                    type: UserProfile
+                    type: User
                     example: !include examples/usersGetProfileResponse.json
+            500:
+                !include errorResponse.raml
+    patch:
+        body:
+            type: UserRequest
+            example: !include examples/usersUpdateProfileRequest.json
+        responses:
+            200:
+                body:
+                    type:
+            500:
+                !include errorResponse.raml
+    patch:
+        body:
+            type: UserUpdateLocation
+            example: !include examples/usersUpdateLocationRequest.json
+        responses:
+            200:
+                body:
+                    type:
             500:
                 !include errorResponse.raml
 

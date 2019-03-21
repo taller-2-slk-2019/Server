@@ -9,6 +9,7 @@ var UserDao = require('../../src/daos/UserDao');
 
 var models = require('../../src/database/sequelize');
 var User = models.User;
+var { UserNotFoundError } = require('../../src/helpers/Errors');
 
 describe('"UserDao Tests"', () => {
 
@@ -83,19 +84,22 @@ describe('"UserDao Tests"', () => {
             expect(user).to.have.property('name', "Pepe");
         });
 
-        it('user must be null if id does not exist', async () => {
-            user = await UserDao.findById(9999999);
-            expect(user).to.be.null;
+        it('throws exception if id does not exist', async () => {
+            //user = await UserDao.findById(9999999);
+            //expect(user).to.be.null;
+            expect(UserDao.findById(9999999)).to.eventually.be.rejectedWith(UserNotFoundError);
         });
 
-        it('user must be null if id is 0', async () => {
-            user = await UserDao.findById(-1);
-            expect(user).to.be.null;
+        it('throws exception if id is 0', async () => {
+            //user = await UserDao.findById(0);
+            //expect(user).to.be.null;
+            expect(UserDao.findById(0)).to.eventually.be.rejectedWith(UserNotFoundError);
         });
 
-        it('user must be null if id is 0', async () => {
-            user = await UserDao.findById(-1);
-            expect(user).to.be.null;
+        it('throws exception if id is -1', async () => {
+            //user = await UserDao.findById(-1);
+            //expect(user).to.be.null;
+            expect(UserDao.findById(-1)).to.eventually.be.rejectedWith(UserNotFoundError);
         });
 
     });

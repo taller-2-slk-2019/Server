@@ -1,5 +1,6 @@
 var models = require('../database/sequelize');
 var User = models.User;
+var { UserNotFoundError } = require('../helpers/Errors');
 
 class UserDao{
 
@@ -8,7 +9,15 @@ class UserDao{
     }
 
     async findById(id){
-        return await User.findByPk(id);
+        var user = await User.findByPk(id);
+        if (!user) {
+            throw new UserNotFoundError(id)
+        }
+        return user;
+    }
+    
+    async update(user, id){
+        await User.update(user, {where: {id: id}});
     }
 
 }

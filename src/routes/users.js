@@ -7,6 +7,8 @@ router.get('/:id', usersController.getProfile);
 
 router.post('/register', usersController.register);
 
+router.patch('/:id', usersController.updateProfile)
+
 router.patch('/organizations/acceptInvitation/:token', usersController.acceptOrganizationInvitation);
 
 

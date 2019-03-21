@@ -1,22 +1,22 @@
 User:
-  type: object
-  properties:
-    id: integer
-    name: string
-    surname: string
-    email: string
-    picture: string
-    updatedAt: datetime
-    createdAt: datetime
-    latitude?: number
-    longitude?: number
+    type: object
+    properties:
+        id: integer
+        name: string
+        surname: string
+        email: string
+        picture: string
+        updatedAt: datetime
+        createdAt: datetime
+        latitude?: number
+        longitude?: number
 
 UserRole:
-  type: object
-  properties:
-    role: string
-    updatedAt: datetime
-    createdAt: datetime
+    type: object
+    properties:
+        role: string
+        updatedAt: datetime
+        createdAt: datetime
 
 UserWithRole:
     type: User
@@ -24,12 +24,18 @@ UserWithRole:
         UserOrganizations: UserRole
 
 UserRequest:
-  type: object
-  properties:
-    name: string
-    surname: string
-    email: string
-    picture?: string
+    type: object
+    properties:
+        name: string
+        surname: string
+        email: string
+        picture?: string
+    
+UserUpdateLocation:
+    type: object
+    properties:
+        latitude: number
+        longitude: number
 
 Organization:
     type: object

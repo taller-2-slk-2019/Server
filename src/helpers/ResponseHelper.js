@@ -10,7 +10,12 @@ var sendSuccessResponse = function(res, data){
     res.status(200).send(data);
 }
 
+var sendEmptySuccessResponse = function(res){
+    sendSuccessResponse(res, {accepted: true});
+}
+
 module.exports = {
     sendErrorResponse: sendErrorResponse,
-    sendSuccessResponse: sendSuccessResponse
+    sendSuccessResponse: sendSuccessResponse,
+    sendEmptySuccessResponse: sendEmptySuccessResponse
 }
