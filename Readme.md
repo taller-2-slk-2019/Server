@@ -1,6 +1,7 @@
 # Taller de Programación II
 
 [![Build Status](https://travis-ci.org/taller-2-slk-2019/Server.svg?branch=master)](https://travis-ci.org/taller-2-slk-2019/Server)
+[![Coverage Status](https://coveralls.io/repos/github/taller-2-slk-2019/Server/badge.svg?branch=refactor)](https://coveralls.io/github/taller-2-slk-2019/Server?branch=refactor)
 
 ## Server
 
@@ -19,6 +20,10 @@ https://taller-2-slk-2019.github.io
 ### Travis
 
 https://travis-ci.org/taller-2-slk-2019/Server
+
+### Coveralls
+
+https://coveralls.io/github/taller-2-slk-2019/Server
 
 ### Instalación
 
