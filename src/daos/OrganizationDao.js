@@ -2,9 +2,9 @@ var sha1 = require('sha1');
 var logger = require('logops');
 var UserDao = require('./UserDao');
 var models = require('../database/sequelize');
-var Organization = models.Organization;
-var OrganizationUserInvitation = models.OrganizationUserInvitation;
-var { UserAlreadyInvitedError, UserAlreadyInOrganizationError, UserNotFoundError,
+var Organization = models.organization;
+var OrganizationUserInvitation = models.organizationUserInvitation;
+var { UserAlreadyInvitedError, UserAlreadyInOrganizationError,
              InvalidOrganizationInvitationTokenError, OrganizationNotFoundError} = require('../helpers/Errors');
 var UserRoleCreator = require('../models/userRoles/UserRoleCreator');
 var UserRoleMember = require('../models/userRoles/UserRoleMember');
@@ -22,7 +22,7 @@ class OrganizationDao{
 
     async findById(id){
         var org = await Organization.findByPk(id, 
-            { include : [models.User, models.Channel] });
+            { include : [models.user, models.channel] });
         if (!org){
             throw new OrganizationNotFoundError(id);
         }
@@ -39,7 +39,7 @@ class OrganizationDao{
 
         var invitedUser = (await organization.getInvitedUsers()).find((usr) => usr.id == userId);
         if (invitedUser){
-            if (invitedUser.OrganizationUserInvitation.hasExpired()){
+            if (invitedUser.organizationUserInvitation.hasExpired()){
                 await organization.removeInvitedUser(userId);
             } else {
                 throw new UserAlreadyInvitedError(organization.id, userId);
@@ -63,8 +63,8 @@ class OrganizationDao{
             throw new InvalidOrganizationInvitationTokenError(token);
         }
 
-        var org = await this.findById(invitation.OrganizationId);
-        var user = await UserDao.findById(invitation.UserId);
+        var org = await this.findById(invitation.organizationId);
+        var user = await UserDao.findById(invitation.userId);
 
         await org.addUser(user, { through: {role: (new UserRoleMember()).name } });
         await invitation.destroy();

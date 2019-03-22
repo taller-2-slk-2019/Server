@@ -1,8 +1,7 @@
 var UserDao = require('./UserDao');
 var OrganizationDao = require('./OrganizationDao');
 var models = require('../database/sequelize');
-var Channel = models.Channel;
-var { UserNotFoundError, OrganizationNotFound } = require('../helpers/Errors');
+var Channel = models.channel;
 
 class ChannelDao{
 
@@ -12,8 +11,8 @@ class ChannelDao{
 
         var organization = await OrganizationDao.findById(channel.organizationId);
 
-        channel.CreatorId = user.id;
-        channel.OrganizationId = organization.id;
+        channel.creatorId = user.id;
+        channel.organizationId = organization.id;
 
         return await Channel.create(channel);
     }

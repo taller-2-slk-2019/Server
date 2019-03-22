@@ -1,6 +1,6 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
-  const Organization = sequelize.define('Organization', {
+  const Organization = sequelize.define('organization', {
     name: { type: DataTypes.STRING, allowNull: false, validate: { notNull: true } },
     picture: { type: DataTypes.STRING, allowNull: false, validate: { notNull: true } },
     latitude: { type: DataTypes.FLOAT, allowNull: false, validate: { notNull: true } },
@@ -10,9 +10,9 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
 
   Organization.associate = function(models) {
-    Organization.belongsToMany(models.User, { through: models.UserOrganizations });
-    Organization.belongsToMany(models.User, { through: models.OrganizationUserInvitation, as: 'InvitedUsers' });
-    Organization.hasMany(models.Channel);
+    Organization.belongsToMany(models.user, { through: models.userOrganizations });
+    Organization.belongsToMany(models.user, { through: models.organizationUserInvitation, as: 'invitedUsers' });
+    Organization.hasMany(models.channel);
   };
 
   return Organization;

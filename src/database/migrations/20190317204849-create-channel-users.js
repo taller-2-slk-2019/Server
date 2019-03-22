@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('ChannelUsers', {
+    return queryInterface.createTable('channelUsers', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -16,25 +16,25 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE
       },
-      UserId: {
+      userId: {
         allowNull: false,
         type: Sequelize.INTEGER,
         references: {
-          model: 'Users',
+          model: 'users',
           key: 'id'
         }
       },
-      ChannelId: {
+      channelId: {
         allowNull: false,
         type: Sequelize.INTEGER,
         references: {
-          model: 'Channels',
+          model: 'channels',
           key: 'id'
         }
       }
     });
   },
-  down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('ChannelUsers');
+  down: (queryInterface) => {
+    return queryInterface.dropTable('channelUsers');
   }
 };

@@ -5,13 +5,14 @@ var { sendSuccessResponse, sendErrorResponse, sendEmptySuccessResponse } = requi
 
 class UsersController{
 
-    async register(req, res, next){
+    async register(req, res){
         var data = {
             name: req.body.name,
             surname: req.body.surname,
             email: req.body.email,
             picture: req.body.picture ? req.body.picture : 'default.jpg'
-        }
+        };
+
         try{
             var user = await UserDao.create(data);
             logger.info("User created: " + user.id);
@@ -22,52 +23,54 @@ class UsersController{
         }
     }
 
-    async getProfile(req, res, next) {
-        var id = req.params.id
+    async getProfile(req, res) {
+        var id = req.params.id;
+
         try{
             var user = await UserDao.findById(id);
             sendSuccessResponse(res, user);
-            
         } catch (err){
             sendErrorResponse(res, err);
         }
     }
     
-    async updateProfile(req, res, next) {
+    async updateProfile(req, res) {
         var data = {
             name: req.body.name,
             surname: req.body.surname,
             email: req.body.email,
             picture: req.body.picture ? req.body.picture : 'default.jpg'
-        }
+        };
+
         try{
-            var id = req.params.id
+            var id = req.params.id;
             await UserDao.update(data, id);
             logger.info("User " + id + " updated");
             sendEmptySuccessResponse(res);
 
         } catch (err){
-            sendErrorResponse(res, err)
+            sendErrorResponse(res, err);
         }
     }
 
-    async updateLocation(req, res, next) {
+    async updateLocation(req, res) {
         var data = {
             latitude: req.body.latitude,
             longitude: req.body.longitude,
-        }
+        };
+
         try{
-            var id = req.params.id
+            var id = req.params.id;
             await UserDao.update(data, id);
             logger.info("Location from user " + id + " updated");
             sendEmptySuccessResponse(res);
             
         } catch (err){
-            sendErrorResponse(res, err)
+            sendErrorResponse(res, err);
         }
     }
 
-    async acceptOrganizationInvitation(req, res, next){
+    async acceptOrganizationInvitation(req, res){
         var token = req.params.token;
 
         try{

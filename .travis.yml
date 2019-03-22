@@ -7,3 +7,4 @@ services:
   - postgresql
 before_script:
   - psql -c 'create database slack_server_test;' -U postgres
+after_success: npm run coverage

@@ -4,11 +4,11 @@ var Config = require ('../helpers/Config');
 var moment = require('moment');
 
 module.exports = (sequelize, DataTypes) => {
-  const OrganizationUserInvitation = sequelize.define('OrganizationUserInvitation', {
+  const OrganizationUserInvitation = sequelize.define('organizationUserInvitation', {
     token: { type: DataTypes.STRING, allowNull: false, validate: { notNull: true } },
   }, {});
 
-  OrganizationUserInvitation.associate = function(models) {
+  OrganizationUserInvitation.associate = function() {
     // associations can be defined here
   };
 

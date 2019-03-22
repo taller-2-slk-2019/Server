@@ -8,12 +8,12 @@ var SequelizeValidationError = require('../../src/database/sequelize').Sequelize
 var UserDao = require('../../src/daos/UserDao');
 
 var models = require('../../src/database/sequelize');
-var User = models.User;
+var User = models.user;
 var { UserNotFoundError } = require('../../src/helpers/Errors');
 
 describe('"UserDao Tests"', () => {
 
-    describe('Register User without picture', () => {
+    describe('Register User', () => {
 
         var data = {name: "Pepe", surname: "Perez", email:"pepe@gmail.com", picture: "default"};
         var user;
@@ -24,6 +24,10 @@ describe('"UserDao Tests"', () => {
 
         it('user must be registered', async () => {
             expect(user).to.not.be.null;
+        });
+
+        it('user must hava an id', async () => {
+            expect(user).to.have.property('id');
         });
 
         it('user name must be Pepe', async () => {
@@ -62,7 +66,7 @@ describe('"UserDao Tests"', () => {
         });
     });
 
-    describe('Method: Find by id', () => {
+    describe('Find by id', () => {
         var data = {name: "Pepe", surname: "Perez", email:"pepe@gmail.com", picture: "default"};
         var expected;
         var user;
@@ -94,6 +98,52 @@ describe('"UserDao Tests"', () => {
 
         it('throws exception if id is -1', async () => {
             expect(UserDao.findById(-1)).to.eventually.be.rejectedWith(UserNotFoundError);
+        });
+
+    });
+
+    describe('Find by id', () => {
+        var data = {name: "Pepe", surname: "Perez", email:"pepe@gmail.com", picture: "default"};
+        var edited = {name: "Carlos", surname: "Juarez"};
+        var expected;
+        var user;
+
+        before(async () => {
+            expected = await User.create(data);
+            await UserDao.update(edited, expected.id);
+            user = await User.findByPk(expected.id);
+        });
+
+        it('user must not be null', async () => {
+            expect(user).to.not.be.null;
+        });
+        
+        it('user must have correct id', async () => {
+            expect(user).to.have.property('id', expected.id);
+        });
+        
+        it('user name must be Carlos', async () => {
+            expect(user).to.have.property('name', "Carlos");
+        });
+
+        it('user surname must be Juarez', async () => {
+            expect(user).to.have.property('surname', "Juarez");
+        });
+
+        it('user email must not change', async () => {
+            expect(user).to.have.property('email', "pepe@gmail.com");
+        });
+
+        it('throws exception if id does not exist', async () => {
+            expect(UserDao.update(edited, 9999999)).to.eventually.be.rejectedWith(UserNotFoundError);
+        });
+
+        it('throws exception if id is 0', async () => {
+            expect(UserDao.update(edited, 0)).to.eventually.be.rejectedWith(UserNotFoundError);
+        });
+
+        it('throws exception if id is -1', async () => {
+            expect(UserDao.update(edited, -1)).to.eventually.be.rejectedWith(UserNotFoundError);
         });
 
     });
