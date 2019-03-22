@@ -4,7 +4,7 @@ var UserDao = require('./UserDao');
 var models = require('../database/sequelize');
 var Organization = models.organization;
 var OrganizationUserInvitation = models.organizationUserInvitation;
-var { UserAlreadyInvitedError, UserAlreadyInOrganizationError, UserNotFoundError,
+var { UserAlreadyInvitedError, UserAlreadyInOrganizationError,
              InvalidOrganizationInvitationTokenError, OrganizationNotFoundError} = require('../helpers/Errors');
 var UserRoleCreator = require('../models/userRoles/UserRoleCreator');
 var UserRoleMember = require('../models/userRoles/UserRoleMember');

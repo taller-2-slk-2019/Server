@@ -11,7 +11,7 @@ class UserDao{
     async findById(id){
         var user = await User.findByPk(id);
         if (!user) {
-            throw new UserNotFoundError(id)
+            throw new UserNotFoundError(id);
         }
         return user;
     }

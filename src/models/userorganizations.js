@@ -4,7 +4,7 @@ module.exports = (sequelize, DataTypes) => {
     role: { type: DataTypes.STRING, allowNull: false, validate: { notNull: true } }
   }, {});
 
-  UserOrganizations.associate = function(models) {
+  UserOrganizations.associate = function() {
 
   };
   return UserOrganizations;

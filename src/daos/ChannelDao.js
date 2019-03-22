@@ -2,7 +2,6 @@ var UserDao = require('./UserDao');
 var OrganizationDao = require('./OrganizationDao');
 var models = require('../database/sequelize');
 var Channel = models.channel;
-var { UserNotFoundError, OrganizationNotFound } = require('../helpers/Errors');
 
 class ChannelDao{
 

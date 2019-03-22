@@ -39,4 +39,4 @@ module.exports = {
     UserAlreadyInvitedError: UserAlreadyInvitedError,
     UserAlreadyInOrganizationError: UserAlreadyInOrganizationError,
     InvalidOrganizationInvitationTokenError: InvalidOrganizationInvitationTokenError,
-}
+};

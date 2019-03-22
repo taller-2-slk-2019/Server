@@ -10,6 +10,7 @@
     "db:reset": "npx sequelize db:migrate:undo:all",
     "db:migrate": "npx sequelize db:migrate",
     "db": "npm run db:reset && npm run db:migrate",
+    "pretest": "npx eslint src",
     "test": "export NODE_ENV=test || set NODE_ENV=test&& export LOGOPS_LEVEL=FATAL || set LOGOPS_LEVEL=FATAL&& npm run db && mocha --recursive"
   },
   "keywords": [
@@ -34,6 +35,7 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
+    "eslint": "^5.15.3",
     "mocha": "^6.0.2",
     "mock-req-res": "^1.0.4",
     "sinon": "^7.2.7",

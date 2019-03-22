@@ -4,17 +4,17 @@ var { sendSuccessResponse, sendErrorResponse } = require('../helpers/ResponseHel
 
 class OrganizationsController{
 
-    async get(req, res, next){
+    async get(req, res){
         var id = req.params.id;
         try {
             var org = await OrganizationDao.findById(id);
             sendSuccessResponse(res, org);
         } catch (err){
-            sendErrorResponse(res, err)
+            sendErrorResponse(res, err);
         }
     }
 
-    async create(req, res, next){
+    async create(req, res){
         var data = {
             name: req.body.name,
             picture: req.body.picture,
@@ -23,7 +23,7 @@ class OrganizationsController{
             description: req.body.description,
             welcome: req.body.welcome,
             creatorId: req.body.creatorId
-        }
+        };
 
         try{
             var org = await OrganizationDao.create(data);
@@ -35,7 +35,7 @@ class OrganizationsController{
         }
     }
 
-    async inviteUser(req, res, next){
+    async inviteUser(req, res){
         try{
             var organizationId = req.params.id;
             var userId = req.params.userId;
@@ -43,7 +43,7 @@ class OrganizationsController{
             var token = await OrganizationDao.inviteUser(organizationId, userId);
 
             logger.info(`User ${userId} invited to organization ${organizationId} with token: ${token}`);
-            sendSuccessResponse(res, { invitationToken: token });
+            sendSuccessResponse(res, { token: token });
 
         } catch (err){
             sendErrorResponse(res, err);

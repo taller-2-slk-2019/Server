@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
     token: { type: DataTypes.STRING, allowNull: false, validate: { notNull: true } },
   }, {});
 
-  OrganizationUserInvitation.associate = function(models) {
+  OrganizationUserInvitation.associate = function() {
     // associations can be defined here
   };
 

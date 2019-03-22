@@ -1,5 +1,7 @@
 # Taller de Programación II
 
+[![Build Status](https://travis-ci.org/taller-2-slk-2019/Server.svg?branch=master)](https://travis-ci.org/taller-2-slk-2019/Server)
+
 ## Server
 
 ### Heroku
