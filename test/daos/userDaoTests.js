@@ -8,7 +8,7 @@ var SequelizeValidationError = require('../../src/database/sequelize').Sequelize
 var UserDao = require('../../src/daos/UserDao');
 
 var models = require('../../src/database/sequelize');
-var User = models.User;
+var User = models.user;
 var { UserNotFoundError } = require('../../src/helpers/Errors');
 
 describe('"UserDao Tests"', () => {

@@ -9,7 +9,7 @@ const { mockRequest, mockResponse } = require('mock-req-res');
 
 var UserController = require('../../src/controllers/UsersController');
 var models = require('../../src/database/sequelize');
-var User = models.User;
+var User = models.user;
 var {UserNotFoundError } = require('../../src/helpers/Errors');
 
 describe('"UserController Tests"', () => {
