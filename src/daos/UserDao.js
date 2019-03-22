@@ -15,6 +15,14 @@ class UserDao{
         }
         return user;
     }
+
+    async findByEmail(email){
+        var user = await User.findOne({where: {email: email}});
+        if (!user) {
+            throw new UserNotFoundError(email);
+        }
+        return user;
+    }
     
     async update(user, id){
         await this.findById(id);

@@ -33,10 +33,18 @@ class InvalidOrganizationInvitationTokenError extends Error {
     }
 }
 
+class InvalidLocationError extends Error {
+    constructor() {
+        super("Location must have a latitude and a longitude");
+        this.name = this.constructor.name;
+    }
+}
+
 module.exports = {
     UserNotFoundError: UserNotFoundError,
     OrganizationNotFoundError: OrganizationNotFoundError,
     UserAlreadyInvitedError: UserAlreadyInvitedError,
     UserAlreadyInOrganizationError: UserAlreadyInOrganizationError,
     InvalidOrganizationInvitationTokenError: InvalidOrganizationInvitationTokenError,
+    InvalidLocationError,
 };

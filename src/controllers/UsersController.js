@@ -2,6 +2,7 @@ var logger = require('logops');
 var UserDao = require('../daos/UserDao');
 var OrganizationDao = require('../daos/OrganizationDao');
 var { sendSuccessResponse, sendErrorResponse, sendEmptySuccessResponse } = require('../helpers/ResponseHelper');
+var { InvalidLocationError } = require('../helpers/Errors');
 
 class UsersController{
 
@@ -60,6 +61,10 @@ class UsersController{
         };
 
         try{
+            if (!data.latitude || !data.longitude){
+                throw new InvalidLocationError();
+            }
+
             var id = req.params.id;
             await UserDao.update(data, id);
             logger.info("Location from user " + id + " updated");

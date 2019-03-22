@@ -238,5 +238,83 @@ describe('"UserController Tests"', () => {
                 expect(response).to.have.property('error');
             });
         });
+
+        describe('Update Location with Error', () => {
+            describe('Update only latitude', () => {
+                var res;
+                var req;
+
+                before(async () => {
+                    var changes = {latitude: 1.234}
+                    req = mockRequest({ body: changes });
+                    req.params.id = userProfileMock.id;
+                });
+
+                beforeEach(async () => {
+                    res = mockResponse();
+                    await UserController.updateLocation(req, res);
+                });
+
+                it('can not update location', async () => {
+                    expect(res.status).to.have.been.calledWith(500);
+                });
+
+                it('response must have an error', async () => {
+                    var response = res.send.args[0][0];
+                    expect(response).to.have.property('error');
+                });
+            });
+
+            describe('Update only longitude', () => {
+                var res;
+                var req;
+
+                before(async () => {
+                    var changes = {longitude: 1.234}
+                    req = mockRequest({ body: changes });
+                    req.params.id = userProfileMock.id;
+                });
+
+                beforeEach(async () => {
+                    res = mockResponse();
+                    await UserController.updateLocation(req, res);
+                });
+
+                it('can not update location', async () => {
+                    expect(res.status).to.have.been.calledWith(500);
+                });
+
+                it('response must have an error', async () => {
+                    var response = res.send.args[0][0];
+                    expect(response).to.have.property('error');
+                });
+            });
+
+            describe('Update with empty object', () => {
+                var res;
+                var req;
+
+                before(async () => {
+                    var changes = {}
+                    req = mockRequest({ body: changes });
+                    req.params.id = userProfileMock.id;
+                });
+
+                beforeEach(async () => {
+                    res = mockResponse();
+                    await UserController.updateLocation(req, res);
+                });
+
+                it('can not update location', async () => {
+                    expect(res.status).to.have.been.calledWith(500);
+                });
+
+                it('response must have an error', async () => {
+                    var response = res.send.args[0][0];
+                    expect(response).to.have.property('error');
+                });
+            });
+
+        });
     });
 });

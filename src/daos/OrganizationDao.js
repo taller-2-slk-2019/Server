@@ -29,8 +29,10 @@ class OrganizationDao{
         return org;
     }
 
-    async inviteUser(organizationId, userId){
+    async inviteUser(organizationId, userEmail){
         var organization = await this.findById(organizationId);
+
+        var userId = (await UserDao.findByEmail(userEmail)).id; 
 
         var existingUser = (await organization.getUsers()).find((usr) => usr.id == userId);
         if (existingUser){

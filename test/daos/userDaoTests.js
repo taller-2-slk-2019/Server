@@ -102,7 +102,7 @@ describe('"UserDao Tests"', () => {
 
     });
 
-    describe('Find by id', () => {
+    describe('Update', () => {
         var data = {name: "Pepe", surname: "Perez", email:"pepe@gmail.com", picture: "default"};
         var edited = {name: "Carlos", surname: "Juarez"};
         var expected;
@@ -144,6 +144,46 @@ describe('"UserDao Tests"', () => {
 
         it('throws exception if id is -1', async () => {
             expect(UserDao.update(edited, -1)).to.eventually.be.rejectedWith(UserNotFoundError);
+        });
+
+        it('throws if name is null', async () => {
+            newEdited = edited;
+            newEdited.name = null;
+            expect(UserDao.update(newEdited, expected.id)).to.eventually.be.rejectedWith(SequelizeValidationError);
+        });
+
+        it('throws if surnamename is null', async () => {
+            newEdited = edited;
+            newEdited.surname = null;
+            expect(UserDao.update(newEdited, expected.id)).to.eventually.be.rejectedWith(SequelizeValidationError);
+        });
+
+    });
+
+    describe('Find by email', () => {
+        var data = {name: "Pepe", surname: "Perez", email:"pepeTestFindEmail@gmail.com", picture: "default"};
+        var expected;
+        var user;
+
+        before(async () => {
+            expected = await User.create(data);
+            user = await UserDao.findByEmail(expected.email);
+        });
+
+        it('user must not be null', async () => {
+            expect(user).to.not.be.null;
+        });
+        
+        it('user must have correct id', async () => {
+            expect(user).to.have.property('id', expected.id);
+        });
+        
+        it('user email must be pepeTestFindEmail@gmail.com', async () => {
+            expect(user).to.have.property('email', "pepeTestFindEmail@gmail.com");
+        });
+
+        it('throws exception if email does not exist', async () => {
+            expect(UserDao.findByEmail("fdsfsdf@fsdfsdf")).to.eventually.be.rejectedWith(UserNotFoundError);
         });
 
     });
