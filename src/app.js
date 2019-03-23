@@ -1,6 +1,7 @@
 var express = require('express');
 var app = express();
 
+
 var logger = require('logops');
 logger.format = logger.formatters.dev;
 
@@ -19,8 +20,10 @@ var channelsRouter = require('./routes/channels');
 app.use('/channels', channelsRouter);
 
 
-app.get('/', function(req, res){
-    res.send("Welcome to Taller2-Slack");
+
+app.all('*', function(req, res){
+    logger.warn('Invalid Api called Method: %s  Url: %s', req.method, req.url);
+    res.send("Invalid Api");
 });
 
 

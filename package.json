@@ -11,7 +11,7 @@
     "db:migrate": "npx sequelize db:migrate",
     "db": "npm run db:reset && npm run db:migrate",
     "pretest": "npx eslint src",
-    "test": "export NODE_ENV=test || set NODE_ENV=test&& export LOGOPS_LEVEL=FATAL || set LOGOPS_LEVEL=FATAL&& npm run db && nyc mocha --recursive",
+    "test": "export NODE_ENV=test || set NODE_ENV=test&& export LOGOPS_LEVEL=FATAL || set LOGOPS_LEVEL=FATAL&& npm run db && nyc mocha --colors --recursive",
     "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "keywords": [
