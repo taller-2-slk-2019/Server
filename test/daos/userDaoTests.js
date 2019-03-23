@@ -10,16 +10,15 @@ var UserDao = require('../../src/daos/UserDao');
 var models = require('../../src/database/sequelize');
 var User = models.user;
 var { UserNotFoundError } = require('../../src/helpers/Errors');
+var { userCreateData } = require('../data/userData');
 
 describe('"UserDao Tests"', () => {
 
     describe('Register User', () => {
-
-        var data = {name: "Pepe", surname: "Perez", email:"pepe@gmail.com", picture: "default"};
         var user;
 
         beforeEach(async () => {
-            user = await UserDao.create(data);
+            user = await UserDao.create(userCreateData);
         });
 
         it('user must be registered', async () => {
@@ -67,12 +66,11 @@ describe('"UserDao Tests"', () => {
     });
 
     describe('Find by id', () => {
-        var data = {name: "Pepe", surname: "Perez", email:"pepe@gmail.com", picture: "default"};
         var expected;
         var user;
 
         before(async () => {
-            expected = await User.create(data);
+            expected = await User.create(userCreateData);
             user = await UserDao.findById(expected.id);
         });
 
@@ -84,8 +82,8 @@ describe('"UserDao Tests"', () => {
             expect(user).to.have.property('id', expected.id);
         });
         
-        it('user name must be Pepe', async () => {
-            expect(user).to.have.property('name', "Pepe");
+        it('user name must be correct', async () => {
+            expect(user).to.have.property('name', expected.name);
         });
 
         it('throws exception if id does not exist', async () => {
@@ -103,15 +101,14 @@ describe('"UserDao Tests"', () => {
     });
 
     describe('Update', () => {
-        var data = {name: "Pepe", surname: "Perez", email:"pepe@gmail.com", picture: "default"};
         var edited = {name: "Carlos", surname: "Juarez"};
-        var expected;
+        var original;
         var user;
 
         before(async () => {
-            expected = await User.create(data);
-            await UserDao.update(edited, expected.id);
-            user = await User.findByPk(expected.id);
+            original = await User.create(userCreateData);
+            await UserDao.update(edited, original.id);
+            user = await User.findByPk(original.id);
         });
 
         it('user must not be null', async () => {
@@ -119,19 +116,19 @@ describe('"UserDao Tests"', () => {
         });
         
         it('user must have correct id', async () => {
-            expect(user).to.have.property('id', expected.id);
+            expect(user).to.have.property('id', original.id);
         });
         
-        it('user name must be Carlos', async () => {
-            expect(user).to.have.property('name', "Carlos");
+        it('user name must be updated', async () => {
+            expect(user).to.have.property('name', edited.name);
         });
 
-        it('user surname must be Juarez', async () => {
-            expect(user).to.have.property('surname', "Juarez");
+        it('user surname must be updated', async () => {
+            expect(user).to.have.property('surname', edited.surname);
         });
 
         it('user email must not change', async () => {
-            expect(user).to.have.property('email', "pepe@gmail.com");
+            expect(user).to.have.property('email', original.email);
         });
 
         it('throws exception if id does not exist', async () => {
@@ -147,27 +144,28 @@ describe('"UserDao Tests"', () => {
         });
 
         it('throws if name is null', async () => {
-            newEdited = edited;
+            newEdited = Object.create(edited);
             newEdited.name = null;
-            expect(UserDao.update(newEdited, expected.id)).to.eventually.be.rejectedWith(SequelizeValidationError);
+            expect(UserDao.update(newEdited, original.id)).to.eventually.be.rejectedWith(SequelizeValidationError);
         });
 
         it('throws if surnamename is null', async () => {
-            newEdited = edited;
+            newEdited = Object.create(edited);
             newEdited.surname = null;
-            expect(UserDao.update(newEdited, expected.id)).to.eventually.be.rejectedWith(SequelizeValidationError);
+            expect(UserDao.update(newEdited, original.id)).to.eventually.be.rejectedWith(SequelizeValidationError);
         });
 
     });
 
     describe('Find by email', () => {
-        var data = {name: "Pepe", surname: "Perez", email:"pepeTestFindEmail@gmail.com", picture: "default"};
+        var data = Object.create(userCreateData);
+        data.email = "pepeTestFindEmail@unique.gmail.com";
         var expected;
         var user;
 
         before(async () => {
             expected = await User.create(data);
-            user = await UserDao.findByEmail(expected.email);
+            user = await UserDao.findByEmail(data.email);
         });
 
         it('user must not be null', async () => {
@@ -178,12 +176,12 @@ describe('"UserDao Tests"', () => {
             expect(user).to.have.property('id', expected.id);
         });
         
-        it('user email must be pepeTestFindEmail@gmail.com', async () => {
-            expect(user).to.have.property('email', "pepeTestFindEmail@gmail.com");
+        it('user email must be correct', async () => {
+            expect(user).to.have.property('email', data.email);
         });
 
         it('throws exception if email does not exist', async () => {
-            expect(UserDao.findByEmail("fdsfsdf@fsdfsdf")).to.eventually.be.rejectedWith(UserNotFoundError);
+            expect(UserDao.findByEmail("fdsfsdf@unexistantEmail.gmail.blabla.com")).to.eventually.be.rejectedWith(UserNotFoundError);
         });
 
     });

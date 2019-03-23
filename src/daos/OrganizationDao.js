@@ -32,23 +32,17 @@ class OrganizationDao{
     async inviteUser(organizationId, userEmail){
         var organization = await this.findById(organizationId);
 
-        var userId = (await UserDao.findByEmail(userEmail)).id; 
+        var user = await UserDao.findByEmail(userEmail); 
 
-        var existingUser = (await organization.getUsers()).find((usr) => usr.id == userId);
+        var existingUser = (await organization.getUsers()).find((usr) => usr.id == user.id);
         if (existingUser){
-            throw new UserAlreadyInOrganizationError(organization.id, userId);
+            throw new UserAlreadyInOrganizationError(organization.id, user.id);
         }
 
-        var invitedUser = (await organization.getInvitedUsers()).find((usr) => usr.id == userId);
+        var invitedUser = (await organization.getInvitedUsers()).find((usr) => usr.id == user.id);
         if (invitedUser){
-            if (invitedUser.organizationUserInvitation.hasExpired()){
-                await organization.removeInvitedUser(userId);
-            } else {
-                throw new UserAlreadyInvitedError(organization.id, userId);
-            }
+            throw new UserAlreadyInvitedError(organization.id, user.id);
         }
-
-        var user = await UserDao.findById(userId);
 
         var token = sha1(Date.now());
         await organization.addInvitedUser(user, { through: {token: token } });
@@ -61,7 +55,7 @@ class OrganizationDao{
                 where: {token: token},
             });
 
-        if (!invitation || invitation.hasExpired()){
+        if (!invitation){
             throw new InvalidOrganizationInvitationTokenError(token);
         }
 

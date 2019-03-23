@@ -7,38 +7,36 @@ const sinonChai = require('sinon-chai');
 chai.use(sinonChai);
 const { mockRequest, mockResponse } = require('mock-req-res');
 const userProfileMock = require('../mocks/userProfileMock');
-
-var SequelizeValidationError = require('../../src/database/sequelize').Sequelize.SequelizeValidationError;
+const { userCreateData } = require('../data/userData');
 
 var UserController = require('../../src/controllers/UsersController');
-var models = require('../../src/database/sequelize');
-var User = models.user;
 var UserDao = require('../../src/daos/UserDao');
-var {UserNotFoundError } = require('../../src/helpers/Errors');
+var OrganizationDao = require('../../src/daos/OrganizationDao');
 
-describe('"UserController Tests"', () => {
+describe('"UsersController Tests"', () => {
 
     describe('Methods without errors', () => {
         var mock1;
         var mock2;
         var mock3;
+        var mock4;
 
         before(async () => {
             mock1 = stub(UserDao, 'create').resolves(userProfileMock);
             mock2 = stub(UserDao, 'update').resolves();
             mock3 = stub(UserDao, 'findById').resolves(userProfileMock);
+            mock4 = stub(OrganizationDao, 'acceptUserInvitation').resolves();
         });
 
         after(async () => {
             mock1.restore();
             mock2.restore();
             mock3.restore();
+            mock4.restore();
         });
 
         describe('Register User', () => {
-
-            var data = {name: "Pepe", surname: "Perez", email:"pepe@gmail.com"};
-            var req = mockRequest({ body: data });
+            var req = mockRequest({ body: userCreateData });
             var res;
             var expected;
 
@@ -58,17 +56,17 @@ describe('"UserController Tests"', () => {
 
             it('user name must be Pepe', async () => {
                 var response = res.send.args[0][0];
-                expect(response).to.have.property('name', "Pepe");
+                expect(response).to.have.property('name', userCreateData.name);
             });
 
             it('user surname must be Perez', async () => {
                 var response = res.send.args[0][0];
-                expect(response).to.have.property('surname', "Perez");
+                expect(response).to.have.property('surname', userCreateData.surname);
             });
 
             it('user email must be pepe@gmail.com', async () => {
                 var response = res.send.args[0][0];
-                expect(response).to.have.property('email', "pepe@gmail.com");
+                expect(response).to.have.property('email', userCreateData.email);
             });
         });
 
@@ -101,7 +99,7 @@ describe('"UserController Tests"', () => {
             
             it('user name must be Pepe', async () => {
                 var response = res.send.args[0][0];
-                expect(response).to.have.property('name', "Pepe");
+                expect(response).to.have.property('name', userProfileMock.name);
             });
         });
 
@@ -152,7 +150,29 @@ describe('"UserController Tests"', () => {
                 var response = res.send.args[0][0];
                 expect(response).to.have.property('success');
             });
+        });
 
+        describe('Accept organization invitation', () => {
+            var req = mockRequest();
+            var res;
+
+            before(async () => {
+                req.params.token = 'token';
+            });
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await UserController.acceptOrganizationInvitation(req, res);
+            });
+
+            it('response status must be 200', async () => {
+                expect(res.status).to.have.been.calledWith(200);
+            });
+            
+            it('response must have a success', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('success');
+            });
         });
     });
 
@@ -160,17 +180,20 @@ describe('"UserController Tests"', () => {
         var mock1;
         var mock2;
         var mock3;
+        var mock4;
 
         before(async () => {
-            mock1 = stub(UserDao, 'create').rejects(SequelizeValidationError);
-            mock2 = stub(UserDao, 'update').rejects(SequelizeValidationError);
-            mock3 = stub(UserDao, 'findById').rejects(UserNotFoundError);
+            mock1 = stub(UserDao, 'create').rejects();
+            mock2 = stub(UserDao, 'update').rejects();
+            mock3 = stub(UserDao, 'findById').rejects();
+            mock4 = stub(OrganizationDao, 'acceptUserInvitation').rejects();
         });
 
         after(async () => {
             mock1.restore();
             mock2.restore();
             mock3.restore();
+            mock4.restore();
         });
 
 
@@ -315,6 +338,50 @@ describe('"UserController Tests"', () => {
                 });
             });
 
+            describe('Update with both latitude and longitude', () => {
+                var res;
+                var req;
+
+                before(async () => {
+                    var changes = {latitude: 123.45, longitude: 123.45}
+                    req = mockRequest({ body: changes });
+                    req.params.id = userProfileMock.id;
+                });
+
+                beforeEach(async () => {
+                    res = mockResponse();
+                    await UserController.updateLocation(req, res);
+                });
+
+                it('can not update location', async () => {
+                    expect(res.status).to.have.been.calledWith(500);
+                });
+
+                it('response must have an error', async () => {
+                    var response = res.send.args[0][0];
+                    expect(response).to.have.property('error');
+                });
+            });
+        });
+
+        describe('Accept organization invitation with error', () => {
+            var req = mockRequest();
+            req.params.id = "token";
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await UserController.acceptOrganizationInvitation(req, res);
+            });
+
+            it('response status must be 500', async () => {
+                expect(res.status).to.have.been.calledWith(500);
+            });
+
+            it('response must have an error', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('error');
+            });
         });
     });
 });
