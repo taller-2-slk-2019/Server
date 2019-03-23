@@ -1,4 +1,4 @@
-var sha1 = require('sha1');
+var Token = require('../helpers/Token');
 var logger = require('logops');
 var UserDao = require('./UserDao');
 var models = require('../database/sequelize');
@@ -44,7 +44,7 @@ class OrganizationDao{
             throw new UserAlreadyInvitedError(organization.id, user.id);
         }
 
-        var token = sha1(Date.now());
+        var token = Token.generate();
         await organization.addInvitedUser(user, { through: {token: token } });
         return token;
     }
