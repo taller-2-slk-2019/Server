@@ -10,7 +10,8 @@ var OrganizationDao = require('../../src/daos/OrganizationDao');
 var models = require('../../src/database/sequelize');
 var User = models.user;
 var Organization = models.organization;
-var { UserNotFoundError, OrganizationNotFoundError } = require('../../src/helpers/Errors');
+var { UserNotFoundError, OrganizationNotFoundError, UserAlreadyInvitedError, UserAlreadyInOrganizationError } = 
+    require('../../src/helpers/Errors');
 var { userCreateData } = require('../data/userData');
 var { organizationCreateData } = require('../data/organizationData');
 var CreatorRole = require('../../src/models/userRoles/UserRoleCreator');
@@ -108,91 +109,76 @@ describe('"OrganizationDao Tests"', () => {
         });
 
     });
-/*
-    describe('Update', () => {
-        var edited = {name: "Carlos", surname: "Juarez"};
-        var original;
-        var user;
+
+    describe('Invite User', () => {
+        var organization;
+        var invitedUserData = Object.create(userCreateData);
+        var userToInvite;
+        var token;
 
         before(async () => {
-            original = await User.create(userCreateData);
-            await UserDao.update(edited, original.id);
-            user = await User.findByPk(original.id);
+            organization = await Organization.create(organizationData);
+            invitedUserData.email = "invited.user.to.organization@gmail.com";
+            userToInvite = await User.create(invitedUserData);
         });
 
-        it('user must not be null', async () => {
-            expect(user).to.not.be.null;
+        beforeEach(async () => {
+            await organization.setInvitedUsers([]);
+            token = await OrganizationDao.inviteUser(organization.id, userToInvite.email);
+        });
+
+        it('token must not be null', async () => {
+            expect(token).to.not.be.null;
         });
         
-        it('user must have correct id', async () => {
-            expect(user).to.have.property('id', original.id);
-        });
-        
-        it('user name must be updated', async () => {
-            expect(user).to.have.property('name', edited.name);
+        it('organization must have one invited user', async () => {
+            var invited = await organization.getInvitedUsers();
+            expect(invited.length).to.eq(1);
         });
 
-        it('user surname must be updated', async () => {
-            expect(user).to.have.property('surname', edited.surname);
+        it('user must be invited', async () => {
+            var invited = await organization.getInvitedUsers();
+            expect(invited[0].id).to.eq(userToInvite.id);
         });
 
-        it('user email must not change', async () => {
-            expect(user).to.have.property('email', original.email);
+        it('user must not belong to organization', async () => {
+            var users = await organization.getUsers();
+            expect(users.length).to.eq(0);
         });
 
-        it('throws exception if id does not exist', async () => {
-            expect(UserDao.update(edited, 9999999)).to.eventually.be.rejectedWith(UserNotFoundError);
+        it('can not invite user again', async () => {
+            expect(OrganizationDao.inviteUser(organization.id, userToInvite.email))
+                .to.eventually.be.rejectedWith(UserAlreadyInvitedError);
         });
-
-        it('throws exception if id is 0', async () => {
-            expect(UserDao.update(edited, 0)).to.eventually.be.rejectedWith(UserNotFoundError);
-        });
-
-        it('throws exception if id is -1', async () => {
-            expect(UserDao.update(edited, -1)).to.eventually.be.rejectedWith(UserNotFoundError);
-        });
-
-        it('throws if name is null', async () => {
-            newEdited = Object.create(edited);
-            newEdited.name = null;
-            expect(UserDao.update(newEdited, original.id)).to.eventually.be.rejectedWith(SequelizeValidationError);
-        });
-
-        it('throws if surnamename is null', async () => {
-            newEdited = Object.create(edited);
-            newEdited.surname = null;
-            expect(UserDao.update(newEdited, original.id)).to.eventually.be.rejectedWith(SequelizeValidationError);
-        });
-
     });
 
-    describe('Find by email', () => {
-        var data = Object.create(userCreateData);
-        data.email = "pepeTestFindEmail@unique.gmail.com";
-        var expected;
-        var user;
+    describe('Invite user with errors', () => {
+        var organization;
+        var invitedUserData = Object.create(userCreateData);
+        var userToInvite;
+        var token;
 
         before(async () => {
-            expected = await User.create(data);
-            user = await UserDao.findByEmail(data.email);
+            organization = await Organization.create(organizationData);
+            invitedUserData.email = "invited.user.to.organization2@gmail.com";
+            userToInvite = await User.create(invitedUserData);
+            await organization.addUser(userToInvite, { through: {role: creatorRole.name } });
         });
 
-        it('user must not be null', async () => {
-            expect(user).to.not.be.null;
-        });
-        
-        it('user must have correct id', async () => {
-            expect(user).to.have.property('id', expected.id);
-        });
-        
-        it('user email must be correct', async () => {
-            expect(user).to.have.property('email', data.email);
+        it('can not invite user that already belongs to organization', async () => {
+            expect(OrganizationDao.inviteUser(organization.id, userToInvite.email))
+                .to.eventually.be.rejectedWith(UserAlreadyInOrganizationError);
         });
 
-        it('throws exception if email does not exist', async () => {
-            expect(UserDao.findByEmail("fdsfsdf@unexistantEmail.gmail.blabla.com")).to.eventually.be.rejectedWith(UserNotFoundError);
+        it('can not invite email that does not exist', async () => {
+            expect(OrganizationDao.inviteUser(organization.id, "fasdasd.does.not.exists@mail.not.exists.com"))
+                .to.eventually.be.rejectedWith(UserNotFoundError);
         });
 
-    });*/
+        it('can not invite user to organization that does not exist', async () => {
+            expect(OrganizationDao.inviteUser(-2, userToInvite.email))
+                .to.eventually.be.rejectedWith(OrganizationNotFoundError);
+        });
+    });
 
 });
