@@ -14,7 +14,9 @@ class ChannelDao{
         channel.creatorId = user.id;
         channel.organizationId = organization.id;
 
-        return await Channel.create(channel);
+        var channelModel = await Channel.create(channel);
+        await channelModel.addUser(user);
+        return channelModel;
     }
 
 }
