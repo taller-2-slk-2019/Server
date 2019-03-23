@@ -12,8 +12,6 @@ const { userCreateData } = require('../data/userData');
 var SequelizeValidationError = require('../../src/database/sequelize').Sequelize.SequelizeValidationError;
 
 var UserController = require('../../src/controllers/UsersController');
-var models = require('../../src/database/sequelize');
-var User = models.user;
 var UserDao = require('../../src/daos/UserDao');
 var OrganizationDao = require('../../src/daos/OrganizationDao');
 var {UserNotFoundError } = require('../../src/helpers/Errors');
