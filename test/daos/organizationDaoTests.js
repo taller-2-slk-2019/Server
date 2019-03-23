@@ -10,16 +10,18 @@ var OrganizationDao = require('../../src/daos/OrganizationDao');
 var models = require('../../src/database/sequelize');
 var User = models.user;
 var Organization = models.organization;
-var { UserNotFoundError, OrganizationNotFoundError, UserAlreadyInvitedError, UserAlreadyInOrganizationError } = 
-    require('../../src/helpers/Errors');
+var { UserNotFoundError, OrganizationNotFoundError, UserAlreadyInvitedError, UserAlreadyInOrganizationError,
+            InvalidOrganizationInvitationTokenError } = require('../../src/helpers/Errors');
 var { userCreateData } = require('../data/userData');
 var { organizationCreateData } = require('../data/organizationData');
 var CreatorRole = require('../../src/models/userRoles/UserRoleCreator');
+var MemberRole = require('../../src/models/userRoles/UserRoleMember');
 
 describe('"OrganizationDao Tests"', () => {
     var user;
     var organizationData = Object.create(organizationCreateData);
     var creatorRole = new CreatorRole();
+    var memberRole = new MemberRole();
 
     before(async () => {
         user = await User.create(userCreateData);
@@ -179,6 +181,52 @@ describe('"OrganizationDao Tests"', () => {
             expect(OrganizationDao.inviteUser(-2, userToInvite.email))
                 .to.eventually.be.rejectedWith(OrganizationNotFoundError);
         });
+    });
+
+    describe('Accept User Invitation', () => {
+        var organization;
+        var invitedUserData = Object.create(userCreateData);
+        var userToInvite;
+        var token = "my-invitation-token-12345-to test invitations";
+
+        before(async () => {
+            organization = await Organization.create(organizationData);
+            invitedUserData.email = "invited.user.to.organization@will.be.accepted.com";
+            userToInvite = await User.create(invitedUserData);
+        });
+
+        beforeEach(async () => {
+            await organization.setUsers([]);
+            await organization.addInvitedUser(userToInvite, {through: {token: token}});
+            await OrganizationDao.acceptUserInvitation(token);
+        });
+        
+        it('organization has one user', async () => {
+            var users = await organization.getUsers();
+            expect(users.length).to.eq(1);
+        });
+
+        it('user belongs to organization', async () => {
+            var users = await organization.getUsers();
+            expect(users[0].id).to.eq(userToInvite.id);
+        });
+
+        it('user role is member', async () => {
+            var users = await organization.getUsers();
+            var role = users[0].userOrganizations.role;
+            expect(role).to.eq(memberRole.name);
+        });
+
+        it('user is not in organization invited list', async () => {
+            var invited = await organization.getInvitedUsers();
+            expect(invited.length).to.eq(0);
+        });
+
+        it('can not use invalid token', async () => {
+            expect(OrganizationDao.acceptUserInvitation("invalid-token"))
+                .to.eventually.be.rejectedWith(InvalidOrganizationInvitationTokenError);
+        });
+
     });
 
 });
