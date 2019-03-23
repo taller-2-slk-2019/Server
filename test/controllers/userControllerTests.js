@@ -7,6 +7,7 @@ const sinonChai = require('sinon-chai');
 chai.use(sinonChai);
 const { mockRequest, mockResponse } = require('mock-req-res');
 const userProfileMock = require('../mocks/userProfileMock');
+const { userCreateData } = require('../data/userData');
 
 var SequelizeValidationError = require('../../src/database/sequelize').Sequelize.SequelizeValidationError;
 
@@ -36,9 +37,7 @@ describe('"UserController Tests"', () => {
         });
 
         describe('Register User', () => {
-
-            var data = {name: "Pepe", surname: "Perez", email:"pepe@gmail.com"};
-            var req = mockRequest({ body: data });
+            var req = mockRequest({ body: userCreateData });
             var res;
             var expected;
 
@@ -58,17 +57,17 @@ describe('"UserController Tests"', () => {
 
             it('user name must be Pepe', async () => {
                 var response = res.send.args[0][0];
-                expect(response).to.have.property('name', "Pepe");
+                expect(response).to.have.property('name', userCreateData.name);
             });
 
             it('user surname must be Perez', async () => {
                 var response = res.send.args[0][0];
-                expect(response).to.have.property('surname', "Perez");
+                expect(response).to.have.property('surname', userCreateData.surname);
             });
 
             it('user email must be pepe@gmail.com', async () => {
                 var response = res.send.args[0][0];
-                expect(response).to.have.property('email', "pepe@gmail.com");
+                expect(response).to.have.property('email', userCreateData.email);
             });
         });
 
@@ -101,7 +100,7 @@ describe('"UserController Tests"', () => {
             
             it('user name must be Pepe', async () => {
                 var response = res.send.args[0][0];
-                expect(response).to.have.property('name', "Pepe");
+                expect(response).to.have.property('name', userProfileMock.name);
             });
         });
 
@@ -296,6 +295,31 @@ describe('"UserController Tests"', () => {
 
                 before(async () => {
                     var changes = {}
+                    req = mockRequest({ body: changes });
+                    req.params.id = userProfileMock.id;
+                });
+
+                beforeEach(async () => {
+                    res = mockResponse();
+                    await UserController.updateLocation(req, res);
+                });
+
+                it('can not update location', async () => {
+                    expect(res.status).to.have.been.calledWith(500);
+                });
+
+                it('response must have an error', async () => {
+                    var response = res.send.args[0][0];
+                    expect(response).to.have.property('error');
+                });
+            });
+
+            describe('Update with both latitude and longitude', () => {
+                var res;
+                var req;
+
+                before(async () => {
+                    var changes = {latitude: 123.45, longitude: 123.45}
                     req = mockRequest({ body: changes });
                     req.params.id = userProfileMock.id;
                 });
