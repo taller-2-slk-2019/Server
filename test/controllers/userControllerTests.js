@@ -9,14 +9,11 @@ const { mockRequest, mockResponse } = require('mock-req-res');
 const userProfileMock = require('../mocks/userProfileMock');
 const { userCreateData } = require('../data/userData');
 
-var SequelizeValidationError = require('../../src/database/sequelize').Sequelize.SequelizeValidationError;
-
 var UserController = require('../../src/controllers/UsersController');
 var UserDao = require('../../src/daos/UserDao');
 var OrganizationDao = require('../../src/daos/OrganizationDao');
-var {UserNotFoundError } = require('../../src/helpers/Errors');
 
-describe('"UserController Tests"', () => {
+describe('"UsersController Tests"', () => {
 
     describe('Methods without errors', () => {
         var mock1;
@@ -186,10 +183,10 @@ describe('"UserController Tests"', () => {
         var mock4;
 
         before(async () => {
-            mock1 = stub(UserDao, 'create').rejects(SequelizeValidationError);
-            mock2 = stub(UserDao, 'update').rejects(SequelizeValidationError);
-            mock3 = stub(UserDao, 'findById').rejects(UserNotFoundError);
-            mock4 = stub(OrganizationDao, 'acceptUserInvitation').rejects(UserNotFoundError);
+            mock1 = stub(UserDao, 'create').rejects();
+            mock2 = stub(UserDao, 'update').rejects();
+            mock3 = stub(UserDao, 'findById').rejects();
+            mock4 = stub(OrganizationDao, 'acceptUserInvitation').rejects();
         });
 
         after(async () => {
