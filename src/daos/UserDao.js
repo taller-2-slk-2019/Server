@@ -1,5 +1,6 @@
 var models = require('../database/sequelize');
 var User = models.user;
+var UserOrganizations = models.userOrganizations;
 var { UserNotFoundError } = require('../helpers/Errors');
 
 class UserDao{
@@ -22,6 +23,11 @@ class UserDao{
             throw new UserNotFoundError(email);
         }
         return user;
+    }
+
+    async findUserOrganizations(id){
+        var orgs = await UserOrganizations.findAll({attributes: [ 'organizationId', 'role' ], where: {userId: id}});
+        return orgs;
     }
     
     async update(user, id){

@@ -6,11 +6,15 @@ chai.use(chaiAsPromised);
 var SequelizeValidationError = require('../../src/database/sequelize').Sequelize.SequelizeValidationError;
 
 var UserDao = require('../../src/daos/UserDao');
+var OrganizationDao = require('../../src/daos/OrganizationDao');
+
 
 var models = require('../../src/database/sequelize');
 var User = models.user;
+var Organization = models.organization;
 var { UserNotFoundError } = require('../../src/helpers/Errors');
 var { userCreateData } = require('../data/userData');
+var { organizationCreateData } = require('../data/organizationData');
 
 describe('"UserDao Tests"', () => {
 
@@ -184,6 +188,42 @@ describe('"UserDao Tests"', () => {
             expect(UserDao.findByEmail("fdsfsdf@unexistantEmail.gmail.blabla.com")).to.eventually.be.rejectedWith(UserNotFoundError);
         });
 
+    });
+
+    describe('Find User Organizations', () => {
+        var expected;
+        var user;
+        var token = "my-invitation-token-12345-to test invitations";
+        var original;
+        var updated;
+        var organizationData = Object.create(organizationCreateData);
+
+        before(async () => {
+            user = await User.create(userCreateData);
+            original = await UserDao.findUserOrganizations(user.id);
+
+            organization = await Organization.create(organizationData);
+            await organization.addInvitedUser(user, {through: {token: token}});
+            await OrganizationDao.acceptUserInvitation(token);
+
+            updated = await UserDao.findUserOrganizations(user.id);
+        });
+
+        it('user must not be created with an organization', async () => {
+            expect(original).to.be.empty;
+        });
+
+        it('user must be in an organization after accepting invitation', async () => {
+            expect(updated).to.not.be.empty;
+        });
+
+        it('user has the correct organizations id', async () => {
+            expect(updated[0].organizationId).to.eq(organization.id);
+        });
+
+        it('the users role is: member', async () => {
+            expect(updated[0].role).to.eq('member');
+        });
     });
 
 });

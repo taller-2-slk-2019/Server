@@ -29,6 +29,17 @@ class UsersController{
 
         try{
             var user = await UserDao.findById(id);
+            var orgs = await UserDao.findUserOrganizations(id);
+            var data = [];
+            for (var i in orgs) {
+                var orgName = await OrganizationDao.findById(orgs[i].organizationId);
+                var aux = { 
+                    name: orgName.name,
+                    role: orgs[i].role
+                };
+                data.push(aux);
+            }
+            user['Organizations'] = data;
             sendSuccessResponse(res, user);
         } catch (err){
             sendErrorResponse(res, err);

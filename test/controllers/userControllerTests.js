@@ -101,6 +101,11 @@ describe('"UsersController Tests"', () => {
                 var response = res.send.args[0][0];
                 expect(response).to.have.property('name', userProfileMock.name);
             });
+
+            it('user organizations must be empty', async () => {
+                var response = res.send.args[0][0];
+                expect(response.Organizations).to.be.empty;
+            });
         });
 
         describe('Update Profile', () => {
