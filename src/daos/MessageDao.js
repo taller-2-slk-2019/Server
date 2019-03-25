@@ -7,6 +7,7 @@ var { UserNotBelongsToChannelError } = require('../helpers/Errors');
 class MessageDao{
 
     async create(msg){
+        // TODO send notifications to mentioned users, etc
         var user = await UserDao.findById(msg.senderId);
         var channel = await ChannelDao.findById(msg.channelId);
 
