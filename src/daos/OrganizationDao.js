@@ -4,7 +4,7 @@ var UserDao = require('./UserDao');
 var models = require('../database/sequelize');
 var Organization = models.organization;
 var OrganizationUserInvitation = models.organizationUserInvitation;
-var { UserAlreadyInvitedError, UserAlreadyInOrganizationError,
+var { UserAlreadyInvitedError, UserAlreadyInOrganizationError, UserNotBelongsToOrganizationError,
              InvalidOrganizationInvitationTokenError, OrganizationNotFoundError} = require('../helpers/Errors');
 var UserRoleCreator = require('../models/userRoles/UserRoleCreator');
 var UserRoleMember = require('../models/userRoles/UserRoleMember');
@@ -68,6 +68,16 @@ class OrganizationDao{
         logger.info(`User ${user.id} accepted invitation to organization ${org.id}`);
     }
 
+    async removeUser(userId, organizationId){
+        var organization = await this.findById(organizationId);
+        var user = await UserDao.findById(userId);
+
+        if (!(await organization.hasUser(user))){
+            throw new UserNotBelongsToOrganizationError(organizationId, userId);
+        }
+
+        await organization.removeUser(user);
+    }
 
 }
 

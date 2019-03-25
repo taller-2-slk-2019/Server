@@ -87,6 +87,18 @@ class UsersController{
         }
     }
 
+    async abandonOrganization(req, res){
+        var userId = req.params.id;
+        var organizationId = req.params.organizationId;
+
+        try{
+            await OrganizationDao.removeUser(userId, organizationId);
+            sendEmptySuccessResponse(res);
+        } catch (err){
+            sendErrorResponse(res, err);
+        }
+    }
+
     async abandonChannel(req, res){
         var userId = req.params.id;
         var channelId = req.params.channelId;

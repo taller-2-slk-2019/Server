@@ -11,7 +11,7 @@ var models = require('../../src/database/sequelize');
 var User = models.user;
 var Organization = models.organization;
 var { UserNotFoundError, OrganizationNotFoundError, UserAlreadyInvitedError, UserAlreadyInOrganizationError,
-            InvalidOrganizationInvitationTokenError } = require('../../src/helpers/Errors');
+            InvalidOrganizationInvitationTokenError, UserNotBelongsToOrganizationError } = require('../../src/helpers/Errors');
 var { userCreateData } = require('../data/userData');
 var { organizationCreateData } = require('../data/organizationData');
 var CreatorRole = require('../../src/models/userRoles/UserRoleCreator');
@@ -227,6 +227,32 @@ describe('"OrganizationDao Tests"', () => {
                 .to.eventually.be.rejectedWith(InvalidOrganizationInvitationTokenError);
         });
 
+    });
+
+    describe('Remove user', () => {
+        var organization;
+        var usr;
+
+        before(async () => {
+            organization = await Organization.create(organizationData);
+            usr = await User.create(userCreateData);
+        });
+
+        beforeEach(async () => {
+            await organization.setUsers([]);
+            await organization.addUser(usr, { through: {role:'role'}});
+            await OrganizationDao.removeUser(usr.id, organization.id);
+        });
+
+        it('organization must have 0 user', async () => {
+            var users = await organization.getUsers();
+            expect(users.length).to.eq(0);
+        });
+
+        it('can not remove user that does no belong to organization', async () => {
+            await organization.setUsers([]);
+            await expect(OrganizationDao.removeUser(user.id, organization.id)).to.eventually.be.rejectedWith(UserNotBelongsToOrganizationError);
+        });
     });
 
 });
