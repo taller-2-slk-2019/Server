@@ -11,7 +11,8 @@ var models = require('../../src/database/sequelize');
 var Channel = models.channel;
 var User = models.user;
 var Organization = models.organization;
-var { UserNotFoundError, OrganizationNotFoundError, ChannelNotFoundError } = require('../../src/helpers/Errors');
+var { UserNotFoundError, OrganizationNotFoundError, ChannelNotFoundError, UserAlreadyInChannelError, 
+            UserNotBelongsToOrganizationError } = require('../../src/helpers/Errors');
 var { channelCreateData } = require('../data/channelData');
 var { userCreateData } = require('../data/userData');
 var { organizationCreateData } = require('../data/organizationData');
@@ -77,16 +78,16 @@ describe('"ChannelDao Tests"', () => {
 
         it('channel must not be created without creator', async () => {
             data.creatorId = -2;
-            expect(ChannelDao.create(data)).to.eventually.be.rejectedWith(UserNotFoundError);
+           await  expect(ChannelDao.create(data)).to.eventually.be.rejectedWith(UserNotFoundError);
         });
 
         it('channel must not be created without organization', async () => {
             data.organizationId = -2;
-            expect(ChannelDao.create(data)).to.eventually.be.rejectedWith(OrganizationNotFoundError);
+            await expect(ChannelDao.create(data)).to.eventually.be.rejectedWith(OrganizationNotFoundError);
         });
 
         it('channel must not be created with empty data', async () => {
-            expect(ChannelDao.create({})).to.eventually.be.rejectedWith(SequelizeValidationError);
+            await expect(ChannelDao.create({})).to.eventually.be.rejectedWith(SequelizeValidationError);
         });
     });
 
@@ -112,15 +113,51 @@ describe('"ChannelDao Tests"', () => {
         });
 
         it('throws exception if id does not exist', async () => {
-            expect(ChannelDao.findById(9999999)).to.eventually.be.rejectedWith(ChannelNotFoundError);
+            await expect(ChannelDao.findById(9999999)).to.eventually.be.rejectedWith(ChannelNotFoundError);
         });
 
         it('throws exception if id is 0', async () => {
-            expect(ChannelDao.findById(0)).to.eventually.be.rejectedWith(ChannelNotFoundError);
+            await expect(ChannelDao.findById(0)).to.eventually.be.rejectedWith(ChannelNotFoundError);
         });
 
         it('throws exception if id is -1', async () => {
-            expect(ChannelDao.findById(-1)).to.eventually.be.rejectedWith(ChannelNotFoundError);
+            await expect(ChannelDao.findById(-1)).to.eventually.be.rejectedWith(ChannelNotFoundError);
+        });
+
+    });
+
+    describe('Add user', () => {
+        var channel;
+        var usr;
+
+        before(async () => {
+            channel = await Channel.create(channelData);
+            usr = await User.create(userCreateData);
+            await organization.addUser(usr, { through: {role: 'role'}});
+        });
+
+        beforeEach(async () => {
+            await channel.setUsers([]);
+            await ChannelDao.addUser(channel.id, usr.id);
+        });
+
+        it('channel must have 1 user', async () => {
+            var users = await channel.getUsers();
+            expect(users.length).to.eq(1);
+        });
+
+        it('user must be added to channel', async () => {
+            var users = await channel.getUsers();
+            expect(users[0].id).to.eq(usr.id);
+        });
+
+        it('can not add user again to channel', async () => {
+            await expect(ChannelDao.addUser(channel.id, usr.id)).to.eventually.be.rejectedWith(UserAlreadyInChannelError);
+        });
+
+        it('can not add user that does not belong to channel organization', async () => {
+            var user2 = await User.create(userCreateData);
+            await expect(ChannelDao.addUser(channel.id, user2.id)).to.eventually.be.rejectedWith(UserNotBelongsToOrganizationError);
         });
 
     });

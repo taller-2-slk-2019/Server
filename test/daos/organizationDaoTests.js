@@ -69,11 +69,11 @@ describe('"OrganizationDao Tests"', () => {
 
         it('organization must not be created without creator', async () => {
             data.creatorId = -2;
-            expect(OrganizationDao.create(data)).to.eventually.be.rejectedWith(UserNotFoundError);
+            await expect(OrganizationDao.create(data)).to.eventually.be.rejectedWith(UserNotFoundError);
         });
 
         it('organization must not be created with empty data', async () => {
-            expect(OrganizationDao.create({})).to.eventually.be.rejectedWith(SequelizeValidationError);
+            await expect(OrganizationDao.create({})).to.eventually.be.rejectedWith(SequelizeValidationError);
         });
     });
 
@@ -99,15 +99,15 @@ describe('"OrganizationDao Tests"', () => {
         });
 
         it('throws exception if id does not exist', async () => {
-            expect(OrganizationDao.findById(9999999)).to.eventually.be.rejectedWith(OrganizationNotFoundError);
+            await expect(OrganizationDao.findById(9999999)).to.eventually.be.rejectedWith(OrganizationNotFoundError);
         });
 
         it('throws exception if id is 0', async () => {
-            expect(OrganizationDao.findById(0)).to.eventually.be.rejectedWith(OrganizationNotFoundError);
+            await expect(OrganizationDao.findById(0)).to.eventually.be.rejectedWith(OrganizationNotFoundError);
         });
 
         it('throws exception if id is -1', async () => {
-            expect(OrganizationDao.findById(-1)).to.eventually.be.rejectedWith(OrganizationNotFoundError);
+            await expect(OrganizationDao.findById(-1)).to.eventually.be.rejectedWith(OrganizationNotFoundError);
         });
 
     });
@@ -149,7 +149,7 @@ describe('"OrganizationDao Tests"', () => {
         });
 
         it('can not invite user again', async () => {
-            expect(OrganizationDao.inviteUser(organization.id, userToInvite.email))
+            await expect(OrganizationDao.inviteUser(organization.id, userToInvite.email))
                 .to.eventually.be.rejectedWith(UserAlreadyInvitedError);
         });
     });
@@ -168,17 +168,17 @@ describe('"OrganizationDao Tests"', () => {
         });
 
         it('can not invite user that already belongs to organization', async () => {
-            expect(OrganizationDao.inviteUser(organization.id, userToInvite.email))
+            await expect(OrganizationDao.inviteUser(organization.id, userToInvite.email))
                 .to.eventually.be.rejectedWith(UserAlreadyInOrganizationError);
         });
 
         it('can not invite email that does not exist', async () => {
-            expect(OrganizationDao.inviteUser(organization.id, "fasdasd.does.not.exists@mail.not.exists.com"))
+            await expect(OrganizationDao.inviteUser(organization.id, "fasdasd.does.not.exists@mail.not.exists.com"))
                 .to.eventually.be.rejectedWith(UserNotFoundError);
         });
 
         it('can not invite user to organization that does not exist', async () => {
-            expect(OrganizationDao.inviteUser(-2, userToInvite.email))
+            await expect(OrganizationDao.inviteUser(-2, userToInvite.email))
                 .to.eventually.be.rejectedWith(OrganizationNotFoundError);
         });
     });
@@ -223,7 +223,7 @@ describe('"OrganizationDao Tests"', () => {
         });
 
         it('can not use invalid token', async () => {
-            expect(OrganizationDao.acceptUserInvitation("invalid-token"))
+            await expect(OrganizationDao.acceptUserInvitation("invalid-token"))
                 .to.eventually.be.rejectedWith(InvalidOrganizationInvitationTokenError);
         });
 

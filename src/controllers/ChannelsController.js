@@ -1,6 +1,6 @@
 var logger = require('logops');
 var ChannelDao = require('../daos/ChannelDao');
-var { sendSuccessResponse, sendErrorResponse } = require('../helpers/ResponseHelper');
+var { sendSuccessResponse, sendErrorResponse, sendEmptySuccessResponse } = require('../helpers/ResponseHelper');
 
 class ChannelsController{
 
@@ -19,6 +19,19 @@ class ChannelsController{
             logger.info(`Channel created (${channel.id}) in organization ${data.organizationId} by user ${data.creatorId}`);
             sendSuccessResponse(res, channel);
             
+        } catch (err){
+            sendErrorResponse(res, err);
+        }
+    }
+
+    async addUser(req, res){
+        var channelId = req.params.id;
+        var userId = req.params.userId;
+        try{
+            await ChannelDao.addUser(channelId, userId);
+            logger.info(`User ${userId} added to channel ${channelId}`);
+            sendEmptySuccessResponse(res);
+
         } catch (err){
             sendErrorResponse(res, err);
         }

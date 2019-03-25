@@ -2,7 +2,7 @@ var UserDao = require('./UserDao');
 var OrganizationDao = require('./OrganizationDao');
 var models = require('../database/sequelize');
 var Channel = models.channel;
-var { ChannelNotFoundError } = require('../helpers/Errors');
+var { ChannelNotFoundError, UserAlreadyInChannelError, UserNotBelongsToOrganizationError } = require('../helpers/Errors');
 
 class ChannelDao{
 
@@ -26,6 +26,24 @@ class ChannelDao{
             throw new ChannelNotFoundError(id);
         }
         return channel;
+    }
+
+    async addUser(channelId, userId){
+        var channel = await this.findById(channelId);
+
+        var organization = await channel.getOrganization();
+
+        var user = await UserDao.findById(userId);
+
+        if (await channel.hasUser(user)){
+            throw new UserAlreadyInChannelError(channelId, userId);
+        }
+
+        if (!(await organization.hasUser(user))){
+            throw new UserNotBelongsToOrganizationError(organization.id, userId);
+        }
+
+        await channel.addUser(user);
     }
 
 }
