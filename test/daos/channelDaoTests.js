@@ -12,7 +12,7 @@ var Channel = models.channel;
 var User = models.user;
 var Organization = models.organization;
 var { UserNotFoundError, OrganizationNotFoundError, ChannelNotFoundError, UserAlreadyInChannelError, 
-            UserNotBelongsToOrganizationError } = require('../../src/helpers/Errors');
+            UserNotBelongsToOrganizationError, UserNotBelongsToChannelError } = require('../../src/helpers/Errors');
 var { channelCreateData } = require('../data/channelData');
 var { userCreateData } = require('../data/userData');
 var { organizationCreateData } = require('../data/organizationData');
@@ -160,5 +160,30 @@ describe('"ChannelDao Tests"', () => {
             await expect(ChannelDao.addUser(channel.id, user2.id)).to.eventually.be.rejectedWith(UserNotBelongsToOrganizationError);
         });
 
+    });
+
+    describe('Remove user', () => {
+        var channel;
+        var usr;
+
+        before(async () => {
+            channel = await Channel.create(channelData);
+            usr = await User.create(userCreateData);
+        });
+
+        beforeEach(async () => {
+            await channel.setUsers([usr]);
+            await ChannelDao.removeUser(usr.id, channel.id);
+        });
+
+        it('channel must have 0 user', async () => {
+            var users = await channel.getUsers();
+            expect(users.length).to.eq(0);
+        });
+
+        it('can not remove user that does no belong to channel', async () => {
+            await channel.setUsers([]);
+            await expect(ChannelDao.removeUser(user.id, channel.id)).to.eventually.be.rejectedWith(UserNotBelongsToChannelError);
+        });
     });
 });

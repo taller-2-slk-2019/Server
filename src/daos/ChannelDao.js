@@ -2,7 +2,8 @@ var UserDao = require('./UserDao');
 var OrganizationDao = require('./OrganizationDao');
 var models = require('../database/sequelize');
 var Channel = models.channel;
-var { ChannelNotFoundError, UserAlreadyInChannelError, UserNotBelongsToOrganizationError } = require('../helpers/Errors');
+var { ChannelNotFoundError, UserAlreadyInChannelError, UserNotBelongsToOrganizationError, 
+            UserNotBelongsToChannelError } = require('../helpers/Errors');
 
 class ChannelDao{
 
@@ -44,6 +45,17 @@ class ChannelDao{
         }
 
         await channel.addUser(user);
+    }
+
+    async removeUser(userId, channelId){
+        var channel = await this.findById(channelId);
+        var user = await UserDao.findById(userId);
+
+        if (!(await channel.hasUser(user))){
+            throw new UserNotBelongsToChannelError(channelId, userId);
+        }
+
+        await channel.removeUser(user);
     }
 
 }

@@ -47,6 +47,13 @@ class UserAlreadyInChannelError extends Error {
     }
 }
 
+class UserNotBelongsToChannelError extends Error {
+    constructor(channelId, userId) {
+        super(`User ${userId} does not belong to channel ${channelId}`);
+        this.name = this.constructor.name;
+    }
+}
+
 class InvalidOrganizationInvitationTokenError extends Error {
     constructor(token) {
         super("Invalid token to be invited to an organization: " + token);
@@ -71,4 +78,5 @@ module.exports = {
     ChannelNotFoundError,
     UserNotBelongsToOrganizationError,
     UserAlreadyInChannelError,
+    UserNotBelongsToChannelError,
 };
