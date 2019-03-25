@@ -93,6 +93,7 @@ class UsersController{
 
         try{
             await OrganizationDao.removeUser(userId, organizationId);
+            logger.info(`User ${userId} abandoned organization ${organizationId}`);
             sendEmptySuccessResponse(res);
         } catch (err){
             sendErrorResponse(res, err);
@@ -105,6 +106,7 @@ class UsersController{
 
         try{
             await ChannelDao.removeUser(userId, channelId);
+            logger.info(`User ${userId} abandoned channel ${channelId}`);
             sendEmptySuccessResponse(res);
         } catch (err){
             sendErrorResponse(res, err);
