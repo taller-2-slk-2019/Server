@@ -24,6 +24,7 @@ describe('"Token Tests"', () => {
             var token3 = Token.generate();
             expect(token1).to.not.be.eq(token2);
             expect(token1).to.not.be.eq(token3);
+            expect(token2).to.not.be.eq(token3);
         });
 
         it('50 tokens must be different', async () => {
