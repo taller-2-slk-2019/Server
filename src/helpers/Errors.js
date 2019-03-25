@@ -12,6 +12,13 @@ class OrganizationNotFoundError extends Error {
     }
 }
 
+class ChannelNotFoundError extends Error {
+    constructor(channelId) {
+        super("Channel not found: " + channelId);
+        this.name = this.constructor.name;
+    }
+}
+
 class UserAlreadyInvitedError extends Error {
     constructor(organizationId, userId) {
         super(`User ${userId} is already invited to organization ${organizationId}`);
@@ -47,4 +54,5 @@ module.exports = {
     UserAlreadyInOrganizationError: UserAlreadyInOrganizationError,
     InvalidOrganizationInvitationTokenError: InvalidOrganizationInvitationTokenError,
     InvalidLocationError,
+    ChannelNotFoundError,
 };

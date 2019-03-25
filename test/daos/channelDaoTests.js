@@ -11,7 +11,7 @@ var models = require('../../src/database/sequelize');
 var Channel = models.channel;
 var User = models.user;
 var Organization = models.organization;
-var { UserNotFoundError, OrganizationNotFoundError } = require('../../src/helpers/Errors');
+var { UserNotFoundError, OrganizationNotFoundError, ChannelNotFoundError } = require('../../src/helpers/Errors');
 var { channelCreateData } = require('../data/channelData');
 var { userCreateData } = require('../data/userData');
 var { organizationCreateData } = require('../data/organizationData');
@@ -88,5 +88,40 @@ describe('"ChannelDao Tests"', () => {
         it('channel must not be created with empty data', async () => {
             expect(ChannelDao.create({})).to.eventually.be.rejectedWith(SequelizeValidationError);
         });
+    });
+
+    describe('Find by id', () => {
+        var expected;
+        var channel;
+
+        before(async () => {
+            expected = await Channel.create(channelData);
+            channel = await ChannelDao.findById(expected.id);
+        });
+
+        it('channel must not be null', async () => {
+            expect(channel).to.not.be.null;
+        });
+        
+        it('channel must have correct id', async () => {
+            expect(channel).to.have.property('id', expected.id);
+        });
+        
+        it('channel name must be correct', async () => {
+            expect(channel).to.have.property('name', expected.name);
+        });
+
+        it('throws exception if id does not exist', async () => {
+            expect(ChannelDao.findById(9999999)).to.eventually.be.rejectedWith(ChannelNotFoundError);
+        });
+
+        it('throws exception if id is 0', async () => {
+            expect(ChannelDao.findById(0)).to.eventually.be.rejectedWith(ChannelNotFoundError);
+        });
+
+        it('throws exception if id is -1', async () => {
+            expect(ChannelDao.findById(-1)).to.eventually.be.rejectedWith(ChannelNotFoundError);
+        });
+
     });
 });

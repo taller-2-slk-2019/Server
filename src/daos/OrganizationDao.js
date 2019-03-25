@@ -34,12 +34,12 @@ class OrganizationDao{
 
         var user = await UserDao.findByEmail(userEmail); 
 
-        var existingUser = (await organization.getUsers()).find((usr) => usr.id == user.id);
+        var existingUser = await organization.hasUser(user);
         if (existingUser){
             throw new UserAlreadyInOrganizationError(organization.id, user.id);
         }
 
-        var invitedUser = (await organization.getInvitedUsers()).find((usr) => usr.id == user.id);
+        var invitedUser = await organization.hasInvitedUser(user);
         if (invitedUser){
             throw new UserAlreadyInvitedError(organization.id, user.id);
         }
