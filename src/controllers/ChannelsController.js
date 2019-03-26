@@ -43,7 +43,7 @@ class ChannelsController{
         var page = req.params.page || 1;
         try{
             var messages = await MessageDao.get(channelId, page);
-            sendSuccessResponse(res, messages);
+            sendSuccessResponse(res, {messages: messages});
 
         } catch (err){
             sendErrorResponse(res, err);

@@ -26,9 +26,11 @@ class MessageDao{
         var offset = (page - 1) * limit;
 
         return await Message.findAll({
+            where: { channelId: channel.id },
             order: [['id', 'DESC']],
             offset: offset,
-            limit: limit
+            limit: limit,
+            include: [Message.sender]
         });
     }
 
