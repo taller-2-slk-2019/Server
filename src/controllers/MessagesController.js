@@ -19,7 +19,7 @@ class MessagesController{
                 throw new InvalidMessageTypeError();
             }
             await MessageDao.create(data);
-            logger.info(`Message sent from ${data.senderId} to channel ${data.channelId}`);
+            logger.info(`Message sent from user ${data.senderId} to channel ${data.channelId}`);
             sendEmptySuccessResponse(res);
             
         } catch (err){

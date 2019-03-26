@@ -3,6 +3,8 @@ var router = express.Router();
 
 var channelsController = require('../controllers/ChannelsController');
 
+router.get('/:id/messages/:page?', channelsController.getMessages)
+
 router.post('/create', channelsController.create);
 
 router.patch('/:id/addUser/:userId', channelsController.addUser);
