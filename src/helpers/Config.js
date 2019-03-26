@@ -10,6 +10,8 @@ class Config{
     static get messageTypes() { return this.messageTypesWithText.concat(this.messageTypesWithFiles); }
 
     static get messagesPerPage() { return 25; }
+
+    static get forbiddenWordsReplacement() { return '*****'; }
 }
 
 module.exports = Config;

@@ -85,6 +85,11 @@ describe('"MessageDao Tests"', () => {
             await expect(MessageDao.create(data)).to.eventually.be.rejectedWith(SequelizeValidationError);
         });
 
+        it('channel must not be created without data', async () => {
+            data.data = null;
+            await expect(MessageDao.create(data)).to.eventually.be.rejectedWith(SequelizeValidationError);
+        });
+
         it('message sender must belong to channel', async () => {
             var user2 = await User.create(userCreateData);
             data.senderId = user2.id;

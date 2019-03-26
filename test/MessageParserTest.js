@@ -2,6 +2,7 @@ const chai = require('chai');
 const expect = chai.expect;
 
 var messageParser = require('../src/helpers/MessageParser');
+var Config = require('../src/helpers/Config');
 
 describe('"Message Parser Tests"', () => {
 
@@ -62,6 +63,40 @@ describe('"Message Parser Tests"', () => {
         it('must return empty array for message with @ inside a word', async () => {
             var msg = "Hello pepe@pepe how are you? I am good";
             expect(messageParser.getMentionedUsers(msg)).to.be.an('array').that.is.empty;
+        });
+    });
+
+    describe('Replace forbidden words', () => {
+
+        var forbidden = ['one', 'two', 'three', 'four'];
+        var replace = Config.forbiddenWordsReplacement;
+
+        it('empty message must be the same', async () => {
+            var msg = "";
+            expect(messageParser.replaceForbiddenWords(msg, forbidden)).to.eq(msg);
+        });
+
+        it('message without forbidden words must be the same', async () => {
+            var msg = "this is a message without forbidden words";
+            expect(messageParser.replaceForbiddenWords(msg, forbidden)).to.eq(msg);
+        });
+
+        it('one forbidden word must be replaced', async () => {
+            var msg = "this is a message with one forbidden word";
+            var expected = `this is a message with ${replace} forbidden word`;
+            expect(messageParser.replaceForbiddenWords(msg, forbidden)).to.eq(expected);
+        });
+
+        it('two forbidden words must be replaced', async () => {
+            var msg = "this is a message with one or two forbidden words";
+            var expected = `this is a message with ${replace} or ${replace} forbidden words`;
+            expect(messageParser.replaceForbiddenWords(msg, forbidden)).to.eq(expected);
+        });
+
+        it('forbidden words must be replaced every time', async () => {
+            var msg = "one two three four five six one one one";
+            var expected = `${replace} ${replace} ${replace} ${replace} five six ${replace} ${replace} ${replace}`;
+            expect(messageParser.replaceForbiddenWords(msg, forbidden)).to.eq(expected);
         });
     });
 
