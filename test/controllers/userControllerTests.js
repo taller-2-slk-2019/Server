@@ -23,14 +23,16 @@ describe('"UsersController Tests"', () => {
         var mock4;
         var mock5;
         var mock6;
+        var mock7;
 
         before(async () => {
             mock1 = stub(UserDao, 'create').resolves(userProfileMock);
             mock2 = stub(UserDao, 'update').resolves();
             mock3 = stub(UserDao, 'findById').resolves(userProfileMock);
-            mock4 = stub(OrganizationDao, 'acceptUserInvitation').resolves();
-            mock5 = stub(ChannelDao, 'removeUser').resolves();
-            mock6 = stub(OrganizationDao, 'removeUser').resolves();
+            mock4 = stub(UserDao, 'findWithOrganizations').resolves(userProfileMock);
+            mock5 = stub(OrganizationDao, 'acceptUserInvitation').resolves();
+            mock6 = stub(ChannelDao, 'removeUser').resolves();
+            mock7 = stub(OrganizationDao, 'removeUser').resolves();
         });
 
         after(async () => {
@@ -40,6 +42,7 @@ describe('"UsersController Tests"', () => {
             mock4.restore();
             mock5.restore();
             mock6.restore();
+            mock7.restore();
         });
 
         describe('Register User', () => {
@@ -103,10 +106,16 @@ describe('"UsersController Tests"', () => {
                 var response = res.send.args[0][0];
                 expect(response).to.have.property('id', req.params.id);
             });
-            
-            it('user name must be Pepe', async () => {
+
+            it('user must have organizations', async () => {
                 var response = res.send.args[0][0];
-                expect(response).to.have.property('name', userProfileMock.name);
+                expect(response.organizations.length).to.eq(userProfileMock.organizations.length);
+            });
+
+            it('user has a role in organizations', async () => {
+                var response = res.send.args[0][0];
+                var role =  userProfileMock.organizations[0].userOrganizations.role;
+                expect(response.organizations[0].userOrganizations).to.have.property('role', role);
             });
         });
 
@@ -228,14 +237,16 @@ describe('"UsersController Tests"', () => {
         var mock4;
         var mock5;
         var mock6;
+        var mock7;
 
         before(async () => {
             mock1 = stub(UserDao, 'create').rejects();
             mock2 = stub(UserDao, 'update').rejects();
             mock3 = stub(UserDao, 'findById').rejects();
-            mock4 = stub(OrganizationDao, 'acceptUserInvitation').rejects();
-            mock5 = stub(ChannelDao, 'removeUser').rejects();
-            mock6 = stub(OrganizationDao, 'removeUser').rejects();
+            mock4 = stub(UserDao, 'findWithOrganizations').rejects();
+            mock5 = stub(OrganizationDao, 'acceptUserInvitation').rejects();
+            mock6 = stub(ChannelDao, 'removeUser').rejects();
+            mock7 = stub(OrganizationDao, 'removeUser').rejects();
         });
 
         after(async () => {
@@ -245,6 +256,7 @@ describe('"UsersController Tests"', () => {
             mock4.restore();
             mock5.restore();
             mock6.restore();
+            mock7.restore();
         });
 
 

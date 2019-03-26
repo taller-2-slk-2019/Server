@@ -14,6 +14,17 @@ class OrganizationsController{
         }
     }
 
+    async getProfileForUser(req, res){
+        var id = req.params.id;
+        var userId = req.params.userId;
+        try {
+            var org = await OrganizationDao.findProfileForUser(id, userId);
+            sendSuccessResponse(res, org);
+        } catch (err){
+            sendErrorResponse(res, err);
+        }
+    }
+
     async create(req, res){
         var data = {
             name: req.body.name,

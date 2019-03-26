@@ -6,11 +6,15 @@ chai.use(chaiAsPromised);
 var SequelizeValidationError = require('../../src/database/sequelize').Sequelize.SequelizeValidationError;
 
 var UserDao = require('../../src/daos/UserDao');
+var OrganizationDao = require('../../src/daos/OrganizationDao');
+
 
 var models = require('../../src/database/sequelize');
 var User = models.user;
+var Organization = models.organization;
 var { UserNotFoundError } = require('../../src/helpers/Errors');
 var { userCreateData } = require('../data/userData');
+var { organizationCreateData } = require('../data/organizationData');
 
 describe('"UserDao Tests"', () => {
 
@@ -184,6 +188,51 @@ describe('"UserDao Tests"', () => {
             await expect(UserDao.findByEmail("fdsfsdf@unexistantEmail.gmail.blabla.com")).to.eventually.be.rejectedWith(UserNotFoundError);
         });
 
+    });
+
+    describe('Find With Organizations', () => {
+        var user;
+        var original;
+        var updated;
+        var organizationData = Object.create(organizationCreateData);
+
+        before(async () => {
+            user = await User.create(userCreateData);
+            original = await UserDao.findWithOrganizations(user.id);
+
+            organization = await Organization.create(organizationData);
+            await organization.addUser(user, {through: {role: 'role'}});
+
+            updated = await UserDao.findWithOrganizations(user.id);
+        });
+
+        it('user must not be created with an organization', async () => {
+            expect(original.organizations).to.be.empty;
+        });
+
+        it('user must be in an organization after accepting invitation', async () => {
+            expect(updated.organizations.length).to.eq(1);
+        });
+
+        it('user has the correct organizations id', async () => {
+            expect(updated.organizations[0].id).to.eq(organization.id);
+        });
+
+        it('the users role is: role', async () => {
+            expect(updated.organizations[0].userOrganizations.role).to.eq('role');
+        });
+
+        it('throws exception if id does not exist', async () => {
+            expect(UserDao.findWithOrganizations(9999999)).to.eventually.be.rejectedWith(UserNotFoundError);
+        });
+
+        it('throws exception if id is 0', async () => {
+            expect(UserDao.findWithOrganizations(0)).to.eventually.be.rejectedWith(UserNotFoundError);
+        });
+
+        it('throws exception if id is -1', async () => {
+            expect(UserDao.findWithOrganizations(-1)).to.eventually.be.rejectedWith(UserNotFoundError);
+        });
     });
 
 });

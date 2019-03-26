@@ -29,7 +29,7 @@ class UsersController{
         var id = req.params.id;
 
         try{
-            var user = await UserDao.findById(id);
+            var user = await UserDao.findWithOrganizations(id);
             sendSuccessResponse(res, user);
         } catch (err){
             sendErrorResponse(res, err);
