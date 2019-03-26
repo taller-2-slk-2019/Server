@@ -1,3 +1,5 @@
+var Config = require('./Config');
+
 class UserNotFoundError extends Error {
     constructor(userId) {
         super("User not found: " + userId);
@@ -68,6 +70,13 @@ class InvalidLocationError extends Error {
     }
 }
 
+class InvalidMessageTypeError extends Error {
+    constructor() {
+        super("Message type is invalid. Must be one of " + Config.messageTypes);
+        this.name = this.constructor.name;
+    }
+}
+
 module.exports = {
     UserNotFoundError: UserNotFoundError,
     OrganizationNotFoundError: OrganizationNotFoundError,
@@ -79,4 +88,5 @@ module.exports = {
     UserNotBelongsToOrganizationError,
     UserAlreadyInChannelError,
     UserNotBelongsToChannelError,
+    InvalidMessageTypeError
 };

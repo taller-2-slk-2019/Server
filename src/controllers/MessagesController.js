@@ -1,6 +1,8 @@
 var logger = require('logops');
 var MessageDao = require('../daos/MessageDao');
 var { sendErrorResponse, sendEmptySuccessResponse } = require('../helpers/ResponseHelper');
+var { InvalidMessageTypeError } = require('../helpers/Errors');
+var Config = require('../helpers/Config');
 
 class MessagesController{
 
@@ -13,8 +15,11 @@ class MessagesController{
         };
 
         try{
+            if (! Config.messageTypes.includes(data.type)){
+                throw new InvalidMessageTypeError();
+            }
             await MessageDao.create(data);
-            logger.info(`Message sent from ${data.senderId} to channel ${data.channelId}`);
+            logger.info(`Message sent from user ${data.senderId} to channel ${data.channelId}`);
             sendEmptySuccessResponse(res);
             
         } catch (err){
