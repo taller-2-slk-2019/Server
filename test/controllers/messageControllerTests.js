@@ -74,5 +74,26 @@ describe('"MessagesController Tests"', () => {
                 expect(response).to.have.property('error');
             });
         });
+
+        describe('Create message with invalid type', () => {
+            var data = Object.create(messageCreateData);
+            data.type = "invalid type";
+            var req = mockRequest({ body: data });
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await MessagesController.create(req, res);
+            });
+
+            it('response status must be 500', async () => {
+                expect(res.status).to.have.been.calledWith(500);
+            });
+
+            it('response must have an error', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('error');
+            });
+        });
     });
 });
