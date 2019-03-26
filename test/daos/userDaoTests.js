@@ -191,11 +191,9 @@ describe('"UserDao Tests"', () => {
     });
 
     describe('Find With Organizations', () => {
-        var expected;
         var user;
         var original;
         var updated;
-        var token = "my-invitation-token-12345-to test invitations";
         var organizationData = Object.create(organizationCreateData);
 
         before(async () => {
@@ -203,8 +201,7 @@ describe('"UserDao Tests"', () => {
             original = await UserDao.findWithOrganizations(user.id);
 
             organization = await Organization.create(organizationData);
-            await organization.addInvitedUser(user, {through: {token: token}});
-            await OrganizationDao.acceptUserInvitation(token);
+            await organization.addUser(user, {through: {role: 'role'}});
 
             updated = await UserDao.findWithOrganizations(user.id);
         });
@@ -214,15 +211,15 @@ describe('"UserDao Tests"', () => {
         });
 
         it('user must be in an organization after accepting invitation', async () => {
-            expect(updated.organizations).to.not.be.empty;
+            expect(updated.organizations.length).to.eq(1);
         });
 
         it('user has the correct organizations id', async () => {
             expect(updated.organizations[0].id).to.eq(organization.id);
         });
 
-        it('the users role is: member', async () => {
-            expect(updated.organizations[0].userOrganizations.role).to.eq('member');
+        it('the users role is: role', async () => {
+            expect(updated.organizations[0].userOrganizations.role).to.eq('role');
         });
 
         it('throws exception if id does not exist', async () => {

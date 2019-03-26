@@ -10,10 +10,12 @@ var OrganizationDao = require('../../src/daos/OrganizationDao');
 var models = require('../../src/database/sequelize');
 var User = models.user;
 var Organization = models.organization;
+var Channel = models.channel;
 var { UserNotFoundError, OrganizationNotFoundError, UserAlreadyInvitedError, UserAlreadyInOrganizationError,
             InvalidOrganizationInvitationTokenError, UserNotBelongsToOrganizationError } = require('../../src/helpers/Errors');
 var { userCreateData } = require('../data/userData');
 var { organizationCreateData } = require('../data/organizationData');
+var { channelCreateData } = require('../data/channelData');
 var CreatorRole = require('../../src/models/userRoles/UserRoleCreator');
 var MemberRole = require('../../src/models/userRoles/UserRoleMember');
 
@@ -253,6 +255,55 @@ describe('"OrganizationDao Tests"', () => {
             await organization.setUsers([]);
             await expect(OrganizationDao.removeUser(user.id, organization.id)).to.eventually.be.rejectedWith(UserNotBelongsToOrganizationError);
         });
+    });
+
+    describe('Find profile for user', () => {
+        var expected;
+        var organization;
+        var user;
+
+        before(async () => {
+            expected = await Organization.create(organizationData);
+            user = await User.create(userCreateData);
+            await expected.addUser(user, {through: {role:'role'}});
+            var channelData = Object.create(channelCreateData);
+            channelData.creatorId = user.id;
+            channelData.organizationId = expected.id;
+            var channel = await Channel.create(channelData);
+            await channel.setUsers([user]);
+
+            var ChannelDao = require('../../src/daos/ChannelDao');
+            organization = await OrganizationDao.findProfileForUser(expected.id, user.id);
+        });
+
+        it('organization must not be null', async () => {
+            expect(organization).to.not.be.null;
+        });
+        
+        it('organization must have correct id', async () => {
+            expect(organization).to.have.property('id', expected.id);
+        });
+
+        it('organization must have users', async () => {
+            expect(organization).to.have.property('users').with.length.above(0);
+        });
+
+        it('organization must have channels', async () => {
+            expect(organization).to.have.property('userChannels').with.length.above(0);
+        });
+
+        it('throws exception if id does not exist', async () => {
+            await expect(OrganizationDao.findById(9999999)).to.eventually.be.rejectedWith(OrganizationNotFoundError);
+        });
+
+        it('throws exception if id is 0', async () => {
+            await expect(OrganizationDao.findById(0)).to.eventually.be.rejectedWith(OrganizationNotFoundError);
+        });
+
+        it('throws exception if id is -1', async () => {
+            await expect(OrganizationDao.findById(-1)).to.eventually.be.rejectedWith(OrganizationNotFoundError);
+        });
+
     });
 
 });
