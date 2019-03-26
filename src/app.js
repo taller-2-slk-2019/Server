@@ -22,6 +22,8 @@ app.use('/channels', channelsRouter);
 var messagesRouter = require('./routes/messages');
 app.use('/messages', messagesRouter);
 
+var forbiddenWordsRouter = require('./routes/forbiddenWords');
+app.use('/forbiddenWords', forbiddenWordsRouter);
 
 
 app.all('*', function(req, res){
