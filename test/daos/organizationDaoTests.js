@@ -293,15 +293,20 @@ describe('"OrganizationDao Tests"', () => {
         });
 
         it('throws exception if id does not exist', async () => {
-            await expect(OrganizationDao.findById(9999999)).to.eventually.be.rejectedWith(OrganizationNotFoundError);
+            await expect(OrganizationDao.findProfileForUser(9999999, user.id)).to.eventually.be.rejectedWith(OrganizationNotFoundError);
         });
 
         it('throws exception if id is 0', async () => {
-            await expect(OrganizationDao.findById(0)).to.eventually.be.rejectedWith(OrganizationNotFoundError);
+            await expect(OrganizationDao.findProfileForUser(0, user.id)).to.eventually.be.rejectedWith(OrganizationNotFoundError);
         });
 
         it('throws exception if id is -1', async () => {
-            await expect(OrganizationDao.findById(-1)).to.eventually.be.rejectedWith(OrganizationNotFoundError);
+            await expect(OrganizationDao.findProfileForUser(-1, user.id)).to.eventually.be.rejectedWith(OrganizationNotFoundError);
+        });
+
+        it('throws exception if user not belongs to organization', async () => {
+            var user2 = await User.create(userCreateData);
+            await expect(OrganizationDao.findProfileForUser(expected.id, user2.id)).to.eventually.be.rejectedWith(UserNotBelongsToOrganizationError);
         });
 
     });

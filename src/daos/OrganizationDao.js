@@ -34,6 +34,10 @@ class OrganizationDao{
         var org = await this.findById(id);
         var user = await UserDao.findById(userId);
 
+        if (!(await org.hasUser(user))){
+            throw new UserNotBelongsToOrganizationError(org.id, user.id);
+        }
+
         var channels = await org.getChannels({include: [models.user]});
         var organization = org.toJSON();
         organization.userChannels = await filter(channels, async (channel) => {
