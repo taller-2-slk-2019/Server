@@ -20,12 +20,14 @@ describe('"UsersController Tests"', () => {
         var mock2;
         var mock3;
         var mock4;
+        var mock5;
 
         before(async () => {
             mock1 = stub(UserDao, 'create').resolves(userProfileMock);
             mock2 = stub(UserDao, 'update').resolves();
             mock3 = stub(UserDao, 'findById').resolves(userProfileMock);
-            mock4 = stub(OrganizationDao, 'acceptUserInvitation').resolves();
+            mock4 = stub(UserDao, 'findWithOrganizations').resolves(userProfileMock);
+            mock5 = stub(OrganizationDao, 'acceptUserInvitation').resolves();
         });
 
         after(async () => {
@@ -33,6 +35,7 @@ describe('"UsersController Tests"', () => {
             mock2.restore();
             mock3.restore();
             mock4.restore();
+            mock5.restore();
         });
 
         describe('Register User', () => {
@@ -102,9 +105,25 @@ describe('"UsersController Tests"', () => {
                 expect(response).to.have.property('name', userProfileMock.name);
             });
 
-            it('user organizations must be empty', async () => {
+            it('user email must be correct', async () => {
                 var response = res.send.args[0][0];
-                expect(response.Organizations).to.be.empty;
+                expect(response).to.have.property('email', userProfileMock.email);
+            });
+
+            it('user must have organizations', async () => {
+                var response = res.send.args[0][0];
+                expect(response.organizations).to.not.be.empty;
+            });
+
+            it('user is in the organization called org', async () => {
+                var response = res.send.args[0][0];
+                expect(response.organizations[0]).to.have.property('name', userProfileMock.organizations[0].name);
+            });
+
+            it('user is in the organization called org as a member', async () => {
+                var response = res.send.args[0][0];
+                var role =  userProfileMock.organizations[0].userOrganizations.role;
+                expect(response.organizations[0].userOrganizations).to.have.property('role', role);
             });
         });
 
@@ -186,12 +205,14 @@ describe('"UsersController Tests"', () => {
         var mock2;
         var mock3;
         var mock4;
+        var mock5;
 
         before(async () => {
             mock1 = stub(UserDao, 'create').rejects();
             mock2 = stub(UserDao, 'update').rejects();
             mock3 = stub(UserDao, 'findById').rejects();
-            mock4 = stub(OrganizationDao, 'acceptUserInvitation').rejects();
+            mock4 = stub(UserDao, 'findWithOrganizations').rejects();
+            mock5 = stub(OrganizationDao, 'acceptUserInvitation').rejects();
         });
 
         after(async () => {
@@ -199,6 +220,7 @@ describe('"UsersController Tests"', () => {
             mock2.restore();
             mock3.restore();
             mock4.restore();
+            mock5.restore();
         });
 
 

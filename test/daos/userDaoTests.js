@@ -190,39 +190,51 @@ describe('"UserDao Tests"', () => {
 
     });
 
-    describe('Find User Organizations', () => {
+    describe('Find With Organizations', () => {
         var expected;
         var user;
-        var token = "my-invitation-token-12345-to test invitations";
         var original;
         var updated;
+        var token = "my-invitation-token-12345-to test invitations";
         var organizationData = Object.create(organizationCreateData);
 
         before(async () => {
             user = await User.create(userCreateData);
-            original = await UserDao.findUserOrganizations(user.id);
+            original = await UserDao.findWithOrganizations(user.id);
 
             organization = await Organization.create(organizationData);
             await organization.addInvitedUser(user, {through: {token: token}});
             await OrganizationDao.acceptUserInvitation(token);
 
-            updated = await UserDao.findUserOrganizations(user.id);
+            updated = await UserDao.findWithOrganizations(user.id);
         });
 
         it('user must not be created with an organization', async () => {
-            expect(original).to.be.empty;
+            expect(original.organizations).to.be.empty;
         });
 
         it('user must be in an organization after accepting invitation', async () => {
-            expect(updated).to.not.be.empty;
+            expect(updated.organizations).to.not.be.empty;
         });
 
         it('user has the correct organizations id', async () => {
-            expect(updated[0].organizationId).to.eq(organization.id);
+            expect(updated.organizations[0].id).to.eq(organization.id);
         });
 
         it('the users role is: member', async () => {
-            expect(updated[0].role).to.eq('member');
+            expect(updated.organizations[0].userOrganizations.role).to.eq('member');
+        });
+
+        it('throws exception if id does not exist', async () => {
+            expect(UserDao.findWithOrganizations(9999999)).to.eventually.be.rejectedWith(UserNotFoundError);
+        });
+
+        it('throws exception if id is 0', async () => {
+            expect(UserDao.findWithOrganizations(0)).to.eventually.be.rejectedWith(UserNotFoundError);
+        });
+
+        it('throws exception if id is -1', async () => {
+            expect(UserDao.findWithOrganizations(-1)).to.eventually.be.rejectedWith(UserNotFoundError);
         });
     });
 
