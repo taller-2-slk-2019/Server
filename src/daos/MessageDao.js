@@ -4,6 +4,7 @@ var models = require('../database/sequelize');
 var Message = models.message;
 var Config = require('../helpers/Config');
 var { UserNotBelongsToChannelError } = require('../helpers/Errors');
+var MessageParser = require('../helpers/MessageParser');
 
 class MessageDao{
 
@@ -15,6 +16,16 @@ class MessageDao{
         if (!(await channel.hasUser(user))){
             throw new UserNotBelongsToChannelError(channel.id, user.id);
         }
+
+        if (Config.messageTypesWithText.includes(msg.type)){
+            var organization = await channel.getOrganization();
+            var forbiddenWords = (await organization.getForbiddenWords()).map((word) => {
+                return word.word;
+            });
+
+            msg.data = MessageParser.replaceForbiddenWords(msg.data, forbiddenWords);
+        }
+
 
         return await Message.create(msg);
     }

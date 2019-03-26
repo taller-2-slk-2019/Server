@@ -9,9 +9,11 @@ var SequelizeValidationError = require('../../src/database/sequelize').Sequelize
 var MessageDao = require('../../src/daos/MessageDao');
 
 var Config = require('../../src/helpers/Config');
+var MessageParser = require('../../src/helpers/MessageParser');
 var models = require('../../src/database/sequelize');
 var Message = models.message;
 var Channel = models.channel;
+var ForbiddenWord = models.forbiddenWord;
 var User = models.user;
 var Organization = models.organization;
 var { UserNotBelongsToChannelError } = require('../../src/helpers/Errors');
@@ -95,6 +97,32 @@ describe('"MessageDao Tests"', () => {
             data.senderId = user2.id;
             await expect(MessageDao.create(data)).to.eventually.be.rejectedWith(UserNotBelongsToChannelError);
         });
+    });
+
+    describe('Create message with forbidden words', () => {
+        var msg;
+        var data;
+        var expected;
+
+        before(async () => {
+            data = Object.create(messageData);
+            data.data = "forbidden word detected";
+            expected = `forbidden ${Config.forbiddenWordsReplacement} detected`;
+            forbidden = await ForbiddenWord.create({word: 'word', organizationId: organization.id});
+        })
+
+        it('forbidden word must be replaced', async () => {
+            msg = await MessageDao.create(data);
+            expect(msg.data).to.eq(expected);
+        });
+
+        it('words must not be replaced for files or images', async () => {
+            data.type = 'image';
+            msg = await MessageDao.create(data);
+            expect(msg.data).to.eq(data.data);
+        });
+
+        
     });
 
     describe('Get messages', () => {

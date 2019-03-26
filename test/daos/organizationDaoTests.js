@@ -234,6 +234,7 @@ describe('"OrganizationDao Tests"', () => {
     describe('Remove user', () => {
         var organization;
         var usr;
+        var channel;
 
         before(async () => {
             organization = await Organization.create(organizationData);
@@ -243,6 +244,12 @@ describe('"OrganizationDao Tests"', () => {
         beforeEach(async () => {
             await organization.setUsers([]);
             await organization.addUser(usr, { through: {role:'role'}});
+            var channelData = Object.create(channelCreateData);
+            channelData.creatorId = usr.id;
+            channelData.organizationId = organization.id;
+            channel = await Channel.create(channelData);
+            await channel.setUsers([usr]);
+
             await OrganizationDao.removeUser(usr.id, organization.id);
         });
 
@@ -254,6 +261,11 @@ describe('"OrganizationDao Tests"', () => {
         it('can not remove user that does no belong to organization', async () => {
             await organization.setUsers([]);
             await expect(OrganizationDao.removeUser(user.id, organization.id)).to.eventually.be.rejectedWith(UserNotBelongsToOrganizationError);
+        });
+
+        it('user must be removed from organization channels', async () => {
+            var users = await channel.getUsers();
+            expect(users.length).to.eq(0);
         });
     });
 

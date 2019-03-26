@@ -1,5 +1,5 @@
 var Token = require('../helpers/Token');
-var { filter } = require('p-iteration');
+var { filter, forEach } = require('p-iteration');
 var logger = require('logops');
 var UserDao = require('./UserDao');
 var models = require('../database/sequelize');
@@ -93,6 +93,10 @@ class OrganizationDao{
             throw new UserNotBelongsToOrganizationError(organizationId, userId);
         }
 
+        var channels = await organization.getChannels();
+        forEach(channels, async (channel) => {
+            await channel.removeUser(user);
+        });
         await organization.removeUser(user);
     }
 
