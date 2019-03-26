@@ -7,6 +7,7 @@ module.exports = (sequelize, DataTypes) => {
 
   Message.associate = function(models) {
     Message.belongsTo(models.user, { as: "sender" });
+    Message.belongsTo(models.channel);
   };
   return Message;
 };

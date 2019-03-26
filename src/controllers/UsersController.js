@@ -1,6 +1,7 @@
 var logger = require('logops');
 var UserDao = require('../daos/UserDao');
 var OrganizationDao = require('../daos/OrganizationDao');
+var ChannelDao = require('../daos/ChannelDao');
 var { sendSuccessResponse, sendErrorResponse, sendEmptySuccessResponse } = require('../helpers/ResponseHelper');
 var { InvalidLocationError } = require('../helpers/Errors');
 
@@ -80,6 +81,32 @@ class UsersController{
 
         try{
             await OrganizationDao.acceptUserInvitation(token);
+            sendEmptySuccessResponse(res);
+        } catch (err){
+            sendErrorResponse(res, err);
+        }
+    }
+
+    async abandonOrganization(req, res){
+        var userId = req.params.id;
+        var organizationId = req.params.organizationId;
+
+        try{
+            await OrganizationDao.removeUser(userId, organizationId);
+            logger.info(`User ${userId} abandoned organization ${organizationId}`);
+            sendEmptySuccessResponse(res);
+        } catch (err){
+            sendErrorResponse(res, err);
+        }
+    }
+
+    async abandonChannel(req, res){
+        var userId = req.params.id;
+        var channelId = req.params.channelId;
+
+        try{
+            await ChannelDao.removeUser(userId, channelId);
+            logger.info(`User ${userId} abandoned channel ${channelId}`);
             sendEmptySuccessResponse(res);
         } catch (err){
             sendErrorResponse(res, err);

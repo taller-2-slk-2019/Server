@@ -13,5 +13,9 @@ router.patch('/:id/location', usersController.updateLocation);
 
 router.patch('/organizations/acceptInvitation/:token', usersController.acceptOrganizationInvitation);
 
+router.patch('/:id/organizations/abandon/:organizationId', usersController.abandonOrganization);
+
+router.patch('/:id/channels/abandon/:channelId', usersController.abandonChannel);
+
 
 module.exports = router;

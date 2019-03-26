@@ -50,22 +50,22 @@ describe('"UserDao Tests"', () => {
 
         it('empty user must not be registered', async () => {
             var data = {};
-            expect(UserDao.create(data)).to.eventually.be.rejectedWith(SequelizeValidationError);
+            await expect(UserDao.create(data)).to.eventually.be.rejectedWith(SequelizeValidationError);
         });
 
         it('user must not be registered without name', async () => {
             var data = {surname: "Perez", email:"pepe@gmail.com"};
-            expect(UserDao.create(data)).to.eventually.be.rejectedWith(SequelizeValidationError);
+            await expect(UserDao.create(data)).to.eventually.be.rejectedWith(SequelizeValidationError);
         });
 
         it('user must not be registered without surname', async () => {
             var data = {name: "Pepe", email:"pepe@gmail.com"};
-            expect(UserDao.create(data)).to.eventually.be.rejectedWith(SequelizeValidationError);
+            await expect(UserDao.create(data)).to.eventually.be.rejectedWith(SequelizeValidationError);
         });
 
         it('user must not be registered without email', async () => {
             var data = {name: "Pepe", surname: "Perez"};
-            expect(UserDao.create(data)).to.eventually.be.rejectedWith(SequelizeValidationError);
+            await expect(UserDao.create(data)).to.eventually.be.rejectedWith(SequelizeValidationError);
         });
     });
 
@@ -91,15 +91,15 @@ describe('"UserDao Tests"', () => {
         });
 
         it('throws exception if id does not exist', async () => {
-            expect(UserDao.findById(9999999)).to.eventually.be.rejectedWith(UserNotFoundError);
+            await expect(UserDao.findById(9999999)).to.eventually.be.rejectedWith(UserNotFoundError);
         });
 
         it('throws exception if id is 0', async () => {
-            expect(UserDao.findById(0)).to.eventually.be.rejectedWith(UserNotFoundError);
+            await expect(UserDao.findById(0)).to.eventually.be.rejectedWith(UserNotFoundError);
         });
 
         it('throws exception if id is -1', async () => {
-            expect(UserDao.findById(-1)).to.eventually.be.rejectedWith(UserNotFoundError);
+            await expect(UserDao.findById(-1)).to.eventually.be.rejectedWith(UserNotFoundError);
         });
 
     });
@@ -136,27 +136,27 @@ describe('"UserDao Tests"', () => {
         });
 
         it('throws exception if id does not exist', async () => {
-            expect(UserDao.update(edited, 9999999)).to.eventually.be.rejectedWith(UserNotFoundError);
+            await expect(UserDao.update(edited, 9999999)).to.eventually.be.rejectedWith(UserNotFoundError);
         });
 
         it('throws exception if id is 0', async () => {
-            expect(UserDao.update(edited, 0)).to.eventually.be.rejectedWith(UserNotFoundError);
+            await expect(UserDao.update(edited, 0)).to.eventually.be.rejectedWith(UserNotFoundError);
         });
 
         it('throws exception if id is -1', async () => {
-            expect(UserDao.update(edited, -1)).to.eventually.be.rejectedWith(UserNotFoundError);
+            await expect(UserDao.update(edited, -1)).to.eventually.be.rejectedWith(UserNotFoundError);
         });
 
         it('throws if name is null', async () => {
             newEdited = Object.create(edited);
             newEdited.name = null;
-            expect(UserDao.update(newEdited, original.id)).to.eventually.be.rejectedWith(SequelizeValidationError);
+            await expect(UserDao.update(newEdited, original.id)).to.eventually.be.rejectedWith(SequelizeValidationError);
         });
 
         it('throws if surnamename is null', async () => {
             newEdited = Object.create(edited);
             newEdited.surname = null;
-            expect(UserDao.update(newEdited, original.id)).to.eventually.be.rejectedWith(SequelizeValidationError);
+            await expect(UserDao.update(newEdited, original.id)).to.eventually.be.rejectedWith(SequelizeValidationError);
         });
 
     });
@@ -185,7 +185,7 @@ describe('"UserDao Tests"', () => {
         });
 
         it('throws exception if email does not exist', async () => {
-            expect(UserDao.findByEmail("fdsfsdf@unexistantEmail.gmail.blabla.com")).to.eventually.be.rejectedWith(UserNotFoundError);
+            await expect(UserDao.findByEmail("fdsfsdf@unexistantEmail.gmail.blabla.com")).to.eventually.be.rejectedWith(UserNotFoundError);
         });
 
     });
