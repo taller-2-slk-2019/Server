@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
     Organization.belongsToMany(models.user, { through: models.userOrganizations });
     Organization.belongsToMany(models.user, { through: models.organizationUserInvitation, as: 'invitedUsers' });
     Organization.hasMany(models.channel);
+    Organization.hasMany(models.forbiddenWord);
   };
 
   return Organization;

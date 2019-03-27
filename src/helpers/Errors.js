@@ -77,6 +77,13 @@ class InvalidMessageTypeError extends Error {
     }
 }
 
+class ForbiddenWordAlreadyExistsError extends Error {
+    constructor(word, organizationId) {
+        super(`Forbidden word '${word}' already exists in organization ${organizationId}`);
+        this.name = this.constructor.name;
+    }
+}
+
 module.exports = {
     UserNotFoundError: UserNotFoundError,
     OrganizationNotFoundError: OrganizationNotFoundError,
@@ -88,5 +95,6 @@ module.exports = {
     UserNotBelongsToOrganizationError,
     UserAlreadyInChannelError,
     UserNotBelongsToChannelError,
-    InvalidMessageTypeError
+    InvalidMessageTypeError,
+    ForbiddenWordAlreadyExistsError,
 };

@@ -18,6 +18,21 @@ class MessageParser {
         return users;
     }
 
+    replaceForbiddenWords(message, words){
+        var messageWords = message.split(" ");
+        var messageParsed = [];
+
+        messageWords.forEach((word) => {
+            if (words.includes(word)){
+                messageParsed.push(Config.forbiddenWordsReplacement);
+            } else {
+                messageParsed.push(word);
+            }
+        });
+
+        return messageParsed.join(' ');
+    }
+
 }
 
 module.exports = new MessageParser();
