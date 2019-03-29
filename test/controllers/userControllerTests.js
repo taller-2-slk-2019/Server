@@ -21,18 +21,12 @@ describe('"UsersController Tests"', () => {
         var mock2;
         var mock3;
         var mock4;
-        var mock5;
-        var mock6;
-        var mock7;
 
         before(async () => {
             mock1 = stub(UserDao, 'create').resolves(userProfileMock);
             mock2 = stub(UserDao, 'update').resolves();
             mock3 = stub(UserDao, 'findById').resolves(userProfileMock);
             mock4 = stub(UserDao, 'findWithOrganizations').resolves(userProfileMock);
-            mock5 = stub(OrganizationDao, 'acceptUserInvitation').resolves();
-            mock6 = stub(ChannelDao, 'removeUser').resolves();
-            mock7 = stub(OrganizationDao, 'removeUser').resolves();
         });
 
         after(async () => {
@@ -40,9 +34,6 @@ describe('"UsersController Tests"', () => {
             mock2.restore();
             mock3.restore();
             mock4.restore();
-            mock5.restore();
-            mock6.restore();
-            mock7.restore();
         });
 
         describe('Register User', () => {
@@ -167,49 +158,6 @@ describe('"UsersController Tests"', () => {
                 expect(response).to.have.property('success');
             });
         });
-
-        describe('Accept organization invitation', () => {
-            var req = mockRequest();
-            var res;
-
-            before(async () => {
-                req.params.token = 'token';
-            });
-
-            beforeEach(async () => {
-                res = mockResponse();
-                await UserController.acceptOrganizationInvitation(req, res);
-            });
-
-            it('response status must be 200', async () => {
-                expect(res.status).to.have.been.calledWith(200);
-            });
-            
-            it('response must have a success', async () => {
-                var response = res.send.args[0][0];
-                expect(response).to.have.property('success');
-            });
-        });
-
-
-        describe('Abandon Organization', () => {
-            var req = mockRequest();
-            var res;
-
-            beforeEach(async () => {
-                res = mockResponse();
-                await UserController.abandonOrganization(req, res);
-            });
-
-            it('response status must be 200', async () => {
-                expect(res.status).to.have.been.calledWith(200);
-            });
-            
-            it('response must have a success', async () => {
-                var response = res.send.args[0][0];
-                expect(response).to.have.property('success');
-            });
-        });
     });
 
     describe('Methods with errors', () => {
@@ -217,18 +165,12 @@ describe('"UsersController Tests"', () => {
         var mock2;
         var mock3;
         var mock4;
-        var mock5;
-        var mock6;
-        var mock7;
 
         before(async () => {
             mock1 = stub(UserDao, 'create').rejects();
             mock2 = stub(UserDao, 'update').rejects();
             mock3 = stub(UserDao, 'findById').rejects();
             mock4 = stub(UserDao, 'findWithOrganizations').rejects();
-            mock5 = stub(OrganizationDao, 'acceptUserInvitation').rejects();
-            mock6 = stub(ChannelDao, 'removeUser').rejects();
-            mock7 = stub(OrganizationDao, 'removeUser').rejects();
         });
 
         after(async () => {
@@ -236,9 +178,6 @@ describe('"UsersController Tests"', () => {
             mock2.restore();
             mock3.restore();
             mock4.restore();
-            mock5.restore();
-            mock6.restore();
-            mock7.restore();
         });
 
 
@@ -406,64 +345,6 @@ describe('"UsersController Tests"', () => {
                     var response = res.send.args[0][0];
                     expect(response).to.have.property('error');
                 });
-            });
-        });
-
-        describe('Accept organization invitation with error', () => {
-            var req = mockRequest();
-            req.params.id = "token";
-            var res;
-
-            beforeEach(async () => {
-                res = mockResponse();
-                await UserController.acceptOrganizationInvitation(req, res);
-            });
-
-            it('response status must be 500', async () => {
-                expect(res.status).to.have.been.calledWith(500);
-            });
-
-            it('response must have an error', async () => {
-                var response = res.send.args[0][0];
-                expect(response).to.have.property('error');
-            });
-        });
-
-        describe('Abandon Channel', () => {
-            var req = mockRequest();
-            var res;
-
-            beforeEach(async () => {
-                res = mockResponse();
-                await UserController.abandonChannel(req, res);
-            });
-
-            it('response status must be 500', async () => {
-                expect(res.status).to.have.been.calledWith(500);
-            });
-
-            it('response must have an error', async () => {
-                var response = res.send.args[0][0];
-                expect(response).to.have.property('error');
-            });
-        });
-
-        describe('Abandon Organization', () => {
-            var req = mockRequest();
-            var res;
-
-            beforeEach(async () => {
-                res = mockResponse();
-                await UserController.abandonOrganization(req, res);
-            });
-
-            it('response status must be 500', async () => {
-                expect(res.status).to.have.been.calledWith(500);
-            });
-
-            it('response must have an error', async () => {
-                var response = res.send.args[0][0];
-                expect(response).to.have.property('error');
             });
         });
     });
