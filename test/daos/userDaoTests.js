@@ -190,7 +190,7 @@ describe('"UserDao Tests"', () => {
 
     });
 
-    describe('Find With Organizations', () => {
+    /*describe('Find With Organizations', () => {
         var user;
         var original;
         var updated;
@@ -233,6 +233,6 @@ describe('"UserDao Tests"', () => {
         it('throws exception if id is -1', async () => {
             expect(UserDao.findWithOrganizations(-1)).to.eventually.be.rejectedWith(UserNotFoundError);
         });
-    });
+    });*/
 
 });

@@ -37,7 +37,7 @@ describe('"MessageDao Tests"', () => {
         channelData.creatorId = user.id;
         channelData.organizationId = organization.id;
         channel = await Channel.create(channelData);
-        channel.setUsers([user]);
+        await channel.setUsers([user]);
         messageData.senderId = user.id;
         messageData.channelId = channel.id;
     });
@@ -143,29 +143,23 @@ describe('"MessageDao Tests"', () => {
         });
 
         it('returns correct number of messages', async () => {
-            var messages = await MessageDao.get(channel.id, 1);
+            var messages = await MessageDao.get(channel.id, 0);
             expect(messages).to.have.length(2);
         });
 
-        it('page 1 returns last message', async () => {
-            var messages = await MessageDao.get(channel.id, 1);
+        it('first message is the lastest', async () => {
+            var messages = await MessageDao.get(channel.id, 0);
             expect(messages[0].id).to.eq(msgs[msgs.length - 1].id);
         });
 
-        it('page 2 do not return last message', async () => {
-            var messages = await MessageDao.get(channel.id, 2);
-            expect(messages[0].id).to.not.eq(msgs[msgs.length - 1].id);
-            expect(messages[1].id).to.not.eq(msgs[msgs.length - 1].id);
-        });
-
-        it('page n returns empty array', async () => {
+        it('offset n returns empty array', async () => {
             var messages = await MessageDao.get(channel.id, 99999);
             expect(messages).to.have.length(0);
         });
 
-        it('last page returns less messages', async () => {
+        it('last offset returns less messages', async () => {
             mock.restore();
-            var messages = await MessageDao.get(channel.id, 1);
+            var messages = await MessageDao.get(channel.id, 4);
             expect(messages).to.have.length.below(Config.messagesPerPage);
         });
         

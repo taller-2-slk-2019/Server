@@ -10,19 +10,19 @@ app.use(bodyParser.json());
 
 
 //Set routers
-var usersRouter = require('./routes/users');
+var usersRouter = require('./routes/UsersRoutes');
 app.use('/users', usersRouter);
 
-var organizationsRouter = require('./routes/organizations');
+var organizationsRouter = require('./routes/OrganizationsRoutes');
 app.use('/organizations', organizationsRouter);
 
-var channelsRouter = require('./routes/channels');
+var channelsRouter = require('./routes/ChannelsRoutes');
 app.use('/channels', channelsRouter);
 
-var messagesRouter = require('./routes/messages');
+var messagesRouter = require('./routes/MessagesRoutes');
 app.use('/messages', messagesRouter);
 
-var forbiddenWordsRouter = require('./routes/forbiddenWords');
+var forbiddenWordsRouter = require('./routes/ForbiddenWordsRoutes');
 app.use('/forbiddenWords', forbiddenWordsRouter);
 
 

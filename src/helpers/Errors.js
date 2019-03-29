@@ -77,6 +77,13 @@ class InvalidMessageTypeError extends Error {
     }
 }
 
+class InvalidMessageDataError extends Error {
+    constructor() {
+        super("Message must hava data");
+        this.name = this.constructor.name;
+    }
+}
+
 class ForbiddenWordAlreadyExistsError extends Error {
     constructor(word, organizationId) {
         super(`Forbidden word '${word}' already exists in organization ${organizationId}`);
@@ -97,4 +104,5 @@ module.exports = {
     UserNotBelongsToChannelError,
     InvalidMessageTypeError,
     ForbiddenWordAlreadyExistsError,
+    InvalidMessageDataError
 };

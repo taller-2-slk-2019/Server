@@ -1,6 +1,5 @@
 var logger = require('logops');
 var ChannelDao = require('../daos/ChannelDao');
-var MessageDao = require('../daos/MessageDao');
 var { sendSuccessResponse, sendErrorResponse, sendEmptySuccessResponse } = require('../helpers/ResponseHelper');
 
 class ChannelsController{
@@ -25,9 +24,22 @@ class ChannelsController{
         }
     }
 
+    async get(req, res){
+        var userId = req.query.userId;
+        var organizationId = req.query.organizationId;
+
+        try{
+            var channels  = await ChannelDao.get(userId, organizationId);
+            sendSuccessResponse(res, {channels: channels});
+            
+        } catch (err){
+            sendErrorResponse(res, err);
+        }
+    }
+
     async addUser(req, res){
         var channelId = req.params.id;
-        var userId = req.params.userId;
+        var userId = req.body.userId;
         try{
             await ChannelDao.addUser(channelId, userId);
             logger.info(`User ${userId} added to channel ${channelId}`);
@@ -38,13 +50,14 @@ class ChannelsController{
         }
     }
 
-    async getMessages(req, res){
+    async removeUser(req, res){
+        var userId = req.params.userId;
         var channelId = req.params.id;
-        var page = req.params.page || 1;
-        try{
-            var messages = await MessageDao.get(channelId, page);
-            sendSuccessResponse(res, {messages: messages});
 
+        try{
+            await ChannelDao.removeUser(userId, channelId);
+            logger.info(`User ${userId} abandoned channel ${channelId}`);
+            sendEmptySuccessResponse(res);
         } catch (err){
             sendErrorResponse(res, err);
         }

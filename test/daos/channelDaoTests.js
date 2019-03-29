@@ -186,4 +186,39 @@ describe('"ChannelDao Tests"', () => {
             await expect(ChannelDao.removeUser(user.id, channel.id)).to.eventually.be.rejectedWith(UserNotBelongsToChannelError);
         });
     });
+
+    describe('Get channels', () => {
+        var channel;
+        var channel2;
+        var org;
+        var usr;
+
+        before(async () => {
+            org = await Organization.create(organizationData);
+            var data = Object.create(channelData);
+            data.organizationId = org.id;
+            channel = await Channel.create(data);
+            await channel.addUser(user);
+            channel2 = await Channel.create(data);
+            await channel2.addUser(user);
+            usr = await User.create(userCreateData);
+        });
+
+        it('get for user and organization must return 2 channels', async () => {
+            var channels = await ChannelDao.get(user.id, org.id);
+            expect(channels.length).to.eq(2);
+        });
+
+        it('get for other user and organization must return 0 channels', async () => {
+            var channels = await ChannelDao.get(usr.id, org.id);
+            expect(channels.length).to.eq(0);
+        });
+
+        it('user must belong to returned channels', async () => {
+            var channels = await ChannelDao.get(user.id, org.id);
+            var hasUser = await channels[0].hasUser(user);
+            expect(hasUser).to.be.true;
+        });
+
+    });
 });
