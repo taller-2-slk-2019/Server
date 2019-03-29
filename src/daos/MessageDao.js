@@ -30,11 +30,10 @@ class MessageDao{
         return await Message.create(msg);
     }
 
-    async get(channelId, page){
+    async get(channelId, offset){
         var channel = await ChannelDao.findById(channelId);
 
         var limit = Config.messagesPerPage;
-        var offset = (page - 1) * limit;
 
         return await Message.findAll({
             where: { channelId: channel.id },

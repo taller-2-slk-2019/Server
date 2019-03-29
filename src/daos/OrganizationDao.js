@@ -1,5 +1,5 @@
 var Token = require('../helpers/Token');
-var { filter, forEach } = require('p-iteration');
+var { forEach } = require('p-iteration');
 var logger = require('logops');
 var UserDao = require('./UserDao');
 var models = require('../database/sequelize');
@@ -22,7 +22,7 @@ class OrganizationDao{
     }
 
     async findById(id){
-        var org = await Organization.findByPk(id, {include: [models.user]});
+        var org = await Organization.findByPk(id);
         if (!org){
             throw new OrganizationNotFoundError(id);
         }
@@ -30,20 +30,16 @@ class OrganizationDao{
     }
 
 
-    async findProfileForUser(id, userId){
-        var org = await this.findById(id);
+    async findForUser(userId){
         var user = await UserDao.findById(userId);
 
-        if (!(await org.hasUser(user))){
-            throw new UserNotBelongsToOrganizationError(org.id, user.id);
-        }
+        return await user.getOrganizations();
+    }
 
-        var channels = await org.getChannels({include: [models.user]});
-        var organization = org.toJSON();
-        organization.userChannels = await filter(channels, async (channel) => {
-            return await channel.hasUser(user);
-        });
-        return organization;
+    async findOrganizationUsers(organizationId){
+        var org = await this.findById(organizationId);
+
+        return await org.getUsers();
     }
 
     async inviteUser(organizationId, userEmail){

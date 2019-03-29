@@ -1,10 +1,10 @@
 var logger = require('logops');
 var OrganizationDao = require('../daos/OrganizationDao');
-var { sendSuccessResponse, sendErrorResponse } = require('../helpers/ResponseHelper');
+var { sendSuccessResponse, sendEmptySuccessResponse, sendErrorResponse } = require('../helpers/ResponseHelper');
 
 class OrganizationsController{
 
-    async get(req, res){
+    async getProfile(req, res){
         var id = req.params.id;
         try {
             var org = await OrganizationDao.findById(id);
@@ -14,12 +14,12 @@ class OrganizationsController{
         }
     }
 
-    async getProfileForUser(req, res){
-        var id = req.params.id;
-        var userId = req.params.userId;
+    async get(req, res){
+        var user = req.query.userId;
+        
         try {
-            var org = await OrganizationDao.findProfileForUser(id, userId);
-            sendSuccessResponse(res, org);
+            var orgs = await OrganizationDao.findForUser(user);
+            sendSuccessResponse(res, orgs);
         } catch (err){
             sendErrorResponse(res, err);
         }
@@ -56,6 +56,30 @@ class OrganizationsController{
             logger.info(`User ${userEmail} invited to organization ${organizationId} with token: ${token}`);
             sendSuccessResponse(res, { token: token });
 
+        } catch (err){
+            sendErrorResponse(res, err);
+        }
+    }
+
+    async addUser(req, res){
+        var token = req.body.token;
+
+        try{
+            await OrganizationDao.acceptUserInvitation(token);
+            sendEmptySuccessResponse(res);
+        } catch (err){
+            sendErrorResponse(res, err);
+        }
+    }
+
+    async removeUser(req, res){
+        var userId = req.params.userId;
+        var organizationId = req.params.id;
+
+        try{
+            await OrganizationDao.removeUser(userId, organizationId);
+            logger.info(`User ${userId} abandoned organization ${organizationId}`);
+            sendEmptySuccessResponse(res);
         } catch (err){
             sendErrorResponse(res, err);
         }

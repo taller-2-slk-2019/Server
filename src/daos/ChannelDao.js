@@ -1,3 +1,4 @@
+var { filter } = require('p-iteration');
 var UserDao = require('./UserDao');
 var OrganizationDao = require('./OrganizationDao');
 var models = require('../database/sequelize');
@@ -56,6 +57,19 @@ class ChannelDao{
         }
 
         await channel.removeUser(user);
+    }
+
+    async get(userId, organizationId){
+        var org = await OrganizationDao.findById(organizationId);
+        var user = await UserDao.findById(userId);
+
+        var orgChannels = await org.getChannels();
+
+        var userChannels = await filter(orgChannels, async (channel) => {
+            return await channel.hasUser(user);
+        });
+
+        return userChannels;
     }
 
 }

@@ -1,6 +1,5 @@
 var models = require('../database/sequelize');
 var User = models.user;
-var Organization = models.organization;
 var { UserNotFoundError } = require('../helpers/Errors');
 
 class UserDao{
@@ -11,14 +10,6 @@ class UserDao{
 
     async findById(id){
         var user = await User.findByPk(id);
-        if (!user) {
-            throw new UserNotFoundError(id);
-        }
-        return user;
-    }
-
-    async findWithOrganizations(id){
-        var user = await User.findByPk(id, { include : Organization });
         if (!user) {
             throw new UserNotFoundError(id);
         }

@@ -5,7 +5,7 @@ var { sendSuccessResponse, sendErrorResponse, sendEmptySuccessResponse } = requi
 class ForbiddenWordsController{
 
     async get(req, res){
-        var organizationId = req.params.organizationId;
+        var organizationId = req.query.organizationId;
 
         try{
             var words  = await ForbiddenWordDao.get(organizationId);
@@ -19,8 +19,9 @@ class ForbiddenWordsController{
     async add(req, res){
         var data = {
             word: req.body.word,
-            organizationId: req.params.organizationId
+            organizationId: req.body.organizationId
         };
+        
         try{
             await ForbiddenWordDao.create(data);
             logger.info(`Forbidden word '${data.word}' added to organization ${data.organizationId}`);
@@ -33,6 +34,7 @@ class ForbiddenWordsController{
 
     async delete(req, res){
         var wordId = req.params.id;
+
         try{
             await ForbiddenWordDao.delete(wordId);
             logger.info(`Forbidden word '${wordId}' deleted`);
