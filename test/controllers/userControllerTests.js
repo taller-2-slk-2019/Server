@@ -191,24 +191,6 @@ describe('"UsersController Tests"', () => {
             });
         });
 
-        describe('Abandon Channel', () => {
-            var req = mockRequest();
-            var res;
-
-            beforeEach(async () => {
-                res = mockResponse();
-                await UserController.abandonChannel(req, res);
-            });
-
-            it('response status must be 200', async () => {
-                expect(res.status).to.have.been.calledWith(200);
-            });
-            
-            it('response must have a success', async () => {
-                var response = res.send.args[0][0];
-                expect(response).to.have.property('success');
-            });
-        });
 
         describe('Abandon Organization', () => {
             var req = mockRequest();
