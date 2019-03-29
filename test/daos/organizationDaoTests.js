@@ -269,58 +269,64 @@ describe('"OrganizationDao Tests"', () => {
         });
     });
 
-    describe('Find profile for user', () => {
-        var expected;
-        var organization;
+    describe('Find for user', () => {
+        var organization1;
+        var organization2;
         var user;
+        var organizations;
 
         before(async () => {
-            expected = await Organization.create(organizationData);
+            organization1 = await Organization.create(organizationData);
             user = await User.create(userCreateData);
-            await expected.addUser(user, {through: {role:'role'}});
-            var channelData = Object.create(channelCreateData);
-            channelData.creatorId = user.id;
-            channelData.organizationId = expected.id;
-            var channel = await Channel.create(channelData);
-            await channel.setUsers([user]);
-
-            var ChannelDao = require('../../src/daos/ChannelDao');
-            organization = await OrganizationDao.findProfileForUser(expected.id, user.id);
+            await organization1.addUser(user, {through: {role:'role'}});
+            organization2 = await Organization.create(organizationData);
+            await organization2.addUser(user, {through: {role:'role'}});
+            
+            organizations = await OrganizationDao.findForUser(user.id);
         });
 
-        it('organization must not be null', async () => {
-            expect(organization).to.not.be.null;
+        it('must return 2 organizations', async () => {
+            expect(organizations.length).to.eq(2);
         });
         
-        it('organization must have correct id', async () => {
-            expect(organization).to.have.property('id', expected.id);
+        it('organizations must have correct id', async () => {
+            expect(organizations[0]).to.have.property('id', organization1.id);
         });
 
-        it('organization must have users', async () => {
-            expect(organization).to.have.property('users').with.length.above(0);
+        it('organization must have user', async () => {
+            var belongs = await organizations[0].hasUser(user);
+            expect(belongs).to.be.true;
+        });
+    });
+
+    describe('Find Organization Users', () => {
+        var organization;
+        var user;
+        var user2;
+        var users;
+
+        before(async () => {
+            organization = await Organization.create(organizationData);
+            user = await User.create(userCreateData);
+            user2 = await User.create(userCreateData);
+            await organization.addUser(user, {through: {role:'role'}});
+            await organization.addUser(user2, {through: {role:'role'}});
+            
+            users = await OrganizationDao.findOrganizationUsers(organization.id);
         });
 
-        it('organization must have channels', async () => {
-            expect(organization).to.have.property('userChannels').with.length.above(0);
+        it('must return 2 users', async () => {
+            expect(users.length).to.eq(2);
+        });
+        
+        it('users must have correct id', async () => {
+            expect(users[0]).to.have.property('id', user.id);
         });
 
-        it('throws exception if id does not exist', async () => {
-            await expect(OrganizationDao.findProfileForUser(9999999, user.id)).to.eventually.be.rejectedWith(OrganizationNotFoundError);
+        it('users must belong to organization', async () => {
+            var belongs = await users[0].hasOrganization(organization);
+            expect(belongs).to.be.true;
         });
-
-        it('throws exception if id is 0', async () => {
-            await expect(OrganizationDao.findProfileForUser(0, user.id)).to.eventually.be.rejectedWith(OrganizationNotFoundError);
-        });
-
-        it('throws exception if id is -1', async () => {
-            await expect(OrganizationDao.findProfileForUser(-1, user.id)).to.eventually.be.rejectedWith(OrganizationNotFoundError);
-        });
-
-        it('throws exception if user not belongs to organization', async () => {
-            var user2 = await User.create(userCreateData);
-            await expect(OrganizationDao.findProfileForUser(expected.id, user2.id)).to.eventually.be.rejectedWith(UserNotBelongsToOrganizationError);
-        });
-
     });
 
 });

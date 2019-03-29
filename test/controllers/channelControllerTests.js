@@ -12,8 +12,7 @@ const messageMock = require('../mocks/messageMock');
 
 var ChannelsController = require('../../src/controllers/ChannelsController');
 var ChannelDao = require('../../src/daos/ChannelDao');
-var MessageDao = require('../../src/daos/MessageDao');
-
+/*
 describe('"ChannelsController Tests"', () => {
 
     describe('Methods without errors', () => {
@@ -178,3 +177,4 @@ describe('"ChannelsController Tests"', () => {
         });
     });
 });
+*/

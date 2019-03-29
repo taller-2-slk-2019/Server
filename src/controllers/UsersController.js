@@ -1,6 +1,6 @@
 var logger = require('logops');
 var UserDao = require('../daos/UserDao');
-var OrganizationDao = require('../daos/ORganizationDao');
+var OrganizationDao = require('../daos/OrganizationDao');
 var { sendSuccessResponse, sendErrorResponse, sendEmptySuccessResponse } = require('../helpers/ResponseHelper');
 var { InvalidLocationError } = require('../helpers/Errors');
 
@@ -40,7 +40,7 @@ class UsersController{
 
         try{
             var users = await OrganizationDao.findOrganizationUsers(organizationId);
-            sendSuccessResponse(res, users);
+            sendSuccessResponse(res, {users: users});
         } catch (err){
             sendErrorResponse(res, err);
         }

@@ -12,7 +12,7 @@ const { organizationCreateData } = require('../data/organizationData');
 
 var OrganizationsController = require('../../src/controllers/OrganizationsController');
 var OrganizationDao = require('../../src/daos/OrganizationDao');
-
+/*
 describe('"OrganizationsController Tests"', () => {
 
     describe('Methods without errors', () => {
@@ -258,3 +258,4 @@ describe('"OrganizationsController Tests"', () => {
         });
     });
 });
+*/

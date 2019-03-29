@@ -13,7 +13,7 @@ var UserController = require('../../src/controllers/UsersController');
 var UserDao = require('../../src/daos/UserDao');
 var OrganizationDao = require('../../src/daos/OrganizationDao');
 var ChannelDao = require('../../src/daos/ChannelDao');
-
+/*
 describe('"UsersController Tests"', () => {
 
     describe('Methods without errors', () => {
@@ -486,3 +486,4 @@ describe('"UsersController Tests"', () => {
         });
     });
 });
+*/
