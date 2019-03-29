@@ -7,13 +7,13 @@ const sinonChai = require('sinon-chai');
 chai.use(sinonChai);
 const { mockRequest, mockResponse } = require('mock-req-res');
 const userProfileMock = require('../mocks/userProfileMock');
+const userForOrganizationMock = require('../mocks/userForOrganizationMock');
 const { userCreateData } = require('../data/userData');
 
 var UserController = require('../../src/controllers/UsersController');
 var UserDao = require('../../src/daos/UserDao');
 var OrganizationDao = require('../../src/daos/OrganizationDao');
-var ChannelDao = require('../../src/daos/ChannelDao');
-/*
+
 describe('"UsersController Tests"', () => {
 
     describe('Methods without errors', () => {
@@ -26,7 +26,7 @@ describe('"UsersController Tests"', () => {
             mock1 = stub(UserDao, 'create').resolves(userProfileMock);
             mock2 = stub(UserDao, 'update').resolves();
             mock3 = stub(UserDao, 'findById').resolves(userProfileMock);
-            mock4 = stub(UserDao, 'findWithOrganizations').resolves(userProfileMock);
+            mock4 = stub(OrganizationDao, 'findOrganizationUsers').resolves([userForOrganizationMock, userForOrganizationMock]);
         });
 
         after(async () => {
@@ -97,16 +97,34 @@ describe('"UsersController Tests"', () => {
                 var response = res.send.args[0][0];
                 expect(response).to.have.property('id', req.params.id);
             });
+        });
 
-            it('user must have organizations', async () => {
-                var response = res.send.args[0][0];
-                expect(response.organizations.length).to.eq(userProfileMock.organizations.length);
+        describe('Get', () => {
+            var req = mockRequest({});
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await UserController.get(req, res);
             });
 
-            it('user has a role in organizations', async () => {
+            it('response status must be 200', async () => {
+                expect(res.status).to.have.been.calledWith(200);
+            });
+            
+            it('response must have users', async () => {
                 var response = res.send.args[0][0];
-                var role =  userProfileMock.organizations[0].userOrganizations.role;
-                expect(response.organizations[0].userOrganizations).to.have.property('role', role);
+                expect(response).to.have.property('users');
+            });
+
+            it('user id must be correct', async () => {
+                var response = res.send.args[0][0];
+                expect(response.users[0]).to.have.property('id', userForOrganizationMock.id);
+            });
+
+            it('users must have role', async () => {
+                var response = res.send.args[0][0];
+                expect(response.users[0].userOrganizations).to.have.property('role');
             });
         });
 
@@ -170,7 +188,7 @@ describe('"UsersController Tests"', () => {
             mock1 = stub(UserDao, 'create').rejects();
             mock2 = stub(UserDao, 'update').rejects();
             mock3 = stub(UserDao, 'findById').rejects();
-            mock4 = stub(UserDao, 'findWithOrganizations').rejects();
+            mock4 = stub(OrganizationDao, 'findOrganizationUsers').rejects();
         });
 
         after(async () => {
@@ -212,6 +230,26 @@ describe('"UsersController Tests"', () => {
             beforeEach(async () => {
                 res = mockResponse();
                 await UserController.getProfile(req, res);
+            });
+
+            it('response status must be 500', async () => { 
+                expect(res.status).to.have.been.calledWith(500);
+            });
+            
+            it('response must have an error', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('error');
+            });
+        });
+
+        describe('Get with error', () => {
+
+            var req = mockRequest();
+            var res;
+            
+            beforeEach(async () => {
+                res = mockResponse();
+                await UserController.get(req, res);
             });
 
             it('response status must be 500', async () => { 
@@ -349,4 +387,3 @@ describe('"UsersController Tests"', () => {
         });
     });
 });
-*/
