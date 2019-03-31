@@ -23,6 +23,14 @@ class UserDao{
         }
         return user;
     }
+
+    async findByToken(token){
+        var user = await User.findOne({where: {token: token}});
+        if (!user) {
+            throw new UserNotFoundError(token);
+        }
+        return user;
+    }
     
     async update(user, id){
         await this.findById(id);
