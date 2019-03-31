@@ -114,17 +114,17 @@ describe('"UsersController Tests"', () => {
             
             it('response must have users', async () => {
                 var response = res.send.args[0][0];
-                expect(response).to.have.property('users');
+                expect(response).to.be.an('array');
             });
 
             it('user id must be correct', async () => {
                 var response = res.send.args[0][0];
-                expect(response.users[0]).to.have.property('id', userForOrganizationMock.id);
+                expect(response[0]).to.have.property('id', userForOrganizationMock.id);
             });
 
             it('users must have role', async () => {
                 var response = res.send.args[0][0];
-                expect(response.users[0].userOrganizations).to.have.property('role');
+                expect(response[0].userOrganizations).to.have.property('role');
             });
         });
 

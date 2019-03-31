@@ -81,17 +81,17 @@ describe('"OrganizationsController Tests"', () => {
 
             it('organizations must not be null', async () => {
                 var response = res.send.args[0][0];
-                expect(response).to.have.property('organizations');
+                expect(response).to.be.an('array');
             });
 
             it('returned organization must have correct id', async () => {
                 var response = res.send.args[0][0];
-                expect(response.organizations[0]).to.have.property('id', organizationsForUserMock.id);
+                expect(response[0]).to.have.property('id', organizationsForUserMock.id);
             });
 
             it('returned organizations must have role', async () => {
                 var response = res.send.args[0][0];
-                expect(response.organizations[0].userOrganizations).to.have.property('role');
+                expect(response[0].userOrganizations).to.have.property('role');
             });
         });
 

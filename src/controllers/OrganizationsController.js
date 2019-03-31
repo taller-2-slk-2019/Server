@@ -19,7 +19,7 @@ class OrganizationsController{
         
         try {
             var orgs = await OrganizationDao.findForUser(user);
-            sendSuccessResponse(res, {organizations: orgs});
+            sendSuccessResponse(res, orgs);
         } catch (err){
             sendErrorResponse(res, err);
         }

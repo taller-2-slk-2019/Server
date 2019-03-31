@@ -9,7 +9,7 @@ class ForbiddenWordsController{
 
         try{
             var words  = await ForbiddenWordDao.get(organizationId);
-            sendSuccessResponse(res, {forbiddenWords: words});
+            sendSuccessResponse(res, words);
             
         } catch (err){
             sendErrorResponse(res, err);

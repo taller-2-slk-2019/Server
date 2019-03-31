@@ -84,12 +84,12 @@ describe('"ForbiddenWordsController Tests"', () => {
 
             it('words must not be null', async () => {
                 var response = res.send.args[0][0];
-                expect(response).to.have.property('forbiddenWords').with.length.above(0);
+                expect(response).to.be.an('array').with.length.above(0);
             });
 
             it('words must have a word', async () => {
                 var response = res.send.args[0][0];
-                expect(response.forbiddenWords[0]).to.have.property('word');
+                expect(response[0]).to.have.property('word');
             });
         });
     });

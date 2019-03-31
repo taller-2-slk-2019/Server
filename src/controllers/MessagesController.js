@@ -37,7 +37,7 @@ class MessagesController{
 
         try{
             var messages = await MessageDao.get(channelId, offset);
-            sendSuccessResponse(res, {messages: messages});
+            sendSuccessResponse(res, messages);
 
         } catch (err){
             sendErrorResponse(res, err);

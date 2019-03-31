@@ -63,12 +63,12 @@ describe('"MessagesController Tests"', () => {
 
             it('messages must not be null', async () => {
                 var response = res.send.args[0][0];
-                expect(response).to.have.property('messages').with.length.above(0);
+                expect(response).to.be.an('array').with.length.above(0);
             });
 
             it('messages must have sender', async () => {
                 var response = res.send.args[0][0];
-                expect(response.messages[0]).to.have.property('sender');
+                expect(response[0]).to.have.property('sender');
             });
         });
     });

@@ -30,7 +30,7 @@ class ChannelsController{
 
         try{
             var channels  = await ChannelDao.get(userId, organizationId);
-            sendSuccessResponse(res, {channels: channels});
+            sendSuccessResponse(res, channels);
             
         } catch (err){
             sendErrorResponse(res, err);

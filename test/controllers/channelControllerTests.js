@@ -111,12 +111,12 @@ describe('"ChannelsController Tests"', () => {
             
             it('response must have channels', async () => {
                 var response = res.send.args[0][0];
-                expect(response).to.have.property('channels');
+                expect(response).to.be.an('array');
             });
 
             it('response must have 3 channels', async () => {
                 var response = res.send.args[0][0];
-                expect(response.channels.length).to.eq(3);
+                expect(response.length).to.eq(3);
             });
         });
 
