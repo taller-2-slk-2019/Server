@@ -20,9 +20,11 @@ describe('"UserDao Tests"', () => {
 
     describe('Register User', () => {
         var user;
+        var data;
 
         beforeEach(async () => {
-            user = await UserDao.create(userCreateData);
+            data = userCreateData();
+            user = await UserDao.create(data);
         });
 
         it('user must be registered', async () => {
@@ -39,6 +41,12 @@ describe('"UserDao Tests"', () => {
 
         it('user email must be pepe@gmail.com', async () => {
             expect(user.email).to.eq("pepe@gmail.com");
+        });
+
+        it('register with same token updates user', async () => {
+            data.name = "other";
+            user = await UserDao.create(data);
+            expect(user.name).to.eq("other");
         });
     });
 
@@ -70,7 +78,7 @@ describe('"UserDao Tests"', () => {
         var user;
 
         before(async () => {
-            expected = await User.create(userCreateData);
+            expected = await User.create(userCreateData());
             user = await UserDao.findById(expected.id);
         });
 
@@ -106,7 +114,7 @@ describe('"UserDao Tests"', () => {
         var user;
 
         before(async () => {
-            original = await User.create(userCreateData);
+            original = await User.create(userCreateData());
             await UserDao.update(edited, original.id);
             user = await User.findByPk(original.id);
         });
@@ -148,7 +156,7 @@ describe('"UserDao Tests"', () => {
     });
 
     describe('Find by email', () => {
-        var data = Object.create(userCreateData);
+        var data = Object.create(userCreateData());
         data.email = "pepeTestFindEmail@unique.gmail.com";
         var expected;
         var user;
@@ -177,7 +185,7 @@ describe('"UserDao Tests"', () => {
     });
 
     describe('Find by token', () => {
-        var data = Object.create(userCreateData);
+        var data = Object.create(userCreateData());
         data.token = "uniqueToken123456";
         var expected;
         var user;

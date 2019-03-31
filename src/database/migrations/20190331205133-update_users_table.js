@@ -5,7 +5,8 @@ module.exports = {
     return queryInterface.sequelize.transaction((t) => {
       return Promise.all([
         queryInterface.addColumn('users', 'token', {
-          type: Sequelize.STRING
+          type: Sequelize.STRING,
+          unique: true
         }, { transaction: t }),
           queryInterface.removeColumn('users', 'surname', { transaction: t }),
       ]);

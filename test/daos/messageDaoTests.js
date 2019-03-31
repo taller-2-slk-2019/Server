@@ -31,7 +31,7 @@ describe('"MessageDao Tests"', () => {
     var messageData = Object.create(messageCreateData);
 
     before(async () => {
-        user = await User.create(userCreateData);
+        user = await User.create(userCreateData());
         organizationData.creatorId = user.id;
         organization = await Organization.create(organizationData);
         channelData.creatorId = user.id;
@@ -93,7 +93,7 @@ describe('"MessageDao Tests"', () => {
         });
 
         it('message sender must belong to channel', async () => {
-            var user2 = await User.create(userCreateData);
+            var user2 = await User.create(userCreateData());
             data.senderId = user2.id;
             await expect(MessageDao.create(data)).to.eventually.be.rejectedWith(UserNotBelongsToChannelError);
         });

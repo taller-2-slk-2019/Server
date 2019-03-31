@@ -1,8 +1,12 @@
-var userCreateData = {
-    name: "Pepe",
-    token: "token123",
-    email: "pepe@gmail.com",
-    picture: "default.jpg",
+var randtoken = require('rand-token');
+
+var userCreateData = function() {
+    return {
+        name: "Pepe",
+        token: randtoken.generate(20),
+        email: "pepe@gmail.com",
+        picture: "default.jpg",
+    }
 };
 
 module.exports = { 

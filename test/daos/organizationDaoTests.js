@@ -26,7 +26,7 @@ describe('"OrganizationDao Tests"', () => {
     var memberRole = new MemberRole();
 
     before(async () => {
-        user = await User.create(userCreateData);
+        user = await User.create(userCreateData());
         organizationData.creatorId = user.id;
     });
 
@@ -116,7 +116,7 @@ describe('"OrganizationDao Tests"', () => {
 
     describe('Invite User', () => {
         var organization;
-        var invitedUserData = Object.create(userCreateData);
+        var invitedUserData = Object.create(userCreateData());
         var userToInvite;
         var token;
 
@@ -158,7 +158,7 @@ describe('"OrganizationDao Tests"', () => {
 
     describe('Invite user with errors', () => {
         var organization;
-        var invitedUserData = Object.create(userCreateData);
+        var invitedUserData = Object.create(userCreateData());
         var userToInvite;
         var token;
 
@@ -187,7 +187,7 @@ describe('"OrganizationDao Tests"', () => {
 
     describe('Accept User Invitation', () => {
         var organization;
-        var invitedUserData = Object.create(userCreateData);
+        var invitedUserData = Object.create(userCreateData());
         var userToInvite;
         var token = "my-invitation-token-12345-to test invitations";
 
@@ -238,7 +238,7 @@ describe('"OrganizationDao Tests"', () => {
 
         before(async () => {
             organization = await Organization.create(organizationData);
-            usr = await User.create(userCreateData);
+            usr = await User.create(userCreateData());
         });
 
         beforeEach(async () => {
@@ -277,7 +277,7 @@ describe('"OrganizationDao Tests"', () => {
 
         before(async () => {
             organization1 = await Organization.create(organizationData);
-            user = await User.create(userCreateData);
+            user = await User.create(userCreateData());
             await organization1.addUser(user, {through: {role:'role'}});
             organization2 = await Organization.create(organizationData);
             await organization2.addUser(user, {through: {role:'role'}});
@@ -307,8 +307,8 @@ describe('"OrganizationDao Tests"', () => {
 
         before(async () => {
             organization = await Organization.create(organizationData);
-            user = await User.create(userCreateData);
-            user2 = await User.create(userCreateData);
+            user = await User.create(userCreateData());
+            user2 = await User.create(userCreateData());
             await organization.addUser(user, {through: {role:'role'}});
             await organization.addUser(user2, {through: {role:'role'}});
             

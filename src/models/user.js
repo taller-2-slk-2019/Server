@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
     picture: { type: DataTypes.STRING, allowNull: false, validate: { notNull: true } },
     latitude: DataTypes.FLOAT,
     longitude: DataTypes.FLOAT,
-    token: { type: DataTypes.STRING, allowNull: false, validate: { notNull: true }},
+    token: { type: DataTypes.STRING, allowNull: false, validate: { notNull: true }, unique: true},
   }, {
     defaultScope: {
       attributes: { exclude: ['token'] }
