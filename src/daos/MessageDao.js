@@ -40,7 +40,7 @@ class MessageDao{
             order: [['id', 'DESC']],
             offset: offset,
             limit: limit,
-            include: [Message.sender]
+            include: [{ association: Message.sender, attributes: { exclude: ['token'] }}]
         });
     }
 

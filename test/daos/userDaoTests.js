@@ -37,10 +37,6 @@ describe('"UserDao Tests"', () => {
             expect(user.name).to.eq("Pepe");
         });
 
-        it('user surname must be Perez', async () => {
-            expect(user.surname).to.eq("Perez");
-        });
-
         it('user email must be pepe@gmail.com', async () => {
             expect(user.email).to.eq("pepe@gmail.com");
         });
@@ -54,11 +50,11 @@ describe('"UserDao Tests"', () => {
         });
 
         it('user must not be registered without name', async () => {
-            var data = {surname: "Perez", email:"pepe@gmail.com"};
+            var data = {email:"pepe@gmail.com"};
             await expect(UserDao.create(data)).to.eventually.be.rejectedWith(SequelizeValidationError);
         });
 
-        it('user must not be registered without surname', async () => {
+        it('user must not be registered without token', async () => {
             var data = {name: "Pepe", email:"pepe@gmail.com"};
             await expect(UserDao.create(data)).to.eventually.be.rejectedWith(SequelizeValidationError);
         });
@@ -105,7 +101,7 @@ describe('"UserDao Tests"', () => {
     });
 
     describe('Update', () => {
-        var edited = {name: "Carlos", surname: "Juarez"};
+        var edited = {name: "Carlos"};
         var original;
         var user;
 
@@ -127,10 +123,6 @@ describe('"UserDao Tests"', () => {
             expect(user).to.have.property('name', edited.name);
         });
 
-        it('user surname must be updated', async () => {
-            expect(user).to.have.property('surname', edited.surname);
-        });
-
         it('user email must not change', async () => {
             expect(user).to.have.property('email', original.email);
         });
@@ -150,12 +142,6 @@ describe('"UserDao Tests"', () => {
         it('throws if name is null', async () => {
             newEdited = Object.create(edited);
             newEdited.name = null;
-            await expect(UserDao.update(newEdited, original.id)).to.eventually.be.rejectedWith(SequelizeValidationError);
-        });
-
-        it('throws if surnamename is null', async () => {
-            newEdited = Object.create(edited);
-            newEdited.surname = null;
             await expect(UserDao.update(newEdited, original.id)).to.eventually.be.rejectedWith(SequelizeValidationError);
         });
 

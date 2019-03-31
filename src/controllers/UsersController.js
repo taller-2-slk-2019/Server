@@ -9,7 +9,7 @@ class UsersController{
     async register(req, res){
         var data = {
             name: req.body.name,
-            surname: req.body.surname,
+            token: req.body.token,
             email: req.body.email,
             picture: req.body.picture
         };
@@ -49,7 +49,6 @@ class UsersController{
     async updateProfile(req, res) {
         var data = {
             name: req.body.name,
-            surname: req.body.surname,
             email: req.body.email,
             picture: req.body.picture
         };

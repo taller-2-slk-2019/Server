@@ -1,6 +1,6 @@
 var userCreateData = {
     name: "Pepe",
-    surname: "Perez",
+    token: "token123",
     email: "pepe@gmail.com",
     picture: "default.jpg",
 };

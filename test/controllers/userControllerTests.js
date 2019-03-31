@@ -60,11 +60,6 @@ describe('"UsersController Tests"', () => {
                 expect(response).to.have.property('name', userCreateData.name);
             });
 
-            it('user surname must be Perez', async () => {
-                var response = res.send.args[0][0];
-                expect(response).to.have.property('surname', userCreateData.surname);
-            });
-
             it('user email must be pepe@gmail.com', async () => {
                 var response = res.send.args[0][0];
                 expect(response).to.have.property('email', userCreateData.email);
@@ -96,6 +91,11 @@ describe('"UsersController Tests"', () => {
             it('user id must be correct', async () => {
                 var response = res.send.args[0][0];
                 expect(response).to.have.property('id', req.params.id);
+            });
+
+            it('user must not have token', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.not.have.property('token');
             });
         });
 
