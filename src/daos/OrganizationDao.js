@@ -90,7 +90,7 @@ class OrganizationDao{
         }
 
         var channels = await organization.getChannels();
-        forEach(channels, async (channel) => {
+        await forEach(channels, async (channel) => {
             await channel.removeUser(user);
         });
         await organization.removeUser(user);
