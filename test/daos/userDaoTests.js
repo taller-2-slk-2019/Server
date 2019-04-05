@@ -199,7 +199,6 @@ describe('"UserDao Tests"', () => {
         it('throws exception if token does not exist', async () => {
             await expect(UserDao.findByToken("fdsfsdf@unexistantToken.gmail.blabla.com")).to.eventually.be.rejectedWith(UserNotFoundError);
         });
-
     });
 
 });

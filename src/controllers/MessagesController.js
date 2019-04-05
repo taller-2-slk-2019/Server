@@ -10,7 +10,7 @@ class MessagesController{
         var data = {
             type: req.body.type,
             data: req.body.data,
-            senderId: req.body.senderId,
+            senderToken: req.query.userToken,
             channelId: req.body.channelId
         };
 
