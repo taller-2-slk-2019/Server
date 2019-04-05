@@ -37,9 +37,9 @@ class UserDao{
         return user;
     }
     
-    async update(user, id){
-        await this.findById(id);
-        await User.update(user, {where: {id: id}});
+    async update(user, token){
+        await this.findByToken(token);
+        await User.update(user, {where: {token: token}});
     }
 
 }

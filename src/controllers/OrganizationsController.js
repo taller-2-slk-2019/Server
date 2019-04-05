@@ -15,7 +15,7 @@ class OrganizationsController{
     }
 
     async get(req, res){
-        var user = req.query.userId;
+        var user = req.query.userToken;
         
         try {
             var orgs = await OrganizationDao.findForUser(user);

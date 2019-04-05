@@ -205,17 +205,17 @@ describe('"ChannelDao Tests"', () => {
         });
 
         it('get for user and organization must return 2 channels', async () => {
-            var channels = await ChannelDao.get(user.id, org.id);
+            var channels = await ChannelDao.get(user.token, org.id);
             expect(channels.length).to.eq(2);
         });
 
         it('get for other user and organization must return 0 channels', async () => {
-            var channels = await ChannelDao.get(usr.id, org.id);
+            var channels = await ChannelDao.get(usr.token, org.id);
             expect(channels.length).to.eq(0);
         });
 
         it('user must belong to returned channels', async () => {
-            var channels = await ChannelDao.get(user.id, org.id);
+            var channels = await ChannelDao.get(user.token, org.id);
             var hasUser = await channels[0].hasUser(user);
             expect(hasUser).to.be.true;
         });

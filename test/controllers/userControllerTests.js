@@ -21,12 +21,14 @@ describe('"UsersController Tests"', () => {
         var mock2;
         var mock3;
         var mock4;
+        var mock5;
 
         before(async () => {
             mock1 = stub(UserDao, 'create').resolves(userProfileMock);
             mock2 = stub(UserDao, 'update').resolves();
             mock3 = stub(UserDao, 'findById').resolves(userProfileMock);
             mock4 = stub(OrganizationDao, 'findOrganizationUsers').resolves([userForOrganizationMock, userForOrganizationMock]);
+            mock5 = stub(UserDao, 'findByToken').resolves(userProfileMock);
         });
 
         after(async () => {
@@ -34,6 +36,7 @@ describe('"UsersController Tests"', () => {
             mock2.restore();
             mock3.restore();
             mock4.restore();
+            mock5.restore();
         });
 
         describe('Register User', () => {
@@ -70,10 +73,6 @@ describe('"UsersController Tests"', () => {
             var req = mockRequest({});
             var res;
 
-            before(async () => {
-                req.params.id = userProfileMock.id;
-            });
-
             beforeEach(async () => {
                 res = mockResponse();
                 await UserController.getProfile(req, res);
@@ -90,7 +89,7 @@ describe('"UsersController Tests"', () => {
 
             it('user id must be correct', async () => {
                 var response = res.send.args[0][0];
-                expect(response).to.have.property('id', req.params.id);
+                expect(response).to.have.property('id', userProfileMock.id);
             });
 
             it('user must not have token', async () => {
@@ -183,12 +182,14 @@ describe('"UsersController Tests"', () => {
         var mock2;
         var mock3;
         var mock4;
+        var mock5;
 
         before(async () => {
             mock1 = stub(UserDao, 'create').rejects();
             mock2 = stub(UserDao, 'update').rejects();
             mock3 = stub(UserDao, 'findById').rejects();
             mock4 = stub(OrganizationDao, 'findOrganizationUsers').rejects();
+            mock5 = stub(UserDao, 'findByToken').rejects();
         });
 
         after(async () => {
@@ -196,6 +197,7 @@ describe('"UsersController Tests"', () => {
             mock2.restore();
             mock3.restore();
             mock4.restore();
+            mock5.restore();
         });
 
 

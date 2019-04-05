@@ -59,9 +59,9 @@ class ChannelDao{
         await channel.removeUser(user);
     }
 
-    async get(userId, organizationId){
+    async get(userToken, organizationId){
         var org = await OrganizationDao.findById(organizationId);
-        var user = await UserDao.findById(userId);
+        var user = await UserDao.findByToken(userToken);
 
         var orgChannels = await org.getChannels();
 

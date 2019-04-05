@@ -282,7 +282,7 @@ describe('"OrganizationDao Tests"', () => {
             organization2 = await Organization.create(organizationData);
             await organization2.addUser(user, {through: {role:'role'}});
             
-            organizations = await OrganizationDao.findForUser(user.id);
+            organizations = await OrganizationDao.findForUser(user.token);
         });
 
         it('must return 2 organizations', async () => {

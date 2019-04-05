@@ -30,8 +30,8 @@ class OrganizationDao{
     }
 
 
-    async findForUser(userId){
-        var user = await UserDao.findById(userId);
+    async findForUser(userToken){
+        var user = await UserDao.findByToken(userToken);
 
         return await user.getOrganizations();
     }
