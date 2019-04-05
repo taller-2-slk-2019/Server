@@ -3,15 +3,15 @@ var router = express.Router();
 
 var usersController = require('../controllers/UsersController');
 
-router.get('/:id', usersController.getProfile);
+router.get('/profile', usersController.getProfile);
 
 router.get('/', usersController.get);
 
 router.post('/', usersController.register);
 
-router.put('/:id', usersController.updateProfile);
+router.put('/', usersController.updateProfile);
 
-router.put('/:id/location', usersController.updateLocation);
+router.put('/location', usersController.updateLocation);
 
 
 module.exports = router;

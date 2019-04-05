@@ -27,7 +27,7 @@ describe('"ChannelDao Tests"', () => {
         user = await User.create(userCreateData());
         organizationData.creatorId = user.id;
         organization = await Organization.create(organizationData);
-        channelData.creatorId = user.id;
+        channelData.creatorToken = user.token;
         channelData.organizationId = organization.id;
     });
 
@@ -77,12 +77,13 @@ describe('"ChannelDao Tests"', () => {
         });
 
         it('channel must not be created without creator', async () => {
-            data.creatorId = -2;
+            data.creatorToken = "abc";
            await  expect(ChannelDao.create(data)).to.eventually.be.rejectedWith(UserNotFoundError);
         });
 
         it('channel must not be created without organization', async () => {
             data.organizationId = -2;
+            data.creatorToken = user.token;
             await expect(ChannelDao.create(data)).to.eventually.be.rejectedWith(OrganizationNotFoundError);
         });
 
@@ -205,17 +206,17 @@ describe('"ChannelDao Tests"', () => {
         });
 
         it('get for user and organization must return 2 channels', async () => {
-            var channels = await ChannelDao.get(user.id, org.id);
+            var channels = await ChannelDao.get(user.token, org.id);
             expect(channels.length).to.eq(2);
         });
 
         it('get for other user and organization must return 0 channels', async () => {
-            var channels = await ChannelDao.get(usr.id, org.id);
+            var channels = await ChannelDao.get(usr.token, org.id);
             expect(channels.length).to.eq(0);
         });
 
         it('user must belong to returned channels', async () => {
-            var channels = await ChannelDao.get(user.id, org.id);
+            var channels = await ChannelDao.get(user.token, org.id);
             var hasUser = await channels[0].hasUser(user);
             expect(hasUser).to.be.true;
         });

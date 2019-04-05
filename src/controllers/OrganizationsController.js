@@ -15,7 +15,7 @@ class OrganizationsController{
     }
 
     async get(req, res){
-        var user = req.query.userId;
+        var user = req.query.userToken;
         
         try {
             var orgs = await OrganizationDao.findForUser(user);
@@ -33,7 +33,7 @@ class OrganizationsController{
             longitude: req.body.longitude,
             description: req.body.description,
             welcome: req.body.welcome,
-            creatorId: req.body.creatorId
+            creatorToken: req.query.userToken
         };
 
         try{

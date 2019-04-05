@@ -10,7 +10,7 @@ class MessageDao{
 
     async create(msg){
         // TODO send notifications to mentioned users, etc
-        var user = await UserDao.findById(msg.senderId);
+        var user = await UserDao.findByToken(msg.senderToken);
         var channel = await ChannelDao.findById(msg.channelId);
 
         if (!(await channel.hasUser(user))){
@@ -26,7 +26,7 @@ class MessageDao{
             msg.data = MessageParser.replaceForbiddenWords(msg.data, forbiddenWords);
         }
 
-
+        msg.senderId = user.id;
         return await Message.create(msg);
     }
 

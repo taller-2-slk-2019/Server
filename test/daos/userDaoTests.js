@@ -115,7 +115,7 @@ describe('"UserDao Tests"', () => {
 
         before(async () => {
             original = await User.create(userCreateData());
-            await UserDao.update(edited, original.id);
+            await UserDao.update(edited, original.token);
             user = await User.findByPk(original.id);
         });
 
@@ -135,22 +135,15 @@ describe('"UserDao Tests"', () => {
             expect(user).to.have.property('email', original.email);
         });
 
-        it('throws exception if id does not exist', async () => {
-            await expect(UserDao.update(edited, 9999999)).to.eventually.be.rejectedWith(UserNotFoundError);
+        it('throws exception if token does not exist', async () => {
+            await expect(UserDao.update(edited, "unexistant token")).to.eventually.be.rejectedWith(UserNotFoundError);
         });
 
-        it('throws exception if id is 0', async () => {
-            await expect(UserDao.update(edited, 0)).to.eventually.be.rejectedWith(UserNotFoundError);
-        });
-
-        it('throws exception if id is -1', async () => {
-            await expect(UserDao.update(edited, -1)).to.eventually.be.rejectedWith(UserNotFoundError);
-        });
 
         it('throws if name is null', async () => {
             newEdited = Object.create(edited);
             newEdited.name = null;
-            await expect(UserDao.update(newEdited, original.id)).to.eventually.be.rejectedWith(SequelizeValidationError);
+            await expect(UserDao.update(newEdited, original.token)).to.eventually.be.rejectedWith(SequelizeValidationError);
         });
 
     });
@@ -206,7 +199,6 @@ describe('"UserDao Tests"', () => {
         it('throws exception if token does not exist', async () => {
             await expect(UserDao.findByToken("fdsfsdf@unexistantToken.gmail.blabla.com")).to.eventually.be.rejectedWith(UserNotFoundError);
         });
-
     });
 
 });

@@ -27,10 +27,10 @@ class UsersController{
     }
 
     async getProfile(req, res) {
-        var id = req.params.id;
+        var token = req.query.userToken;
 
         try{
-            var user = await UserDao.findById(id);
+            var user = await UserDao.findByToken(token);
             sendSuccessResponse(res, user);
         } catch (err){
             sendErrorResponse(res, err);
@@ -56,9 +56,9 @@ class UsersController{
         };
 
         try{
-            var id = req.params.id;
-            await UserDao.update(data, id);
-            logger.info("User " + id + " updated");
+            var token = req.query.userToken;
+            await UserDao.update(data, token);
+            logger.info("User " + token + " updated");
             sendEmptySuccessResponse(res);
 
         } catch (err){
@@ -77,9 +77,9 @@ class UsersController{
                 throw new InvalidLocationError();
             }
 
-            var id = req.params.id;
-            await UserDao.update(data, id);
-            logger.info("Location from user " + id + " updated");
+            var token = req.query.userToken;
+            await UserDao.update(data, token);
+            logger.info("Location from user " + token + " updated");
             sendEmptySuccessResponse(res);
             
         } catch (err){

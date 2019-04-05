@@ -13,7 +13,7 @@ var UserRoleMember = require('../models/userRoles/UserRoleMember');
 class OrganizationDao{
 
     async create(organization){
-        var user = await UserDao.findById(organization.creatorId);
+        var user = await UserDao.findByToken(organization.creatorToken);
 
         var org = await Organization.create(organization);
         await org.addUser(user, { through: {role: (new UserRoleCreator()).name } });
@@ -30,8 +30,8 @@ class OrganizationDao{
     }
 
 
-    async findForUser(userId){
-        var user = await UserDao.findById(userId);
+    async findForUser(userToken){
+        var user = await UserDao.findByToken(userToken);
 
         return await user.getOrganizations();
     }
