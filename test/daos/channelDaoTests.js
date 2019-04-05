@@ -27,7 +27,7 @@ describe('"ChannelDao Tests"', () => {
         user = await User.create(userCreateData());
         organizationData.creatorId = user.id;
         organization = await Organization.create(organizationData);
-        channelData.creatorId = user.id;
+        channelData.creatorToken = user.token;
         channelData.organizationId = organization.id;
     });
 
@@ -77,12 +77,13 @@ describe('"ChannelDao Tests"', () => {
         });
 
         it('channel must not be created without creator', async () => {
-            data.creatorId = -2;
+            data.creatorToken = "abc";
            await  expect(ChannelDao.create(data)).to.eventually.be.rejectedWith(UserNotFoundError);
         });
 
         it('channel must not be created without organization', async () => {
             data.organizationId = -2;
+            data.creatorToken = user.token;
             await expect(ChannelDao.create(data)).to.eventually.be.rejectedWith(OrganizationNotFoundError);
         });
 

@@ -33,7 +33,7 @@ class OrganizationsController{
             longitude: req.body.longitude,
             description: req.body.description,
             welcome: req.body.welcome,
-            creatorId: req.body.creatorId
+            creatorToken: req.query.userToken
         };
 
         try{

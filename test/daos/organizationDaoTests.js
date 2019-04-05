@@ -27,7 +27,7 @@ describe('"OrganizationDao Tests"', () => {
 
     before(async () => {
         user = await User.create(userCreateData());
-        organizationData.creatorId = user.id;
+        organizationData.creatorToken = user.token;
     });
 
     describe('Create Organization', () => {
@@ -70,7 +70,7 @@ describe('"OrganizationDao Tests"', () => {
         });
 
         it('organization must not be created without creator', async () => {
-            data.creatorId = -2;
+            data.creatorToken = "abc";
             await expect(OrganizationDao.create(data)).to.eventually.be.rejectedWith(UserNotFoundError);
         });
 

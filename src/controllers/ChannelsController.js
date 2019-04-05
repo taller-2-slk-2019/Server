@@ -10,13 +10,13 @@ class ChannelsController{
             visibility: req.body.visibility,
             description: req.body.description,
             welcome: req.body.welcome,
-            creatorId: req.body.creatorId,
+            creatorToken: req.query.userToken,
             organizationId: req.body.organizationId
         };
 
         try{
             var channel  = await ChannelDao.create(data);
-            logger.info(`Channel created (${channel.id}) in organization ${data.organizationId} by user ${data.creatorId}`);
+            logger.info(`Channel created (${channel.id}) in organization ${data.organizationId} by user ${data.creatorToken}`);
             sendSuccessResponse(res, channel);
             
         } catch (err){
