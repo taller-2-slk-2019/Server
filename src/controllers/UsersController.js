@@ -3,12 +3,14 @@ var UserDao = require('../daos/UserDao');
 var OrganizationDao = require('../daos/OrganizationDao');
 var { sendSuccessResponse, sendErrorResponse, sendEmptySuccessResponse } = require('../helpers/ResponseHelper');
 var { InvalidLocationError } = require('../helpers/Errors');
+var Token = require('../helpers/Token');
 
 class UsersController{
 
     async register(req, res){
         var data = {
             name: req.body.name,
+            username: req.body.username ? req.body.username : Token.generateRandomUsername(req.body.email),
             token: req.body.token,
             email: req.body.email,
             picture: req.body.picture
@@ -49,7 +51,7 @@ class UsersController{
     async updateProfile(req, res) {
         var data = {
             name: req.body.name,
-            email: req.body.email,
+            username: req.body.username,
             picture: req.body.picture
         };
 

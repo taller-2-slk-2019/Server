@@ -43,10 +43,10 @@ describe('"UserDao Tests"', () => {
             expect(user.email).to.eq("pepe@gmail.com");
         });
 
-        it('register with same token updates user', async () => {
+        it('register with same token does not update user', async () => {
             data.name = "other";
             user = await UserDao.create(data);
-            expect(user.name).to.eq("other");
+            expect(user.name).to.eq("Pepe");
         });
     });
 

@@ -8,6 +8,10 @@ module.exports = {
           type: Sequelize.STRING,
           unique: true
         }, { transaction: t }),
+        queryInterface.addColumn('users', 'username', {
+          type: Sequelize.STRING,
+          unique: true
+        }, { transaction: t }),
           queryInterface.removeColumn('users', 'surname', { transaction: t }),
       ]);
     });
@@ -20,6 +24,7 @@ module.exports = {
           type: Sequelize.STRING
         }, { transaction: t }),
           queryInterface.removeColumn('users', 'token', { transaction: t }),
+          queryInterface.removeColumn('users', 'username', { transaction: t }),
       ]);
     });
   }
