@@ -225,4 +225,36 @@ describe('"UserDao Tests"', () => {
         });
     });
 
+    describe('Find user invitations', () => {
+        var data = Object.create(userCreateData());
+        var user;
+        var org;
+
+        before(async () => {
+            user = await User.create(data);
+            org = await Organization.create(organizationCreateData);
+        });
+
+        beforeEach(async () => {
+            await user.setOrganizationInvitations([]);
+        });
+
+        it('user invitations must be empty', async () => {
+            var invitations = await UserDao.findUserInvitations(user.token);
+            expect(invitations.length).to.eq(0);
+        });
+
+        it('user invitations must not be empty', async () => {
+            await user.addOrganizationInvitation(org, {through: {token: "123"}});
+            var invitations = await UserDao.findUserInvitations(user.token);
+            expect(invitations.length).to.eq(1);
+        });
+
+        it('user invitations must have correct token', async () => {
+            await user.addOrganizationInvitation(org, {through: {token: "12345"}});
+            var invitations = await UserDao.findUserInvitations(user.token);
+            expect(invitations[0].organizationUserInvitation).to.have.property("token", "12345");
+        });
+    });
+
 });
