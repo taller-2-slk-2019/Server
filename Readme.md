@@ -7,15 +7,11 @@
 
 ### Heroku
 
-https://slack-taller2.herokuapp.com/
+https://slack-taller2.herokuapp.com
 
 ### Documentación
 
 https://taller-2-slk-2019.github.io
-
-- Raml: https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md/
-
-- npm i -g raml2html
 
 ### Travis
 
@@ -29,14 +25,19 @@ https://coveralls.io/github/taller-2-slk-2019/Server
 
 - Instalar Node.js
 
-- Ejecutar npm install en la terminal
+- Instalar PotgreSQL
+
+- Ejecutar npm install para actualizar librerias
+
+- Crear una base de datos slack_server  (npx sequelize db:create)
+
+- Correr las migraciones  (npx sequelize db:migrate)
 
 ### Ejecución
 
-- node app.js  (en la terminal en /src)
-- o node src/app.js
+- node src/app.js
 
-- localhost:3000
+- El servidor se levanta en localhost:3000
 
 ### Testing
 
