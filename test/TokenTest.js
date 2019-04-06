@@ -33,7 +33,34 @@ describe('"Token Tests"', () => {
                 expect(Token.generate()).to.not.be.eq(token1);
             }
         });
-
     });
 
+    describe('Username generation', () => {
+        var email = "pepito@gmail.com";
+
+        it('username must start with email name', async () => {
+            var username = Token.generateRandomUsername(email);
+            expect(username).to.have.string("pepito");
+        });
+
+        it('username must not have email provider', async () => {
+            var username = Token.generateRandomUsername(email);
+            expect(username).to.not.have.string("gmail");
+        });
+
+        it('two usernames with same email must be different', async () => {
+            var user1 = Token.generateRandomUsername(email);
+            var user2 = Token.generateRandomUsername(email);
+            expect(user1).to.not.be.eq(user2);
+        });
+
+        it('three usernames with same email must be different', async () => {
+            var user1 = Token.generateRandomUsername(email);
+            var user2 = Token.generateRandomUsername(email);
+            var user3 = Token.generateRandomUsername(email);
+            expect(user1).to.not.be.eq(user2);
+            expect(user1).to.not.be.eq(user3);
+            expect(user2).to.not.be.eq(user3);
+        });
+    });
 });

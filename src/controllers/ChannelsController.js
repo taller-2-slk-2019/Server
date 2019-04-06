@@ -10,13 +10,13 @@ class ChannelsController{
             visibility: req.body.visibility,
             description: req.body.description,
             welcome: req.body.welcome,
-            creatorId: req.body.creatorId,
+            creatorToken: req.query.userToken,
             organizationId: req.body.organizationId
         };
 
         try{
             var channel  = await ChannelDao.create(data);
-            logger.info(`Channel created (${channel.id}) in organization ${data.organizationId} by user ${data.creatorId}`);
+            logger.info(`Channel created (${channel.id}) in organization ${data.organizationId} by user ${data.creatorToken}`);
             sendSuccessResponse(res, channel);
             
         } catch (err){
@@ -25,11 +25,11 @@ class ChannelsController{
     }
 
     async get(req, res){
-        var userId = req.query.userId;
+        var userToken = req.query.userToken;
         var organizationId = req.query.organizationId;
 
         try{
-            var channels  = await ChannelDao.get(userId, organizationId);
+            var channels  = await ChannelDao.get(userToken, organizationId);
             sendSuccessResponse(res, channels);
             
         } catch (err){

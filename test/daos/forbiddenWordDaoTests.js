@@ -24,7 +24,7 @@ describe('"ForbiddenWordDao Tests"', () => {
     var wordData;
 
     before(async () => {
-        user = await User.create(userCreateData);
+        user = await User.create(userCreateData());
         organizationData.creatorId = user.id;
         organization = await Organization.create(organizationData);
         wordData = {

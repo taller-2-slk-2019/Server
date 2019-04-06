@@ -5,7 +5,12 @@ var { UserNotFoundError } = require('../helpers/Errors');
 class UserDao{
 
     async create(user){
-        return await User.create(user);
+        try {
+            var existingUser = await this.findByToken(user.token);
+            return existingUser;
+        } catch (err){
+            return await User.create(user);
+        }
     }
 
     async findById(id){
@@ -23,10 +28,18 @@ class UserDao{
         }
         return user;
     }
+
+    async findByToken(token){
+        var user = await User.findOne({where: {token: token}});
+        if (!user) {
+            throw new UserNotFoundError(token);
+        }
+        return user;
+    }
     
-    async update(user, id){
-        await this.findById(id);
-        await User.update(user, {where: {id: id}});
+    async update(user, token){
+        await this.findByToken(token);
+        await User.update(user, {where: {token: token}});
     }
 
 }

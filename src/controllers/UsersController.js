@@ -3,13 +3,15 @@ var UserDao = require('../daos/UserDao');
 var OrganizationDao = require('../daos/OrganizationDao');
 var { sendSuccessResponse, sendErrorResponse, sendEmptySuccessResponse } = require('../helpers/ResponseHelper');
 var { InvalidLocationError } = require('../helpers/Errors');
+var Token = require('../helpers/Token');
 
 class UsersController{
 
     async register(req, res){
         var data = {
             name: req.body.name,
-            surname: req.body.surname,
+            username: req.body.username ? req.body.username : Token.generateRandomUsername(req.body.email),
+            token: req.body.token,
             email: req.body.email,
             picture: req.body.picture
         };
@@ -25,10 +27,10 @@ class UsersController{
     }
 
     async getProfile(req, res) {
-        var id = req.params.id;
+        var token = req.query.userToken;
 
         try{
-            var user = await UserDao.findById(id);
+            var user = await UserDao.findByToken(token);
             sendSuccessResponse(res, user);
         } catch (err){
             sendErrorResponse(res, err);
@@ -49,15 +51,14 @@ class UsersController{
     async updateProfile(req, res) {
         var data = {
             name: req.body.name,
-            surname: req.body.surname,
-            email: req.body.email,
+            username: req.body.username,
             picture: req.body.picture
         };
 
         try{
-            var id = req.params.id;
-            await UserDao.update(data, id);
-            logger.info("User " + id + " updated");
+            var token = req.query.userToken;
+            await UserDao.update(data, token);
+            logger.info("User " + token + " updated");
             sendEmptySuccessResponse(res);
 
         } catch (err){
@@ -76,9 +77,9 @@ class UsersController{
                 throw new InvalidLocationError();
             }
 
-            var id = req.params.id;
-            await UserDao.update(data, id);
-            logger.info("Location from user " + id + " updated");
+            var token = req.query.userToken;
+            await UserDao.update(data, token);
+            logger.info("Location from user " + token + " updated");
             sendEmptySuccessResponse(res);
             
         } catch (err){

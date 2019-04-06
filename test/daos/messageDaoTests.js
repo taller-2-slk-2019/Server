@@ -31,14 +31,14 @@ describe('"MessageDao Tests"', () => {
     var messageData = Object.create(messageCreateData);
 
     before(async () => {
-        user = await User.create(userCreateData);
+        user = await User.create(userCreateData());
         organizationData.creatorId = user.id;
         organization = await Organization.create(organizationData);
         channelData.creatorId = user.id;
         channelData.organizationId = organization.id;
         channel = await Channel.create(channelData);
         await channel.setUsers([user]);
-        messageData.senderId = user.id;
+        messageData.senderToken = user.token;
         messageData.channelId = channel.id;
     });
 
@@ -78,12 +78,13 @@ describe('"MessageDao Tests"', () => {
         });
 
         it('message must not be created without a sender', async () => {
-            data.senderId = -2;
+            data.senderToken = "abc";
             await expect(MessageDao.create(data)).to.eventually.be.rejectedWith(SequelizeValidationError);
         });
 
         it('channel must not be created without a channel', async () => {
             data.channelId = -2;
+            data.senderToken = user.token;
             await expect(MessageDao.create(data)).to.eventually.be.rejectedWith(SequelizeValidationError);
         });
 
@@ -93,8 +94,8 @@ describe('"MessageDao Tests"', () => {
         });
 
         it('message sender must belong to channel', async () => {
-            var user2 = await User.create(userCreateData);
-            data.senderId = user2.id;
+            var user2 = await User.create(userCreateData());
+            data.senderToken = user2.token;
             await expect(MessageDao.create(data)).to.eventually.be.rejectedWith(UserNotBelongsToChannelError);
         });
     });

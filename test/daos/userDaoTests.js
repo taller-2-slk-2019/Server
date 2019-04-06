@@ -20,9 +20,11 @@ describe('"UserDao Tests"', () => {
 
     describe('Register User', () => {
         var user;
+        var data;
 
         beforeEach(async () => {
-            user = await UserDao.create(userCreateData);
+            data = userCreateData();
+            user = await UserDao.create(data);
         });
 
         it('user must be registered', async () => {
@@ -37,12 +39,14 @@ describe('"UserDao Tests"', () => {
             expect(user.name).to.eq("Pepe");
         });
 
-        it('user surname must be Perez', async () => {
-            expect(user.surname).to.eq("Perez");
-        });
-
         it('user email must be pepe@gmail.com', async () => {
             expect(user.email).to.eq("pepe@gmail.com");
+        });
+
+        it('register with same token does not update user', async () => {
+            data.name = "other";
+            user = await UserDao.create(data);
+            expect(user.name).to.eq("Pepe");
         });
     });
 
@@ -54,11 +58,11 @@ describe('"UserDao Tests"', () => {
         });
 
         it('user must not be registered without name', async () => {
-            var data = {surname: "Perez", email:"pepe@gmail.com"};
+            var data = {email:"pepe@gmail.com"};
             await expect(UserDao.create(data)).to.eventually.be.rejectedWith(SequelizeValidationError);
         });
 
-        it('user must not be registered without surname', async () => {
+        it('user must not be registered without token', async () => {
             var data = {name: "Pepe", email:"pepe@gmail.com"};
             await expect(UserDao.create(data)).to.eventually.be.rejectedWith(SequelizeValidationError);
         });
@@ -74,7 +78,7 @@ describe('"UserDao Tests"', () => {
         var user;
 
         before(async () => {
-            expected = await User.create(userCreateData);
+            expected = await User.create(userCreateData());
             user = await UserDao.findById(expected.id);
         });
 
@@ -105,13 +109,13 @@ describe('"UserDao Tests"', () => {
     });
 
     describe('Update', () => {
-        var edited = {name: "Carlos", surname: "Juarez"};
+        var edited = {name: "Carlos"};
         var original;
         var user;
 
         before(async () => {
-            original = await User.create(userCreateData);
-            await UserDao.update(edited, original.id);
+            original = await User.create(userCreateData());
+            await UserDao.update(edited, original.token);
             user = await User.findByPk(original.id);
         });
 
@@ -127,42 +131,25 @@ describe('"UserDao Tests"', () => {
             expect(user).to.have.property('name', edited.name);
         });
 
-        it('user surname must be updated', async () => {
-            expect(user).to.have.property('surname', edited.surname);
-        });
-
         it('user email must not change', async () => {
             expect(user).to.have.property('email', original.email);
         });
 
-        it('throws exception if id does not exist', async () => {
-            await expect(UserDao.update(edited, 9999999)).to.eventually.be.rejectedWith(UserNotFoundError);
+        it('throws exception if token does not exist', async () => {
+            await expect(UserDao.update(edited, "unexistant token")).to.eventually.be.rejectedWith(UserNotFoundError);
         });
 
-        it('throws exception if id is 0', async () => {
-            await expect(UserDao.update(edited, 0)).to.eventually.be.rejectedWith(UserNotFoundError);
-        });
-
-        it('throws exception if id is -1', async () => {
-            await expect(UserDao.update(edited, -1)).to.eventually.be.rejectedWith(UserNotFoundError);
-        });
 
         it('throws if name is null', async () => {
             newEdited = Object.create(edited);
             newEdited.name = null;
-            await expect(UserDao.update(newEdited, original.id)).to.eventually.be.rejectedWith(SequelizeValidationError);
-        });
-
-        it('throws if surnamename is null', async () => {
-            newEdited = Object.create(edited);
-            newEdited.surname = null;
-            await expect(UserDao.update(newEdited, original.id)).to.eventually.be.rejectedWith(SequelizeValidationError);
+            await expect(UserDao.update(newEdited, original.token)).to.eventually.be.rejectedWith(SequelizeValidationError);
         });
 
     });
 
     describe('Find by email', () => {
-        var data = Object.create(userCreateData);
+        var data = Object.create(userCreateData());
         data.email = "pepeTestFindEmail@unique.gmail.com";
         var expected;
         var user;
@@ -190,49 +177,28 @@ describe('"UserDao Tests"', () => {
 
     });
 
-    /*describe('Find With Organizations', () => {
+    describe('Find by token', () => {
+        var data = Object.create(userCreateData());
+        data.token = "uniqueToken123456";
+        var expected;
         var user;
-        var original;
-        var updated;
-        var organizationData = Object.create(organizationCreateData);
 
         before(async () => {
-            user = await User.create(userCreateData);
-            original = await UserDao.findWithOrganizations(user.id);
-
-            organization = await Organization.create(organizationData);
-            await organization.addUser(user, {through: {role: 'role'}});
-
-            updated = await UserDao.findWithOrganizations(user.id);
+            expected = await User.create(data);
+            user = await UserDao.findByToken(data.token);
         });
 
-        it('user must not be created with an organization', async () => {
-            expect(original.organizations).to.be.empty;
+        it('user must not be null', async () => {
+            expect(user).to.not.be.null;
+        });
+        
+        it('user must have correct id', async () => {
+            expect(user).to.have.property('id', expected.id);
         });
 
-        it('user must be in an organization after accepting invitation', async () => {
-            expect(updated.organizations.length).to.eq(1);
+        it('throws exception if token does not exist', async () => {
+            await expect(UserDao.findByToken("fdsfsdf@unexistantToken.gmail.blabla.com")).to.eventually.be.rejectedWith(UserNotFoundError);
         });
-
-        it('user has the correct organizations id', async () => {
-            expect(updated.organizations[0].id).to.eq(organization.id);
-        });
-
-        it('the users role is: role', async () => {
-            expect(updated.organizations[0].userOrganizations.role).to.eq('role');
-        });
-
-        it('throws exception if id does not exist', async () => {
-            expect(UserDao.findWithOrganizations(9999999)).to.eventually.be.rejectedWith(UserNotFoundError);
-        });
-
-        it('throws exception if id is 0', async () => {
-            expect(UserDao.findWithOrganizations(0)).to.eventually.be.rejectedWith(UserNotFoundError);
-        });
-
-        it('throws exception if id is -1', async () => {
-            expect(UserDao.findWithOrganizations(-1)).to.eventually.be.rejectedWith(UserNotFoundError);
-        });
-    });*/
+    });
 
 });

@@ -10,7 +10,7 @@ class ChannelDao{
 
     async create(channel){
         //TODO check user belongs to organization and role, channel name does not exist in org
-        var user = await UserDao.findById(channel.creatorId);
+        var user = await UserDao.findByToken(channel.creatorToken);
 
         var organization = await OrganizationDao.findById(channel.organizationId);
 
@@ -59,9 +59,9 @@ class ChannelDao{
         await channel.removeUser(user);
     }
 
-    async get(userId, organizationId){
+    async get(userToken, organizationId){
         var org = await OrganizationDao.findById(organizationId);
-        var user = await UserDao.findById(userId);
+        var user = await UserDao.findByToken(userToken);
 
         var orgChannels = await org.getChannels();
 

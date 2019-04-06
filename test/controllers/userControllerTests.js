@@ -21,12 +21,14 @@ describe('"UsersController Tests"', () => {
         var mock2;
         var mock3;
         var mock4;
+        var mock5;
 
         before(async () => {
             mock1 = stub(UserDao, 'create').resolves(userProfileMock);
             mock2 = stub(UserDao, 'update').resolves();
             mock3 = stub(UserDao, 'findById').resolves(userProfileMock);
             mock4 = stub(OrganizationDao, 'findOrganizationUsers').resolves([userForOrganizationMock, userForOrganizationMock]);
+            mock5 = stub(UserDao, 'findByToken').resolves(userProfileMock);
         });
 
         after(async () => {
@@ -34,10 +36,11 @@ describe('"UsersController Tests"', () => {
             mock2.restore();
             mock3.restore();
             mock4.restore();
+            mock5.restore();
         });
 
         describe('Register User', () => {
-            var req = mockRequest({ body: userCreateData });
+            var req = mockRequest({ body: userCreateData() });
             var res;
             var expected;
 
@@ -57,27 +60,18 @@ describe('"UsersController Tests"', () => {
 
             it('user name must be Pepe', async () => {
                 var response = res.send.args[0][0];
-                expect(response).to.have.property('name', userCreateData.name);
-            });
-
-            it('user surname must be Perez', async () => {
-                var response = res.send.args[0][0];
-                expect(response).to.have.property('surname', userCreateData.surname);
+                expect(response).to.have.property('name', req.body.name);
             });
 
             it('user email must be pepe@gmail.com', async () => {
                 var response = res.send.args[0][0];
-                expect(response).to.have.property('email', userCreateData.email);
+                expect(response).to.have.property('email', req.body.email);
             });
         });
 
         describe('Get Profile', () => {
             var req = mockRequest({});
             var res;
-
-            before(async () => {
-                req.params.id = userProfileMock.id;
-            });
 
             beforeEach(async () => {
                 res = mockResponse();
@@ -95,7 +89,12 @@ describe('"UsersController Tests"', () => {
 
             it('user id must be correct', async () => {
                 var response = res.send.args[0][0];
-                expect(response).to.have.property('id', req.params.id);
+                expect(response).to.have.property('id', userProfileMock.id);
+            });
+
+            it('user must not have token', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.not.have.property('token');
             });
         });
 
@@ -183,12 +182,14 @@ describe('"UsersController Tests"', () => {
         var mock2;
         var mock3;
         var mock4;
+        var mock5;
 
         before(async () => {
             mock1 = stub(UserDao, 'create').rejects();
             mock2 = stub(UserDao, 'update').rejects();
             mock3 = stub(UserDao, 'findById').rejects();
             mock4 = stub(OrganizationDao, 'findOrganizationUsers').rejects();
+            mock5 = stub(UserDao, 'findByToken').rejects();
         });
 
         after(async () => {
@@ -196,6 +197,7 @@ describe('"UsersController Tests"', () => {
             mock2.restore();
             mock3.restore();
             mock4.restore();
+            mock5.restore();
         });
 
 
