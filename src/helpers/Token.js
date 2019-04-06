@@ -9,14 +9,10 @@ class Token{
         return token;
     }
 
-    generateRandomUsername(email){
-        if (!email){
-            return this.generate();
-        }
-        var emailName = email.split('@')[0];
-        var username = emailName + randtoken.generate(2);
-        logger.info("Random username generated: " + username);
-        return username;
+    generateRandomUsername(username){
+        var newUsername = username + randtoken.generate(3).toUpperCase();
+        logger.info("Random username generated: " + newUsername);
+        return newUsername;
     }
 }
 

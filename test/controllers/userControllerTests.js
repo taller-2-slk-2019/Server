@@ -69,6 +69,51 @@ describe('"UsersController Tests"', () => {
             });
         });
 
+        describe('Register User without username', () => {
+            var req = mockRequest({ body: userCreateData() });
+            var res;
+            var expected;
+            var mock;
+
+            before(async() => {
+                mock = stub(UserDao, 'usernameExists').resolves(false);
+            });
+
+            after(async() => {
+                mock.restore();
+            });
+
+            beforeEach(async () => {
+                req.body.username = null;
+                res = mockResponse();
+            });
+
+            it('response status must be 200', async () => {
+                await UserController.register(req, res);
+                expect(res.status).to.have.been.calledWith(200);
+            });
+
+            it('user must not be null', async () => {
+                await UserController.register(req, res);
+                var response = res.send.args[0][0];
+                expect(response).to.not.be.null;
+            });
+
+            it('must not fail if generated username not exists', async () => {
+                await UserController.register(req, res);
+                var response = res.send.args[0][0];
+                expect(res.status).to.have.been.calledWith(200);
+            });
+
+            it('must not fail if generated username exists', async () => {
+                mock.restore();
+                mock = stub(UserDao, 'usernameExists').resolves(true);
+                await UserController.register(req, res);
+                var response = res.send.args[0][0];
+                expect(res.status).to.have.been.calledWith(200);
+            });
+        });
+
         describe('Get Profile', () => {
             var req = mockRequest({});
             var res;

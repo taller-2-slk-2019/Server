@@ -36,16 +36,11 @@ describe('"Token Tests"', () => {
     });
 
     describe('Username generation', () => {
-        var email = "pepito@gmail.com";
+        var email = "pepito";
 
         it('username must start with email name', async () => {
             var username = Token.generateRandomUsername(email);
             expect(username).to.have.string("pepito");
-        });
-
-        it('username must not have email provider', async () => {
-            var username = Token.generateRandomUsername(email);
-            expect(username).to.not.have.string("gmail");
         });
 
         it('two usernames with same email must be different', async () => {

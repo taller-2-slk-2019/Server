@@ -8,15 +8,21 @@ var Token = require('../helpers/Token');
 class UsersController{
 
     async register(req, res){
-        var data = {
-            name: req.body.name,
-            username: req.body.username ? req.body.username : Token.generateRandomUsername(req.body.email),
-            token: req.body.token,
-            email: req.body.email,
-            picture: req.body.picture
-        };
-
         try{
+            var data = {
+                name: req.body.name,
+                username: req.body.username,
+                token: req.body.token,
+                email: req.body.email,
+                picture: req.body.picture
+            };
+
+            if (!data.username){
+                var username = data.email.split('@')[0];
+                var exists = await UserDao.usernameExists(username);
+                data.username = exists ? Token.generateRandomUsername(username) : username;
+            }
+
             var user = await UserDao.create(data);
             logger.info("User created: " + user.id);
             sendSuccessResponse(res, user);

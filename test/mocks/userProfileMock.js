@@ -1,6 +1,7 @@
 var userProfileMock = {
     id: 1,
     name: "Pepe",
+    username: "pepito",
     email: "pepe@gmail.com",
     picture: "default.jpg",
     latitude: null,

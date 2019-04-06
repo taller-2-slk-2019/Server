@@ -201,4 +201,28 @@ describe('"UserDao Tests"', () => {
         });
     });
 
+    describe('Username exists', () => {
+        var data = Object.create(userCreateData());
+        data.username = "uniqueUsername1234";
+
+        before(async () => {
+            await User.create(data);
+        });
+
+        it('username must exist', async () => {
+            var exists = await UserDao.usernameExists("uniqueUsername1234");
+            expect(exists).to.be.true;
+        });
+
+        it('username must not exist', async () => {
+            var exists = await UserDao.usernameExists("uniqueUsername123456");
+            expect(exists).to.be.false;
+        });
+
+        it('empty username must not exist', async () => {
+            var exists = await UserDao.usernameExists("");
+            expect(exists).to.be.false;
+        });
+    });
+
 });

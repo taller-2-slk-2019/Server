@@ -42,6 +42,11 @@ class UserDao{
         await User.update(user, {where: {token: token}});
     }
 
+    async usernameExists(username){
+        var count = await User.count({where: {username: username}});
+        return count > 0;
+    }
+
 }
 
 module.exports = new UserDao();
