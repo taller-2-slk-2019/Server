@@ -1,6 +1,6 @@
 var channelCreateData = {
     name: "channel",
-    visibility: "public",
+    isPublic: true,
     description: "description for channel", 
     welcome: "welcome to the channel!"
 };

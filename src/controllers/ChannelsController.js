@@ -7,7 +7,7 @@ class ChannelsController{
     async create(req, res){
         var data = {
             name: req.body.name,
-            visibility: req.body.visibility,
+            isPublic: req.body.isPublic,
             description: req.body.description,
             welcome: req.body.welcome,
             creatorToken: req.query.userToken,
