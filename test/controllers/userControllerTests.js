@@ -8,6 +8,7 @@ chai.use(sinonChai);
 const { mockRequest, mockResponse } = require('mock-req-res');
 const userProfileMock = require('../mocks/userProfileMock');
 const userForOrganizationMock = require('../mocks/userForOrganizationMock');
+const userOrganizationInvitationMock = require('../mocks/userOrganizationInvitationMock');
 const { userCreateData } = require('../data/userData');
 
 var UserController = require('../../src/controllers/UsersController');
@@ -22,6 +23,7 @@ describe('"UsersController Tests"', () => {
         var mock3;
         var mock4;
         var mock5;
+        var mock6;
 
         before(async () => {
             mock1 = stub(UserDao, 'create').resolves(userProfileMock);
@@ -29,6 +31,7 @@ describe('"UsersController Tests"', () => {
             mock3 = stub(UserDao, 'findById').resolves(userProfileMock);
             mock4 = stub(OrganizationDao, 'findOrganizationUsers').resolves([userForOrganizationMock, userForOrganizationMock]);
             mock5 = stub(UserDao, 'findByToken').resolves(userProfileMock);
+            mock6 = stub(UserDao, 'findUserInvitations').resolves([userOrganizationInvitationMock, userOrganizationInvitationMock]);
         });
 
         after(async () => {
@@ -37,6 +40,7 @@ describe('"UsersController Tests"', () => {
             mock3.restore();
             mock4.restore();
             mock5.restore();
+            mock6.restore();
         });
 
         describe('Register User', () => {
@@ -220,6 +224,35 @@ describe('"UsersController Tests"', () => {
                 expect(response).to.have.property('success');
             });
         });
+
+        describe('Get invitations', () => {
+            var req = mockRequest({});
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await UserController.getInvitations(req, res);
+            });
+
+            it('response status must be 200', async () => {
+                expect(res.status).to.have.been.calledWith(200);
+            });
+            
+            it('response must have invitations', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.be.an('array');
+            });
+
+            it('invitation token must be correct', async () => {
+                var response = res.send.args[0][0];
+                expect(response[0]).to.have.property('token', userOrganizationInvitationMock.organizationUserInvitation.token);
+            });
+
+            it('invitation organization must be correct', async () => {
+                var response = res.send.args[0][0];
+                expect(response[0].organization).to.eq(userOrganizationInvitationMock.name);
+            });
+        });
     });
 
     describe('Methods with errors', () => {
@@ -228,6 +261,7 @@ describe('"UsersController Tests"', () => {
         var mock3;
         var mock4;
         var mock5;
+        var mock6;
 
         before(async () => {
             mock1 = stub(UserDao, 'create').rejects();
@@ -235,6 +269,7 @@ describe('"UsersController Tests"', () => {
             mock3 = stub(UserDao, 'findById').rejects();
             mock4 = stub(OrganizationDao, 'findOrganizationUsers').rejects();
             mock5 = stub(UserDao, 'findByToken').rejects();
+            mock6 = stub(UserDao, 'findUserInvitations').rejects();
         });
 
         after(async () => {
@@ -243,6 +278,7 @@ describe('"UsersController Tests"', () => {
             mock3.restore();
             mock4.restore();
             mock5.restore();
+            mock6.restore();
         });
 
 
@@ -430,6 +466,26 @@ describe('"UsersController Tests"', () => {
                     var response = res.send.args[0][0];
                     expect(response).to.have.property('error');
                 });
+            });
+        });
+
+        describe('Get invitations', () => {
+
+            var req = mockRequest();
+            var res;
+            
+            beforeEach(async () => {
+                res = mockResponse();
+                await UserController.getInvitations(req, res);
+            });
+
+            it('response status must be 500', async () => { 
+                expect(res.status).to.have.been.calledWith(500);
+            });
+            
+            it('response must have an error', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('error');
             });
         });
     });

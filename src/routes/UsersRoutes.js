@@ -13,5 +13,7 @@ router.put('/', usersController.updateProfile);
 
 router.put('/location', usersController.updateLocation);
 
+router.get('/invitations', usersController.getInvitations);
+
 
 module.exports = router;

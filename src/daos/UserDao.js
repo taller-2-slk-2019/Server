@@ -47,6 +47,11 @@ class UserDao{
         return count > 0;
     }
 
+    async findUserInvitations(token){
+        var user = await this.findByToken(token);
+        return await user.getOrganizationInvitations();
+    }
+
 }
 
 module.exports = new UserDao();

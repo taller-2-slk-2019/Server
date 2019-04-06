@@ -43,6 +43,25 @@ class UsersController{
         }
     }
 
+    async getInvitations(req, res) {
+        var token = req.query.userToken;
+
+        try{
+            var invitations = await UserDao.findUserInvitations(token);
+            var result = invitations.map(invitation => {
+                return {token: invitation.organizationUserInvitation.token,
+                        organization: invitation.name,
+                        description: invitation.description,
+                        invitedAt: invitation.organizationUserInvitation.createdAt
+                       };
+            });
+            
+            sendSuccessResponse(res, result);
+        } catch (err){
+            sendErrorResponse(res, err);
+        }
+    }
+
     async get(req, res) {
         var organizationId = req.query.organizationId;
 
