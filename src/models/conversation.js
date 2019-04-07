@@ -5,7 +5,7 @@ module.exports = (sequelize) => {
 
   Conversation.associate = function(models) {
     Conversation.belongsTo(models.organization);
-    Conversation.belongsToMany(models.user, { through: models.conversationUsers });
+    Conversation.users = Conversation.belongsToMany(models.user, { through: models.conversationUsers });
   };
 
   return Conversation;
