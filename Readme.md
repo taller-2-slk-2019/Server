@@ -21,6 +21,18 @@ https://travis-ci.org/taller-2-slk-2019/Server
 
 https://coveralls.io/github/taller-2-slk-2019/Server
 
+###Dockerfile
+
+- Cuenta: hypechat4
+
+- Crear imagen local: docker build -t hypechat4/hypechat .
+
+- Log a Docker: docker login 
+
+- Subir nueva imagen (con logeo previo): docker push hypechat4/hypechat
+
+- Usar imagen de la nube(REVISAR): sudo docker run --init --net=host --rm -ebase_url=http://localhost:4567/ hypechat4/hypechat
+
 ### Instalación
 
 - Instalar Node.js
