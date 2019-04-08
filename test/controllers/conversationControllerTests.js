@@ -16,38 +16,41 @@ describe('"ConversationsController Tests"', () => {
 
     describe('Methods without errors', () => {
         var mock1;
+        var mock2;
 
         before(async () => {
-            mock1 = stub(ConversationDao, 'get').resolves([conversationCreateData, conversationCreateData]);
+            mock1 = stub(ConversationDao, 'get').resolves([conversationWithUsersDataMock, conversationWithUsersDataMock]);
+            mock2 = stub(ConversationDao, 'create').resolves(conversationWithUsersDataMock);
         });
 
         after(async () => {
             mock1.restore();
+            mock2.restore();
         });
 
-        /*describe('Create channel', () => {
-            var req = mockRequest({ body: channelCreateData });
+        describe('Create channel', () => {
+            var req = mockRequest();
             var res;
 
             beforeEach(async () => {
                 res = mockResponse();
-                await ChannelsController.create(req, res);
+                await ConversationsController.create(req, res);
             });
 
             it('response status must be 200', async () => {
                 expect(res.status).to.have.been.calledWith(200);
             });
 
-            it('channel must not be null', async () => {
+            it('conversation must not be null', async () => {
                 var response = res.send.args[0][0];
                 expect(response).to.not.be.null;
             });
 
-            it('returned channel must have an id', async () => {
+            it('returned conversation must have an id', async () => {
                 var response = res.send.args[0][0];
-                expect(response).to.have.property('id', channelDataMock.id);
+                expect(response).to.have.property('id', conversationWithUsersDataMock.id);
             });
-        });*/
+        });
 
         describe('Get conversations', () => {
             var req = mockRequest();
@@ -77,23 +80,26 @@ describe('"ConversationsController Tests"', () => {
 
     describe('Methods with errors', () => {
         var mock1;
+        var mock2;
 
         before(async () => {
             mock1 = stub(ConversationDao, 'get').rejects();
+            mock2 = stub(ConversationDao, 'create').rejects();
         });
 
         after(async () => {
             mock1.restore();
+            mock2.restore();
         });
 
 
-        /*describe('Create channel with error', () => {
-            var req = mockRequest({ body: channelCreateData });
+        describe('Create conversation with error', () => {
+            var req = mockRequest();
             var res;
 
             beforeEach(async () => {
                 res = mockResponse();
-                await ChannelsController.create(req, res);
+                await ConversationsController.create(req, res);
             });
 
             it('response status must be 500', async () => {
@@ -104,7 +110,7 @@ describe('"ConversationsController Tests"', () => {
                 var response = res.send.args[0][0];
                 expect(response).to.have.property('error');
             });
-        });*/
+        });
 
         describe('Get conversations with error', () => {
             var req = mockRequest();

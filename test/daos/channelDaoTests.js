@@ -27,6 +27,7 @@ describe('"ChannelDao Tests"', () => {
         user = await User.create(userCreateData());
         organizationData.creatorId = user.id;
         organization = await Organization.create(organizationData);
+        await organization.addUser(user, {through: {role: 'role'}});
         channelData.creatorToken = user.token;
         channelData.organizationId = organization.id;
     });
@@ -78,7 +79,7 @@ describe('"ChannelDao Tests"', () => {
 
         it('channel must not be created without creator', async () => {
             data.creatorToken = "abc";
-           await  expect(ChannelDao.create(data)).to.eventually.be.rejectedWith(UserNotFoundError);
+            await  expect(ChannelDao.create(data)).to.eventually.be.rejectedWith(UserNotFoundError);
         });
 
         it('channel must not be created without organization', async () => {
@@ -89,6 +90,12 @@ describe('"ChannelDao Tests"', () => {
 
         it('channel must not be created with empty data', async () => {
             await expect(ChannelDao.create({})).to.eventually.be.rejectedWith(SequelizeValidationError);
+        });
+
+        it('channel must not be created if user not belongs to organization', async () => {
+            await organization.setUsers([]);
+            await expect(ChannelDao.create(channelData)).to.eventually.be.rejectedWith(UserNotBelongsToOrganizationError);
+            await organization.addUser(user, {through: {role: 'role'}});
         });
     });
 

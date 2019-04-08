@@ -20,23 +20,6 @@ var conversationWithUsersDataMock = {
                 conversationId: 1,
                 userId: 1
             }
-        },
-        {
-            id: 10,
-            name: "fdsfdsf",
-            email: "t@test.com",
-            picture: "https://flalala",
-            latitude: null,
-            longitude: null,
-            username: "josesito",
-            createdAt: "2019-04-05T21:35:47.383Z",
-            updatedAt: "2019-04-05T21:35:47.383Z",
-            conversationUsers: {
-                createdAt: "2019-09-09T03:00:00.000Z",
-                updatedAt: "2019-09-09T03:00:00.000Z",
-                conversationId: 1,
-                userId: 10
-            }
         }
     ]
 };

@@ -11,84 +11,81 @@ var models = require('../../src/database/sequelize');
 var Conversation = models.conversation;
 var User = models.user;
 var Organization = models.organization;
-var { ConversationNotFoundError } = require('../../src/helpers/Errors');
+var { ConversationNotFoundError, UserNotBelongsToOrganizationError } = require('../../src/helpers/Errors');
 var { conversationCreateData } = require('../data/conversationData');
 var { userCreateData } = require('../data/userData');
 var { organizationCreateData } = require('../data/organizationData');
 
 describe('"ConversationDao Tests"', () => {
     var user;
+    var user2;
     var organization;
     var organizationData = Object.create(organizationCreateData);
     var conversationData = Object.create(conversationCreateData);
 
     before(async () => {
         user = await User.create(userCreateData());
+        user2 = await User.create(userCreateData());
         organizationData.creatorId = user.id;
         organization = await Organization.create(organizationData);
+        await organization.addUser(user, {through: {role: 'role'}});
+        await organization.addUser(user2, {through: {role: 'role'}});
         conversationData.organizationId = organization.id;
     });
 
 
-    /*describe('Create channel', () => {
-        var channel;
+    describe('Create conversation', () => {
+        var conversation;
 
-        beforeEach(async () => {
-            channel = await ChannelDao.create(channelData);
+        before(async () => {
+            conversation = await ConversationDao.create(organization.id, user2.id, user.token);
         });
 
-        it('channel must be created', async () => {
-            expect(channel).to.not.be.null;
+        it('conversation must be created', async () => {
+            expect(conversation).to.not.be.null;
         });
 
-        it('channel must have an id', async () => {
-            expect(channel).to.have.property('id');
+        it('conversation must have an id', async () => {
+            expect(conversation).to.have.property('id');
         });
 
-        it('channel organization must be correct', async () => {
-            var org = await channel.getOrganization();
+        it('conversation organization must be correct', async () => {
+            var org = await conversation.getOrganization();
             expect(org.id).to.eq(organization.id);
         });
 
-        it('channel creator must be ok', async () => {
-            var creator = await channel.getCreator();
-            expect(creator.id).to.eq(user.id);
-        });
-
-        it('channel must have an user', async () => {
-            var users = await channel.getUsers();
+        it('conversation must have two users', async () => {
+            var users = conversation.users;
             expect(users.length).to.eq(1);
         });
 
-        it('creator must belong to channel', async () => {
-            var users = await channel.getUsers();
-            expect(users[0].id).to.eq(user.id);
+        it('conversation must have non creator user', async () => {
+            var users = conversation.users;
+            expect(users[0].id).to.eq(user2.id);
+        });
+
+        it('conversation for same users must return the same', async () => {
+            var conversation2 = await ConversationDao.create(organization.id, user2.id, user.token);
+            expect(conversation2).to.have.property('id', conversation.id);
         });
     });
 
-    describe('Create channel with error', () => {
-        var channel;
-        var data;
+    describe('Create conversation with error', () => {
+        var conversation;
+        var user3;
 
-        beforeEach(async () => {
-            data = Object.create(channelData);
+        before(async () => {
+            user3 = await User.create(userCreateData());
         });
 
-        it('channel must not be created without creator', async () => {
-            data.creatorToken = "abc";
-           await  expect(ChannelDao.create(data)).to.eventually.be.rejectedWith(UserNotFoundError);
+        it('conversation must not be created if user1 not belongs to organization', async () => {
+           await  expect(ConversationDao.create(organization.id, user.id, user3.token)).to.eventually.be.rejectedWith(UserNotBelongsToOrganizationError);
         });
 
-        it('channel must not be created without organization', async () => {
-            data.organizationId = -2;
-            data.creatorToken = user.token;
-            await expect(ChannelDao.create(data)).to.eventually.be.rejectedWith(OrganizationNotFoundError);
+        it('conversation must not be created if user2 not belongs to organization', async () => {
+           await  expect(ConversationDao.create(organization.id, user3.id, user.token)).to.eventually.be.rejectedWith(UserNotBelongsToOrganizationError);
         });
-
-        it('channel must not be created with empty data', async () => {
-            await expect(ChannelDao.create({})).to.eventually.be.rejectedWith(SequelizeValidationError);
-        });
-    });*/
+    });
 
     describe('Find by id', () => {
         var expected;
@@ -131,11 +128,11 @@ describe('"ConversationDao Tests"', () => {
             org = await Organization.create(organizationData);
             var data = Object.create(conversationData);
             data.organizationId = org.id;
-            conversation = await Conversation.create(data);
-            await conversation.addUser(user);
-            conversation2 = await Conversation.create(data);
-            await conversation2.addUser(user);
             usr = await User.create(userCreateData());
+            conversation = await Conversation.create(data);
+            await conversation.addUsers([user, usr]);
+            conversation2 = await Conversation.create(data);
+            await conversation2.addUsers([user, usr]);
         });
 
         it('get for user and organization must return 2 conversations', async () => {
@@ -144,7 +141,8 @@ describe('"ConversationDao Tests"', () => {
         });
 
         it('get for other user and organization must return 0 channels', async () => {
-            var conversations = await ConversationDao.get(usr.token, org.id);
+            var usr2 = await User.create(userCreateData());
+            var conversations = await ConversationDao.get(usr2.token, org.id);
             expect(conversations.length).to.eq(0);
         });
 

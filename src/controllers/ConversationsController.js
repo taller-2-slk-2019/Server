@@ -5,25 +5,19 @@ var { sendSuccessResponse, sendErrorResponse } = require('../helpers/ResponseHel
 class ConversationsController{
 
     async create(req, res){
-        var data = {
-            name: req.body.name,
-            isPublic: req.body.isPublic,
-            description: req.body.description,
-            welcome: req.body.welcome,
-            creatorToken: req.query.userToken,
-            organizationId: req.body.organizationId
-        };
-/*
+        var organizationId = req.body.organizationId;
+        var userId = req.body.userId;
+        var userToken = req.query.userToken;
+
         try{
-            var channel  = await ChannelDao.create(data);
-            logger.info(`Channel created (${channel.id}) in organization ${data.organizationId} by user ${data.creatorToken}`);
-            sendSuccessResponse(res, channel);
+            var conversation  = await ConversationDao.create(organizationId, userId, userToken);
+            logger.info(`Conversation created (${conversation.id}) in organization ${organizationId} by user ${userToken} with user ${userId}`);
+
+            sendSuccessResponse(res, conversation);
             
         } catch (err){
             sendErrorResponse(res, err);
-        }*/
-        logger.info(`Channel created`);
-         sendSuccessResponse(res,data);
+        }
     }
 
     async get(req, res){
