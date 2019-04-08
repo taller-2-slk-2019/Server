@@ -11,7 +11,7 @@ var models = require('../../src/database/sequelize');
 var Conversation = models.conversation;
 var User = models.user;
 var Organization = models.organization;
-var { ConversationNotFoundError, UserNotBelongsToOrganizationError } = require('../../src/helpers/Errors');
+var { ConversationNotFoundError, UserNotBelongsToOrganizationError, InvalidConversationError } = require('../../src/helpers/Errors');
 var { conversationCreateData } = require('../data/conversationData');
 var { userCreateData } = require('../data/userData');
 var { organizationCreateData } = require('../data/organizationData');
@@ -84,6 +84,10 @@ describe('"ConversationDao Tests"', () => {
 
         it('conversation must not be created if user2 not belongs to organization', async () => {
            await  expect(ConversationDao.create(organization.id, user3.id, user.token)).to.eventually.be.rejectedWith(UserNotBelongsToOrganizationError);
+        });
+
+        it('conversation must not be created if user1 is user2', async () => {
+           await  expect(ConversationDao.create(organization.id, user.id, user.token)).to.eventually.be.rejectedWith(InvalidConversationError);
         });
     });
 

@@ -77,6 +77,13 @@ class InvalidLocationError extends Error {
     }
 }
 
+class InvalidConversationError extends Error {
+    constructor() {
+        super("Conversation must have two different users");
+        this.name = this.constructor.name;
+    }
+}
+
 class InvalidMessageTypeError extends Error {
     constructor() {
         super("Message type is invalid. Must be one of " + Config.messageTypes);
@@ -112,5 +119,6 @@ module.exports = {
     UserNotBelongsToChannelError,
     InvalidMessageTypeError,
     ForbiddenWordAlreadyExistsError,
-    InvalidMessageDataError
+    InvalidMessageDataError,
+    InvalidConversationError
 };

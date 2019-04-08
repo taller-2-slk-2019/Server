@@ -4,7 +4,7 @@ var OrganizationDao = require('./OrganizationDao');
 var models = require('../database/sequelize');
 var Op = models.Sequelize.Op;
 var Conversation = models.conversation;
-var { ConversationNotFoundError, UserNotBelongsToOrganizationError } = require('../helpers/Errors');
+var { ConversationNotFoundError, UserNotBelongsToOrganizationError, InvalidConversationError } = require('../helpers/Errors');
 
 class ConversationDao{
 
@@ -14,6 +14,9 @@ class ConversationDao{
 
         var organization = await OrganizationDao.findById(organizationId);
 
+        if (user1.id == user2.id){
+            throw new InvalidConversationError();
+        }
         if (!(await organization.hasUser(user1))){
             throw new UserNotBelongsToOrganizationError(organization.id, user1.id);
         }
