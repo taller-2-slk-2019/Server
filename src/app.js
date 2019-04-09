@@ -19,6 +19,9 @@ app.use('/organizations', organizationsRouter);
 var channelsRouter = require('./routes/ChannelsRoutes');
 app.use('/channels', channelsRouter);
 
+var conversationsRouter = require('./routes/ConversationsRoutes');
+app.use('/conversations', conversationsRouter);
+
 var messagesRouter = require('./routes/MessagesRoutes');
 app.use('/messages', messagesRouter);
 
@@ -27,7 +30,7 @@ app.use('/forbiddenWords', forbiddenWordsRouter);
 
 
 app.all('*', function(req, res){
-    logger.warn('Invalid Api called Method: %s  Url: %s', req.method, req.url);
+    logger.warn('Invalid Api called   Method: %s  Url: %s', req.method, req.url);
     res.send('Invalid Api');
 });
 
