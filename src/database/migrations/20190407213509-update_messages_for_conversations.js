@@ -24,7 +24,7 @@ module.exports = {
     return queryInterface.sequelize.transaction((t) => {
       return Promise.all([
         queryInterface.changeColumn('messages', 'channelId', {
-          allowNull: false,
+          allowNull: true,
           type: Sequelize.INTEGER
         }, { transaction: t }),
           queryInterface.removeColumn('messages', 'conversationId', { transaction: t }),

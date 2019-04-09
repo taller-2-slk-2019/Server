@@ -19,8 +19,8 @@ describe('"MessagesController Tests"', () => {
         var mock2;
 
         before(async () => {
-            mock1 = stub(MessageDao, 'create').resolves();
-            mock2 = stub(MessageDao, 'get').resolves([messageMock, messageMock, messageMock]);
+            mock1 = stub(MessageDao, 'createForChannel').resolves();
+            mock2 = stub(MessageDao, 'getForChannel').resolves([messageMock, messageMock, messageMock]);
         });
 
         after(async () => {
@@ -78,8 +78,8 @@ describe('"MessagesController Tests"', () => {
         var mock2;
 
         before(async () => {
-            mock1 = stub(MessageDao, 'create').rejects();
-            mock2 = stub(MessageDao, 'get').rejects();
+            mock1 = stub(MessageDao, 'createForChannel').rejects();
+            mock2 = stub(MessageDao, 'getForChannel').rejects();
         });
 
         after(async () => {

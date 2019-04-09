@@ -22,7 +22,7 @@ class MessagesController{
                 throw new InvalidMessageDataError();
             }
 
-            await MessageDao.create(data);
+            await MessageDao.createForChannel(data);
             logger.info(`Message sent from user ${data.senderId} to channel ${data.channelId}`);
             sendEmptySuccessResponse(res);
             
@@ -36,7 +36,7 @@ class MessagesController{
         var offset = req.query.offset || 0;
 
         try{
-            var messages = await MessageDao.get(channelId, offset);
+            var messages = await MessageDao.getForChannel(channelId, offset);
             sendSuccessResponse(res, messages);
 
         } catch (err){
