@@ -1,7 +1,7 @@
 var logger = require('logops');
 var MessageDao = require('../daos/MessageDao');
 var { sendErrorResponse, sendEmptySuccessResponse, sendSuccessResponse } = require('../helpers/ResponseHelper');
-var { InvalidMessageTypeError, InvalidMessageDataError } = require('../helpers/Errors');
+var { InvalidMessageTypeError, InvalidMessageDataError, InvalidQueryError } = require('../helpers/Errors');
 var Config = require('../helpers/Config');
 
 class MessagesController{
@@ -10,8 +10,7 @@ class MessagesController{
         var data = {
             type: req.body.type,
             data: req.body.data,
-            senderToken: req.query.userToken,
-            channelId: req.body.channelId
+            senderToken: req.query.userToken
         };
 
         try{
@@ -22,8 +21,17 @@ class MessagesController{
                 throw new InvalidMessageDataError();
             }
 
-            await MessageDao.createForChannel(data);
-            logger.info(`Message sent from user ${data.senderId} to channel ${data.channelId}`);
+            if (req.body.channelId){
+                data.channelId = req.body.channelId;
+                await MessageDao.createForChannel(data);
+                logger.info(`Message sent from user ${data.senderId} to channel ${data.channelId}`);
+            } else if (req.body.conversationId){
+                data.conversationId = req.body.conversationId;
+                await MessageDao.createForConversation(data);
+                logger.info(`Message sent from user ${data.senderId} to conversation ${data.conversationId}`);
+            } else {
+                throw new InvalidQueryError();
+            }
             sendEmptySuccessResponse(res);
             
         } catch (err){
@@ -33,10 +41,19 @@ class MessagesController{
 
     async get(req, res){
         var channelId = req.query.channelId;
+        var conversationId = req.query.conversationId;
         var offset = req.query.offset || 0;
+        var messages;
 
         try{
-            var messages = await MessageDao.getForChannel(channelId, offset);
+            if (channelId){
+                messages = await MessageDao.getForChannel(channelId, offset);
+            } else if (conversationId){
+                messages = await MessageDao.getForConversation(conversationId, offset);
+            } else {
+                throw new InvalidQueryError();
+            }
+            
             sendSuccessResponse(res, messages);
 
         } catch (err){

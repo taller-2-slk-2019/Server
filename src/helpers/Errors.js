@@ -1,5 +1,12 @@
 var Config = require('./Config');
 
+class InvalidQueryError extends Error {
+    constructor() {
+        super("Invalid Query");
+        this.name = this.constructor.name;
+    }
+}
+
 class UserNotFoundError extends Error {
     constructor(userId) {
         super("User not found: " + userId);
@@ -113,11 +120,11 @@ class ForbiddenWordAlreadyExistsError extends Error {
 }
 
 module.exports = {
-    UserNotFoundError: UserNotFoundError,
-    OrganizationNotFoundError: OrganizationNotFoundError,
-    UserAlreadyInvitedError: UserAlreadyInvitedError,
-    UserAlreadyInOrganizationError: UserAlreadyInOrganizationError,
-    InvalidOrganizationInvitationTokenError: InvalidOrganizationInvitationTokenError,
+    UserNotFoundError,
+    OrganizationNotFoundError,
+    UserAlreadyInvitedError,
+    UserAlreadyInOrganizationError,
+    InvalidOrganizationInvitationTokenError,
     InvalidLocationError,
     ChannelNotFoundError,
     ConversationNotFoundError,
@@ -128,5 +135,6 @@ module.exports = {
     ForbiddenWordAlreadyExistsError,
     InvalidMessageDataError,
     InvalidConversationError,
-    UserNotBelongsToConversationError
+    UserNotBelongsToConversationError,
+    InvalidQueryError
 };
