@@ -1,18 +1,12 @@
 FROM node:10
 
-# Create app directory
-WORKDIR /deployments
+EXPOSE 3000
 
-# Install app dependencies
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-# where available (npm@5+)
-COPY package*.json ./
+# Create app directory
+WORKDIR /home/app
+
+COPY . /home/app
 
 RUN npm install
-
-# Bundle app source
-COPY . .
-
-EXPOSE 8080
 
 CMD [ "node", "./src/app.js" ]

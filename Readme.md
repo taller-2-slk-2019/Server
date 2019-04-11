@@ -21,11 +21,17 @@ https://travis-ci.org/taller-2-slk-2019/Server
 
 https://coveralls.io/github/taller-2-slk-2019/Server
 
-###Dockerfile
+### Docker
 
 - Cuenta: hypechat4
 
+- Importante: Crear el archivo .env como lo dice en la pagina
+
 - Crear imagen local: docker build -t hypechat4/hypechat .
+
+- Otra forma: docker-compose build
+
+- Ejecucion: docker-compose up
 
 - Log a Docker: docker login 
 
