@@ -25,17 +25,13 @@ https://coveralls.io/github/taller-2-slk-2019/Server
 
 - Cuenta: hypechat4
 
-- Importante: Crear el archivo .env como lo dice en la pagina
+- Crear imagen local: docker-compose build
 
-- Crear imagen local: docker build -t hypechat4/hypechat .
+- Ejecucion local: docker-compose up
 
-- Otra forma: docker-compose build
+- Log in a Docker: docker login 
 
-- Ejecucion: docker-compose up
-
-- Log a Docker: docker login 
-
-- Subir nueva imagen (con logeo previo): docker push hypechat4/hypechat
+- Subir nueva imagen (con logueo previo): docker push hypechat4/hypechat
 
 - Usar imagen de la nube(REVISAR): sudo docker run --init --net=host --rm -ebase_url=http://localhost:4567/ hypechat4/hypechat
 
