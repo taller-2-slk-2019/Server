@@ -1,6 +1,8 @@
 var express = require('express');
+var cors = require('cors')
 var app = express();
 
+app.use(cors());
 
 var logger = require('logops');
 logger.format = logger.formatters.dev;
@@ -31,7 +33,7 @@ app.use('/forbiddenWords', forbiddenWordsRouter);
 
 app.all('*', function(req, res){
     logger.warn('Invalid Api called   Method: %s  Url: %s', req.method, req.url);
-    res.send('Invalid Api');
+    res.status(404).send('Invalid Api');
 });
 
 
