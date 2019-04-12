@@ -20,7 +20,7 @@ describe('"ForbiddenWordsController Tests"', () => {
 
         before(async () => {
             mock1 = stub(ForbiddenWordDao, 'get').resolves([forbiddenWordMock, forbiddenWordMock, forbiddenWordMock]);
-            mock2 = stub(ForbiddenWordDao, 'create').resolves();
+            mock2 = stub(ForbiddenWordDao, 'create').resolves(forbiddenWordMock);
             mock3 = stub(ForbiddenWordDao, 'delete').resolves();
         });
 
@@ -42,10 +42,15 @@ describe('"ForbiddenWordsController Tests"', () => {
             it('response status must be 200', async () => {
                 expect(res.status).to.have.been.calledWith(200);
             });
-
-            it('success must be returned', async () => {
+            
+            it('forbidden word must not be null', async () => {
                 var response = res.send.args[0][0];
-                expect(response).to.have.property('success');
+                expect(response).to.not.be.null;
+            });
+            
+            it('forbidden word must be the correct word', async () => {
+                var response = res.send.args[0][0];
+                expect(response.word).to.eq(forbiddenWordMock.word);
             });
         });
 
