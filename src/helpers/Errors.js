@@ -28,6 +28,13 @@ class ChannelNotFoundError extends Error {
     }
 }
 
+class MessageNotFoundError extends Error {
+    constructor(msgId) {
+        super("Message not found: " + msgId);
+        this.name = this.constructor.name;
+    }
+}
+
 class ConversationNotFoundError extends Error {
     constructor(conversationId) {
         super("Conversation not found: " + conversationId);
@@ -136,5 +143,6 @@ module.exports = {
     InvalidMessageDataError,
     InvalidConversationError,
     UserNotBelongsToConversationError,
-    InvalidQueryError
+    InvalidQueryError,
+    MessageNotFoundError
 };

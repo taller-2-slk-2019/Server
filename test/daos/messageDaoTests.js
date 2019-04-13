@@ -18,7 +18,7 @@ var Conversation = models.conversation;
 var ForbiddenWord = models.forbiddenWord;
 var User = models.user;
 var Organization = models.organization;
-var { UserNotBelongsToChannelError, UserNotBelongsToConversationError } = require('../../src/helpers/Errors');
+var { UserNotBelongsToChannelError, UserNotBelongsToConversationError, MessageNotFoundError } = require('../../src/helpers/Errors');
 var { messageCreateData } = require('../data/messageData');
 var { conversationCreateData } = require('../data/conversationData');
 var { channelCreateData } = require('../data/channelData');
@@ -291,6 +291,40 @@ describe('"MessageDao Tests"', () => {
             var messages = await MessageDao.getForConversation(conversation.id, 4);
             expect(messages).to.have.length.below(Config.messagesPerPage);
         });
+    });
+
+    describe('Find by id', () => {
+        var expected;
+        var message;
+
+        before(async () => {
+            expected = await Message.create(messageData);
+            message = await MessageDao.findById(expected.id);
+        });
+
+        it('message must not be null', async () => {
+            expect(message).to.not.be.null;
+        });
         
+        it('message must have correct id', async () => {
+            expect(message).to.have.property('id', expected.id);
+        });
+
+        it('message must have sender', async () => {
+            expect(message).to.have.property('sender');
+        });
+
+        it('throws exception if id does not exist', async () => {
+            await expect(MessageDao.findById(9999999)).to.eventually.be.rejectedWith(MessageNotFoundError);
+        });
+
+        it('throws exception if id is 0', async () => {
+            await expect(MessageDao.findById(0)).to.eventually.be.rejectedWith(MessageNotFoundError);
+        });
+
+        it('throws exception if id is -1', async () => {
+            await expect(MessageDao.findById(-1)).to.eventually.be.rejectedWith(MessageNotFoundError);
+        });
+
     });
 });

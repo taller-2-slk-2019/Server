@@ -5,10 +5,18 @@ var ConversationDao = require('./ConversationDao');
 var models = require('../database/sequelize');
 var Message = models.message;
 var Config = require('../helpers/Config');
-var { UserNotBelongsToChannelError, UserNotBelongsToConversationError } = require('../helpers/Errors');
+var { UserNotBelongsToChannelError, UserNotBelongsToConversationError, MessageNotFoundError } = require('../helpers/Errors');
 var MessageParser = require('../helpers/MessageParser');
 
 class MessageDao{
+    async findById(id){
+        var msg = await Message.findByPk(id, 
+            {include: [{ association: Message.sender, attributes: { exclude: ['token'] }}]});
+        if (!msg){
+            throw new MessageNotFoundError(id);
+        }
+        return msg;
+    }
 
     async createForChannel(msg){
         var user = await UserDao.findByToken(msg.senderToken);
@@ -47,7 +55,7 @@ class MessageDao{
         }
 
         var message = await Message.create(msg);
-        FirebaseController.sendMessage(await Message.findByPk(message.id));
+        FirebaseController.sendMessage(await this.findById(message.id));
         return message;
     }
 
