@@ -21,6 +21,12 @@ https://travis-ci.org/taller-2-slk-2019/Server
 
 https://coveralls.io/github/taller-2-slk-2019/Server
 
+### Docker
+
+- Crear imagen local: sudo docker-compose build
+
+- Ejecucion local: sudo docker-compose up
+
 ### Instalación
 
 - Instalar Node.js

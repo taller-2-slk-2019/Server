@@ -1,0 +1,36 @@
+version: "3"
+services:
+  postgres:
+    image: postgres:9.6
+    ports:
+      - "5432"
+  app:
+    image: hypechat4/hypechat
+    build: .
+    depends_on:
+      - db_migration
+    ports:
+      - "3000:3000"
+    environment:
+        DOCKER: 1
+      
+  db_creation:
+    build: .
+    command: ["npx", "sequelize", "db:create"]
+    links:
+      - postgres
+    depends_on:
+      - postgres
+    environment:
+        DOCKER: 1
+  
+  db_migration:
+    build: .
+    command: ["npx", "sequelize", "db:migrate"]
+    links:
+      - db_creation
+    depends_on:
+      - db_creation
+    environment:
+        DOCKER: 1
+    
