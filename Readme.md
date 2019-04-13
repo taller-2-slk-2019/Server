@@ -23,17 +23,9 @@ https://coveralls.io/github/taller-2-slk-2019/Server
 
 ### Docker
 
-- Cuenta: hypechat4
+- Crear imagen local: sudo docker-compose build
 
-- Crear imagen local: docker-compose build
-
-- Ejecucion local: docker-compose up
-
-- Log in a Docker: docker login 
-
-- Subir nueva imagen (con logueo previo): docker push hypechat4/hypechat
-
-- Usar imagen de la nube(REVISAR): sudo docker run --init --net=host --rm -ebase_url=http://localhost:4567/ hypechat4/hypechat
+- Ejecucion local: sudo docker-compose up
 
 ### Instalación
 
