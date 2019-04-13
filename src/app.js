@@ -1,6 +1,8 @@
 var express = require('express');
+var cors = require('cors');
 var app = express();
 
+app.use(cors());
 
 var logger = require('logops');
 logger.format = logger.formatters.dev;
@@ -19,6 +21,9 @@ app.use('/organizations', organizationsRouter);
 var channelsRouter = require('./routes/ChannelsRoutes');
 app.use('/channels', channelsRouter);
 
+var conversationsRouter = require('./routes/ConversationsRoutes');
+app.use('/conversations', conversationsRouter);
+
 var messagesRouter = require('./routes/MessagesRoutes');
 app.use('/messages', messagesRouter);
 
@@ -27,8 +32,8 @@ app.use('/forbiddenWords', forbiddenWordsRouter);
 
 
 app.all('*', function(req, res){
-    logger.warn('Invalid Api called Method: %s  Url: %s', req.method, req.url);
-    res.send('Invalid Api');
+    logger.warn('Invalid Api called   Method: %s  Url: %s', req.method, req.url);
+    res.status(404).send('Invalid Api');
 });
 
 
