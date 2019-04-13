@@ -47,7 +47,7 @@ class MessageDao{
         }
 
         var message = await Message.create(msg);
-        FirebaseController.sendMessage(message);
+        FirebaseController.sendMessage(await Message.findByPk(message.id));
         return message;
     }
 
