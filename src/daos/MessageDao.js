@@ -1,3 +1,4 @@
+var FirebaseController = require('../firebase/FirebaseController');
 var UserDao = require('./UserDao');
 var ChannelDao = require('./ChannelDao');
 var ConversationDao = require('./ConversationDao');
@@ -45,7 +46,9 @@ class MessageDao{
             msg.data = MessageParser.replaceForbiddenWords(msg.data, forbiddenWords);
         }
 
-        return await Message.create(msg);
+        var message = await Message.create(msg);
+        FirebaseController.sendMessage(message);
+        return message;
     }
 
     async getForChannel(channelId, offset){

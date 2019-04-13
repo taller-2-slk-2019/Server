@@ -7,6 +7,7 @@ const { stub, match } = require('sinon');
 var SequelizeValidationError = require('../../src/database/sequelize').Sequelize.SequelizeValidationError;
 
 var MessageDao = require('../../src/daos/MessageDao');
+var FirebaseController = require('../../src/firebase/FirebaseController');
 
 var Config = require('../../src/helpers/Config');
 var MessageParser = require('../../src/helpers/MessageParser');
@@ -34,8 +35,11 @@ describe('"MessageDao Tests"', () => {
     var conversationData = Object.create(conversationCreateData);
     var messageData = Object.create(messageCreateData);
     var messageConvData = Object.create(messageCreateData);
+    var firebaseMock;
 
     before(async () => {
+        firebaseMock = stub(FirebaseController, 'sendMessage').returns(true);
+
         user = await User.create(userCreateData());
         organizationData.creatorId = user.id;
         organization = await Organization.create(organizationData);
@@ -52,6 +56,10 @@ describe('"MessageDao Tests"', () => {
         messageConvData.senderToken = user.token;
         messageConvData.senderId = user.id;
         messageConvData.conversationId = conversation.id;
+    });
+
+    after(async () => {
+        firebaseMock.restore();
     });
 
 
