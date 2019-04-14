@@ -6,6 +6,7 @@ var messageMock = {
     "updatedAt": "2019-03-26T21:42:33.824Z",
     "senderId": 1,
     "channelId": 1,
+    "conversationId": null,
     "sender": {
         "id": 1,
         "name": "jose",
