@@ -11,7 +11,7 @@ var models = require('../../src/database/sequelize');
 var User = models.user;
 var Organization = models.organization;
 var Channel = models.channel;
-var { UserNotFoundError, OrganizationNotFoundError, UserAlreadyInvitedError, UserAlreadyInOrganizationError,
+var { UserNotFoundError, OrganizationNotFoundError,
             InvalidOrganizationInvitationTokenError, UserNotBelongsToOrganizationError } = require('../../src/helpers/Errors');
 var { userCreateData } = require('../data/userData');
 var { organizationCreateData } = require('../data/organizationData');
@@ -114,35 +114,34 @@ describe('"OrganizationDao Tests"', () => {
 
     });
 
-    describe('Invite User', () => {
+    describe('Invite Users', () => {
         var organization;
-        var invitedUserData = Object.create(userCreateData());
-        var userToInvite;
-        var token;
+        var invitedUser1Data = Object.create(userCreateData());
+        var invitedUser2Data = Object.create(userCreateData());
+        var userToInvite1;
+        var userToInvite2;
 
         before(async () => {
             organization = await Organization.create(organizationData);
-            invitedUserData.email = "invited.user.to.organization@gmail.com";
-            userToInvite = await User.create(invitedUserData);
+            invitedUser1Data.email = "invited.user.to.organization@gmail.com";
+            invitedUser2Data.email = "invited.user.to.organization-2@gmail.com";
+            userToInvite1 = await User.create(invitedUser1Data);
+            userToInvite2 = await User.create(invitedUser2Data);
         });
 
         beforeEach(async () => {
             await organization.setInvitedUsers([]);
-            token = await OrganizationDao.inviteUser(organization.id, userToInvite.email);
-        });
-
-        it('token must not be null', async () => {
-            expect(token).to.not.be.null;
+            await OrganizationDao.inviteUsers(organization.id, [userToInvite1.email, userToInvite2.email]);
         });
         
-        it('organization must have one invited user', async () => {
+        it('organization must have two invited user', async () => {
             var invited = await organization.getInvitedUsers();
-            expect(invited.length).to.eq(1);
+            expect(invited.length).to.eq(2);
         });
 
-        it('user must be invited', async () => {
+        it('user1 must be invited', async () => {
             var invited = await organization.getInvitedUsers();
-            expect(invited[0].id).to.eq(userToInvite.id);
+            expect(invited[0].id).to.eq(userToInvite1.id);
         });
 
         it('user must not belong to organization', async () => {
@@ -150,17 +149,24 @@ describe('"OrganizationDao Tests"', () => {
             expect(users.length).to.eq(0);
         });
 
-        it('can not invite user again', async () => {
-            await expect(OrganizationDao.inviteUser(organization.id, userToInvite.email))
-                .to.eventually.be.rejectedWith(UserAlreadyInvitedError);
+        it('inviting user again will not fail', async () => {
+            await OrganizationDao.inviteUsers(organization.id, [userToInvite1.email]);
+            var invited = await organization.getInvitedUsers();
+            expect(invited.length).to.eq(2);
+        });
+
+        it('should invite user email only once', async () => {
+            await organization.setInvitedUsers([]);
+            await OrganizationDao.inviteUsers(organization.id, [userToInvite1.email, userToInvite1.email])
+            var invited = await organization.getInvitedUsers();
+            expect(invited.length).to.eq(1);
         });
     });
 
-    describe('Invite user with errors', () => {
+    describe('Invite users with errors', () => {
         var organization;
         var invitedUserData = Object.create(userCreateData());
         var userToInvite;
-        var token;
 
         before(async () => {
             organization = await Organization.create(organizationData);
@@ -170,17 +176,19 @@ describe('"OrganizationDao Tests"', () => {
         });
 
         it('can not invite user that already belongs to organization', async () => {
-            await expect(OrganizationDao.inviteUser(organization.id, userToInvite.email))
-                .to.eventually.be.rejectedWith(UserAlreadyInOrganizationError);
+            await OrganizationDao.inviteUsers(organization.id, [userToInvite.email]);
+            var invited = await organization.getInvitedUsers();
+            expect(invited.length).to.eq(0);
         });
 
         it('can not invite email that does not exist', async () => {
-            await expect(OrganizationDao.inviteUser(organization.id, "fasdasd.does.not.exists@mail.not.exists.com"))
-                .to.eventually.be.rejectedWith(UserNotFoundError);
+            await OrganizationDao.inviteUsers(organization.id, ["fasdasd.does.not.exists@mail.not.exists.com"])
+            var invited = await organization.getInvitedUsers();
+            expect(invited.length).to.eq(0);
         });
 
         it('can not invite user to organization that does not exist', async () => {
-            await expect(OrganizationDao.inviteUser(-2, userToInvite.email))
+            await expect(OrganizationDao.inviteUsers(-2, [userToInvite.email]))
                 .to.eventually.be.rejectedWith(OrganizationNotFoundError);
         });
     });

@@ -46,15 +46,14 @@ class OrganizationsController{
         }
     }
 
-    async inviteUser(req, res){
+    async inviteUsers(req, res){
         try{
             var organizationId = req.params.id;
-            var userEmail = req.body.userEmail;
+            var userEmails = req.body.userEmails;
 
-            var token = await OrganizationDao.inviteUser(organizationId, userEmail);
+            await OrganizationDao.inviteUsers(organizationId, userEmails);
 
-            logger.info(`User ${userEmail} invited to organization ${organizationId} with token: ${token}`);
-            sendSuccessResponse(res, { token: token });
+            sendEmptySuccessResponse(res);
 
         } catch (err){
             sendErrorResponse(res, err);

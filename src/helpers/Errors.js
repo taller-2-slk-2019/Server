@@ -42,20 +42,6 @@ class ConversationNotFoundError extends Error {
     }
 }
 
-class UserAlreadyInvitedError extends Error {
-    constructor(organizationId, userId) {
-        super(`User ${userId} is already invited to organization ${organizationId}`);
-        this.name = this.constructor.name;
-    }
-}
-
-class UserAlreadyInOrganizationError extends Error {
-    constructor(organizationId, userId) {
-        super(`User ${userId} already belongs to organization ${organizationId}`);
-        this.name = this.constructor.name;
-    }
-}
-
 class UserNotBelongsToOrganizationError extends Error {
     constructor(organizationId, userId) {
         super(`User ${userId} does not belong to organization ${organizationId}`);
@@ -129,8 +115,6 @@ class ForbiddenWordAlreadyExistsError extends Error {
 module.exports = {
     UserNotFoundError,
     OrganizationNotFoundError,
-    UserAlreadyInvitedError,
-    UserAlreadyInOrganizationError,
     InvalidOrganizationInvitationTokenError,
     InvalidLocationError,
     ChannelNotFoundError,

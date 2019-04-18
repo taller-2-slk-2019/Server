@@ -5,7 +5,7 @@ var UserDao = require('./UserDao');
 var models = require('../database/sequelize');
 var Organization = models.organization;
 var OrganizationUserInvitation = models.organizationUserInvitation;
-var { UserAlreadyInvitedError, UserAlreadyInOrganizationError, UserNotBelongsToOrganizationError,
+var { UserNotBelongsToOrganizationError,
              InvalidOrganizationInvitationTokenError, OrganizationNotFoundError} = require('../helpers/Errors');
 var UserRoleCreator = require('../models/userRoles/UserRoleCreator');
 var UserRoleMember = require('../models/userRoles/UserRoleMember');
@@ -42,24 +42,32 @@ class OrganizationDao{
         return await org.getUsers();
     }
 
-    async inviteUser(organizationId, userEmail){
+    async inviteUsers(organizationId, userEmails){
         var organization = await this.findById(organizationId);
+        let uniqueUserEmails = [...new Set(userEmails)]; 
 
-        var user = await UserDao.findByEmail(userEmail); 
+        await forEach(uniqueUserEmails, async (userEmail) => {
+            try{
+                var user = await UserDao.findByEmail(userEmail);
+            } catch (ex) {
+                return;
+            }
+            
 
-        var existingUser = await organization.hasUser(user);
-        if (existingUser){
-            throw new UserAlreadyInOrganizationError(organization.id, user.id);
-        }
+            var existingUser = await organization.hasUser(user);
+            if (existingUser){
+                return;
+            }
 
-        var invitedUser = await organization.hasInvitedUser(user);
-        if (invitedUser){
-            throw new UserAlreadyInvitedError(organization.id, user.id);
-        }
+            var invitedUser = await organization.hasInvitedUser(user);
+            if (invitedUser){
+                return;
+            }
 
-        var token = Token.generate();
-        await organization.addInvitedUser(user, { through: {token: token } });
-        return token;
+            var token = Token.generate();
+            await organization.addInvitedUser(user, { through: {token: token } });
+            logger.info(`User ${userEmail} invited to organization ${organizationId} with token: ${token}`);
+        });
     }
 
     async acceptUserInvitation(token){
