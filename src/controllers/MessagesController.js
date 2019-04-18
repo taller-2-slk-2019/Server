@@ -21,11 +21,11 @@ class MessagesController{
                 throw new InvalidMessageDataError();
             }
 
-            if (req.body.channelId){
+            if (Number(req.body.channelId)){
                 data.channelId = req.body.channelId;
                 await MessageDao.createForChannel(data);
                 logger.info(`Message sent from user ${data.senderId} to channel ${data.channelId}`);
-            } else if (req.body.conversationId){
+            } else if (Number(req.body.conversationId)){
                 data.conversationId = req.body.conversationId;
                 await MessageDao.createForConversation(data);
                 logger.info(`Message sent from user ${data.senderId} to conversation ${data.conversationId}`);
@@ -46,9 +46,9 @@ class MessagesController{
         var messages;
 
         try{
-            if (channelId){
+            if (Number(channelId)){
                 messages = await MessageDao.getForChannel(channelId, offset);
-            } else if (conversationId){
+            } else if (Number(conversationId)){
                 messages = await MessageDao.getForConversation(conversationId, offset);
             } else {
                 throw new InvalidQueryError();
