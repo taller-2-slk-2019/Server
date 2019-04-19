@@ -46,13 +46,13 @@ describe('"MessagesController Tests"', () => {
                 await MessagesController.create(req, res);
             });
 
-            it('response status must be 200', async () => {
-                expect(res.status).to.have.been.calledWith(200);
+            it('response status must be 204', async () => {
+                expect(res.status).to.have.been.calledWith(204);
             });
 
-            it('must return a success', async () => {
+            it('response body must be null', async () => {
                 var response = res.send.args[0][0];
-                expect(response).to.have.property('success');
+                expect(response).to.be.undefined;
             });
         });
 
@@ -67,13 +67,13 @@ describe('"MessagesController Tests"', () => {
                 await MessagesController.create(req, res);
             });
 
-            it('response status must be 200', async () => {
-                expect(res.status).to.have.been.calledWith(200);
+            it('response status must be 204', async () => {
+                expect(res.status).to.have.been.calledWith(204);
             });
 
-            it('must return a success', async () => {
+            it('response body must be null', async () => {
                 var response = res.send.args[0][0];
-                expect(response).to.have.property('success');
+                expect(response).to.be.undefined;
             });
         });
 
@@ -164,8 +164,8 @@ describe('"MessagesController Tests"', () => {
                 await MessagesController.create(req, res);
             });
 
-            it('response status must be 500', async () => {
-                expect(res.status).to.have.been.calledWith(500);
+            it('response status must be 400', async () => {
+                expect(res.status).to.have.been.calledWith(400);
             });
 
             it('response must have an error', async () => {
@@ -185,8 +185,8 @@ describe('"MessagesController Tests"', () => {
                 await MessagesController.create(req, res);
             });
 
-            it('response status must be 500', async () => {
-                expect(res.status).to.have.been.calledWith(500);
+            it('response status must be 400', async () => {
+                expect(res.status).to.have.been.calledWith(400);
             });
 
             it('response must have an error', async () => {
@@ -206,8 +206,8 @@ describe('"MessagesController Tests"', () => {
                 await MessagesController.create(req, res);
             });
 
-            it('response status must be 500', async () => {
-                expect(res.status).to.have.been.calledWith(500);
+            it('response status must be 400', async () => {
+                expect(res.status).to.have.been.calledWith(400);
             });
 
             it('response must have an error', async () => {
@@ -227,8 +227,8 @@ describe('"MessagesController Tests"', () => {
                 await MessagesController.create(req, res);
             });
 
-            it('response status must be 500', async () => {
-                expect(res.status).to.have.been.calledWith(500);
+            it('response status must be 400', async () => {
+                expect(res.status).to.have.been.calledWith(400);
             });
 
             it('response must have an error', async () => {
@@ -248,8 +248,8 @@ describe('"MessagesController Tests"', () => {
                 await MessagesController.get(req, res);
             });
 
-            it('response status must be 500', async () => {
-                expect(res.status).to.have.been.calledWith(500);
+            it('response status must be 400', async () => {
+                expect(res.status).to.have.been.calledWith(400);
             });
 
             it('response must have an error', async () => {
@@ -269,8 +269,8 @@ describe('"MessagesController Tests"', () => {
                 await MessagesController.get(req, res);
             });
 
-            it('response status must be 500', async () => {
-                expect(res.status).to.have.been.calledWith(500);
+            it('response status must be 400', async () => {
+                expect(res.status).to.have.been.calledWith(400);
             });
 
             it('response must have an error', async () => {
@@ -290,8 +290,8 @@ describe('"MessagesController Tests"', () => {
                 await MessagesController.create(req, res);
             });
 
-            it('response status must be 500', async () => {
-                expect(res.status).to.have.been.calledWith(500);
+            it('response status must be 400', async () => {
+                expect(res.status).to.have.been.calledWith(400);
             });
 
             it('response must have an error', async () => {
@@ -311,8 +311,8 @@ describe('"MessagesController Tests"', () => {
                 await MessagesController.get(req, res);
             });
 
-            it('response status must be 500', async () => {
-                expect(res.status).to.have.been.calledWith(500);
+            it('response status must be 400', async () => {
+                expect(res.status).to.have.been.calledWith(400);
             });
 
             it('response must have an error', async () => {

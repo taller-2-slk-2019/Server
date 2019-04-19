@@ -3,7 +3,7 @@ var logger = require('logops');
 var sendErrorResponse = function(res, err){
     logger.error(err);
     var response = { error : err.message };
-    res.status(500).send(response);
+    res.status(400).send(response);
 };
 
 var sendSuccessResponse = function(res, data){
@@ -11,7 +11,7 @@ var sendSuccessResponse = function(res, data){
 };
 
 var sendEmptySuccessResponse = function(res){
-    sendSuccessResponse(res, {success: true});
+    res.status(204).send();
 };
 
 module.exports = {

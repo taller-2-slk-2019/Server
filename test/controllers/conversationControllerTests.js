@@ -102,8 +102,8 @@ describe('"ConversationsController Tests"', () => {
                 await ConversationsController.create(req, res);
             });
 
-            it('response status must be 500', async () => {
-                expect(res.status).to.have.been.calledWith(500);
+            it('response status must be 400', async () => {
+                expect(res.status).to.have.been.calledWith(400);
             });
 
             it('response must have an error', async () => {
@@ -121,8 +121,8 @@ describe('"ConversationsController Tests"', () => {
                 await ConversationsController.get(req, res);
             });
 
-            it('response status must be 500', async () => {
-                expect(res.status).to.have.been.calledWith(500);
+            it('response status must be 400', async () => {
+                expect(res.status).to.have.been.calledWith(400);
             });
 
             it('response must have an error', async () => {
