@@ -51,9 +51,9 @@ class OrganizationsController{
             var organizationId = req.params.id;
             var userEmails = req.body.userEmails;
 
-            await OrganizationDao.inviteUsers(organizationId, userEmails);
+            var mails = await OrganizationDao.inviteUsers(organizationId, userEmails);
 
-            sendEmptySuccessResponse(res);
+            sendSuccessResponse(res, mails);
 
         } catch (err){
             sendErrorResponse(res, err);

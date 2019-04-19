@@ -155,6 +155,11 @@ describe('"OrganizationDao Tests"', () => {
             expect(invited.length).to.eq(2);
         });
 
+        it('inviting user again will return failed mail', async () => {
+            var failed = await OrganizationDao.inviteUsers(organization.id, [userToInvite1.email]);
+            expect(failed[0]).to.eq(userToInvite1.email);
+        });
+
         it('should invite user email only once', async () => {
             await organization.setInvitedUsers([]);
             await OrganizationDao.inviteUsers(organization.id, [userToInvite1.email, userToInvite1.email])

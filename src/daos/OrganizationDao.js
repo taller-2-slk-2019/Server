@@ -46,21 +46,26 @@ class OrganizationDao{
         var organization = await this.findById(organizationId);
         let uniqueUserEmails = [...new Set(userEmails)]; 
 
+        var failed = [];
+
         await forEach(uniqueUserEmails, async (userEmail) => {
             try{
                 var user = await UserDao.findByEmail(userEmail);
             } catch (ex) {
+                failed.push(userEmail);
                 return;
             }
             
 
             var existingUser = await organization.hasUser(user);
             if (existingUser){
+                failed.push(userEmail);
                 return;
             }
 
             var invitedUser = await organization.hasInvitedUser(user);
             if (invitedUser){
+                failed.push(userEmail);
                 return;
             }
 
@@ -68,6 +73,8 @@ class OrganizationDao{
             await organization.addInvitedUser(user, { through: {token: token } });
             logger.info(`User ${userEmail} invited to organization ${organizationId} with token: ${token}`);
         });
+
+        return failed;
     }
 
     async acceptUserInvitation(token){

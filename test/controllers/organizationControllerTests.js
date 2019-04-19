@@ -26,7 +26,7 @@ describe('"OrganizationsController Tests"', () => {
         before(async () => {
             mock1 = stub(OrganizationDao, 'findById').resolves(organizationDataMock);
             mock2 = stub(OrganizationDao, 'create').resolves(organizationDataMock);
-            mock3 = stub(OrganizationDao, 'inviteUsers').resolves();
+            mock3 = stub(OrganizationDao, 'inviteUsers').resolves(["mail1", "mail2"]);
             mock4 = stub(OrganizationDao, 'findForUser').resolves([organizationsForUserMock, organizationsForUserMock]);
             mock5 = stub(OrganizationDao, 'acceptUserInvitation').resolves();
             mock6 = stub(OrganizationDao, 'removeUser').resolves();
@@ -128,13 +128,13 @@ describe('"OrganizationsController Tests"', () => {
                 await OrganizationsController.inviteUsers(req, res);
             });
 
-            it('response status must be 204', async () => {
-                expect(res.status).to.have.been.calledWith(204);
+            it('response status must be 200', async () => {
+                expect(res.status).to.have.been.calledWith(200);
             });
 
-            it('response body must be null', async () => {
+            it('response must be an array', async () => {
                 var response = res.send.args[0][0];
-                expect(response).to.be.undefined;
+                expect(response).to.be.an('array');
             });
         });
 
@@ -280,7 +280,7 @@ describe('"OrganizationsController Tests"', () => {
                 expect(res.status).to.have.been.calledWith(400);
             });
 
-            it('response must have an error', async () => {
+            it('response must be an array', async () => {
                 var response = res.send.args[0][0];
                 expect(response).to.have.property('error');
             });
