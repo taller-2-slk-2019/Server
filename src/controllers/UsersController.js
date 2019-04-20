@@ -62,6 +62,17 @@ class UsersController{
         }
     }
 
+    async deleteInvitation(req, res) {
+        var token = req.params.token;
+
+        try{
+            await UserDao.deleteUserInvitation(token);
+            sendEmptySuccessResponse(res);
+        } catch (err){
+            sendErrorResponse(res, err);
+        }
+    }
+
     async get(req, res) {
         var organizationId = req.query.organizationId;
 

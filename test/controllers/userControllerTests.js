@@ -24,6 +24,7 @@ describe('"UsersController Tests"', () => {
         var mock4;
         var mock5;
         var mock6;
+        var mock7;
 
         before(async () => {
             mock1 = stub(UserDao, 'create').resolves(userProfileMock);
@@ -32,6 +33,7 @@ describe('"UsersController Tests"', () => {
             mock4 = stub(OrganizationDao, 'findOrganizationUsers').resolves([userForOrganizationMock, userForOrganizationMock]);
             mock5 = stub(UserDao, 'findByToken').resolves(userProfileMock);
             mock6 = stub(UserDao, 'findUserInvitations').resolves([userOrganizationInvitationMock, userOrganizationInvitationMock]);
+            mock7 = stub(UserDao, 'deleteUserInvitation').resolves();
         });
 
         after(async () => {
@@ -41,6 +43,7 @@ describe('"UsersController Tests"', () => {
             mock4.restore();
             mock5.restore();
             mock6.restore();
+            mock7.restore();
         });
 
         describe('Register User', () => {
@@ -253,6 +256,25 @@ describe('"UsersController Tests"', () => {
                 expect(response[0].organization).to.eq(userOrganizationInvitationMock.name);
             });
         });
+
+        describe('Delete invitation', () => {
+            var req = mockRequest();
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await UserController.deleteInvitation(req, res);
+            });
+
+            it('response status must be 204', async () => {
+                expect(res.status).to.have.been.calledWith(204);
+            });
+
+            it('response body must be null', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.be.undefined;
+            });
+        });
     });
 
     describe('Methods with errors', () => {
@@ -262,6 +284,7 @@ describe('"UsersController Tests"', () => {
         var mock4;
         var mock5;
         var mock6;
+        var mock7;
 
         before(async () => {
             mock1 = stub(UserDao, 'create').rejects();
@@ -270,6 +293,7 @@ describe('"UsersController Tests"', () => {
             mock4 = stub(OrganizationDao, 'findOrganizationUsers').rejects();
             mock5 = stub(UserDao, 'findByToken').rejects();
             mock6 = stub(UserDao, 'findUserInvitations').rejects();
+            mock7 = stub(UserDao, 'deleteUserInvitation').rejects();
         });
 
         after(async () => {
@@ -279,6 +303,7 @@ describe('"UsersController Tests"', () => {
             mock4.restore();
             mock5.restore();
             mock6.restore();
+            mock7.restore();
         });
 
 
@@ -477,6 +502,26 @@ describe('"UsersController Tests"', () => {
             beforeEach(async () => {
                 res = mockResponse();
                 await UserController.getInvitations(req, res);
+            });
+
+            it('response status must be 400', async () => { 
+                expect(res.status).to.have.been.calledWith(400);
+            });
+            
+            it('response must have an error', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('error');
+            });
+        });
+
+        describe('Delete invitation', () => {
+
+            var req = mockRequest();
+            var res;
+            
+            beforeEach(async () => {
+                res = mockResponse();
+                await UserController.deleteInvitation(req, res);
             });
 
             it('response status must be 400', async () => { 

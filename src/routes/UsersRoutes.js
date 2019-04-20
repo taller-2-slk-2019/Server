@@ -15,5 +15,7 @@ router.put('/location', usersController.updateLocation);
 
 router.get('/invitations', usersController.getInvitations);
 
+router.delete('/invitations/:token', usersController.deleteInvitation);
+
 
 module.exports = router;

@@ -257,4 +257,42 @@ describe('"UserDao Tests"', () => {
         });
     });
 
+    describe('Delete user invitation', () => {
+        var data = Object.create(userCreateData());
+        var user;
+        var org;
+
+        before(async () => {
+            user = await User.create(data);
+            org = await Organization.create(organizationCreateData);
+        });
+
+        beforeEach(async () => {
+            await user.setOrganizationInvitations([]);
+        });
+
+        it('user invitations must be empty', async () => {
+            await user.addOrganizationInvitation(org, {through: {token: "token123"}});
+            await UserDao.deleteUserInvitation('token123');
+            var invitations = await user.getOrganizationInvitations();
+            expect(invitations.length).to.eq(0);
+        });
+
+        it('must delete correct invitation', async () => {
+            await user.addOrganizationInvitation(org, {through: {token: "token123"}});
+            await user.addOrganizationInvitation(org, {through: {token: "token124"}});
+            await UserDao.deleteUserInvitation('token123');
+            var invitations = await user.getOrganizationInvitations();
+            expect(invitations.length).to.eq(1);
+        });
+
+        it('must delete correct invitation', async () => {
+            await user.addOrganizationInvitation(org, {through: {token: "token123"}});
+            await user.addOrganizationInvitation(org, {through: {token: "token124"}});
+            await UserDao.deleteUserInvitation('token123');
+            var invitations = await user.getOrganizationInvitations();
+            expect(invitations[0].organizationUserInvitation).to.have.property("token", "token124");
+        });
+    });
+
 });

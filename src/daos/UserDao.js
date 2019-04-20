@@ -1,5 +1,6 @@
 var models = require('../database/sequelize');
 var User = models.user;
+var OrganizationUserInvitation = models.organizationUserInvitation;
 var { UserNotFoundError } = require('../helpers/Errors');
 
 class UserDao{
@@ -50,6 +51,13 @@ class UserDao{
     async findUserInvitations(token){
         var user = await this.findByToken(token);
         return await user.getOrganizationInvitations();
+    }
+
+    async deleteUserInvitation(token){
+        await OrganizationUserInvitation.destroy(
+            {
+                where: {token: token},
+            });
     }
 
 }
