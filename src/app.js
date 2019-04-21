@@ -30,6 +30,9 @@ app.use('/messages', messagesRouter);
 var forbiddenWordsRouter = require('./routes/ForbiddenWordsRoutes');
 app.use('/forbiddenWords', forbiddenWordsRouter);
 
+var firebaseRouter = require('./routes/FirebaseRoutes');
+app.use('/firebase', firebaseRouter);
+
 
 app.all('*', function(req, res){
     logger.warn('Invalid Api called   Method: %s  Url: %s', req.method, req.url);

@@ -7,6 +7,7 @@ var Message = models.message;
 var Config = require('../helpers/Config');
 var { UserNotBelongsToChannelError, UserNotBelongsToConversationError, MessageNotFoundError } = require('../helpers/Errors');
 var MessageParser = require('../helpers/MessageParser');
+var MessageNotifications = require('../controllers/MessageNotificationsController');
 
 class MessageDao{
     async findById(id){
@@ -45,7 +46,6 @@ class MessageDao{
     }
 
     async _create(msg, organization){
-        // TODO send notifications to mentioned users, etc
         if (Config.messageTypesWithText.includes(msg.type)){
             var forbiddenWords = (await organization.getForbiddenWords()).map((word) => {
                 return word.word;
@@ -56,6 +56,7 @@ class MessageDao{
 
         var message = await Message.create(msg);
         FirebaseController.sendMessage(await this.findById(message.id));
+        await MessageNotifications.sendNotification(message);
         return message;
     }
 
