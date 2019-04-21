@@ -43,4 +43,56 @@ describe('"FirebaseTokensDao Tests"', () => {
             expect(result).to.include('token3');
         });
     });
+
+    describe('Add token for user', () => {
+        var user;
+
+        before(async () => {
+            user = await User.create(userCreateData());
+            await FirebaseTokensDao.addToken(user.token, "mytoken12345");
+        });
+
+        it('user should have one token', async () => {
+            var userTokens = await user.getFirebaseTokens();
+            expect(userTokens.length).to.eq(1);
+        });
+
+        it('user should have correct token', async () => {
+            var userTokens = await user.getFirebaseTokens();
+            expect(userTokens[0]).to.have.property('token', "mytoken12345");
+        });
+
+        it('should add another token to user', async () => {
+            await FirebaseTokensDao.addToken(user.token, "mytoken123456");
+            var userTokens = await user.getFirebaseTokens();
+            expect(userTokens.length).to.eq(2);
+            expect(userTokens[1]).to.have.property('token', "mytoken123456");
+        });
+    });
+
+    describe('Remove token', () => {
+        var user;
+
+        before(async () => {
+            user = await User.create(userCreateData());
+        });
+
+        beforeEach(async () => {
+            await FirebaseToken.create({userId: user.id, token: 'token1234567'});
+        });
+
+        it('user must not have tokens', async () => {
+            await FirebaseTokensDao.removeToken('token1234567');
+            var userTokens = await user.getFirebaseTokens();
+            expect(userTokens.length).to.eq(0);
+        });
+
+        it('should delete only specified token', async () => {
+            await FirebaseToken.create({userId: user.id, token: 'token1234567890'});
+            await FirebaseTokensDao.removeToken('token1234567');
+            var userTokens = await user.getFirebaseTokens();
+            expect(userTokens.length).to.eq(1);
+            expect(userTokens[0]).to.have.property('token', 'token1234567890');
+        });
+    });
 });
