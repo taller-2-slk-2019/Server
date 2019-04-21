@@ -1,5 +1,7 @@
 var models = require('../database/sequelize');
 var User = models.user;
+var FirebaseToken = models.firebaseToken;
+var UserDao = require('../daos/UserDao');
 
 class FirebaseTokensDao {
 
@@ -19,6 +21,23 @@ class FirebaseTokensDao {
         });
 
         return tokens;
+    }
+
+    async addToken(userToken, token){
+        var user = await UserDao.findByToken(userToken);
+
+        var data = {
+            userId: user.id,
+            token: token
+        };
+
+        await FirebaseToken.create(data);
+    }
+
+    async removeToken(token){
+        await FirebaseToken.destroy({
+            where: {token: token}
+        });
     }
 }
 
