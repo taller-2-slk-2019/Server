@@ -15,15 +15,16 @@ class MessageNotificationsController {
         //TODO check bot tito
 
         var usersToNotify = await this._getAllMessageReceptors(message);
-        var sender = await message.getSender();
-        
+
         if (!mentionedUsers.includes(Config.mentionAllUsers)){
             usersToNotify = usersToNotify.filter(username => {
-                return mentionedUsers.includes(username) &&
-                    username != sender.username;
+                return mentionedUsers.includes(username);
             });
         }
         
+        var sender = await message.getSender();
+        usersToNotify = usersToNotify.filter(username => {return username != sender.username;});
+
         await FirebaseController.sendChannelMessageNotification(message, usersToNotify);
     }
 
