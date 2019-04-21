@@ -1,3 +1,4 @@
+var FirebaseController = require('../firebase/FirebaseController');
 var Token = require('../helpers/Token');
 var { forEach } = require('p-iteration');
 var logger = require('logops');
@@ -72,6 +73,7 @@ class OrganizationDao{
             var token = Token.generate();
             await organization.addInvitedUser(user, { through: {token: token } });
             logger.info(`User ${userEmail} invited to organization ${organizationId} with token: ${token}`);
+            FirebaseController.sendOrganizationInvitationNotification(user, organization);
         });
 
         return failed;

@@ -2,10 +2,12 @@ const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised');
 const expect = chai.expect;
 chai.use(chaiAsPromised);
+const { stub, match } = require('sinon');
 
 var SequelizeValidationError = require('../../src/database/sequelize').Sequelize.SequelizeValidationError;
 
 var OrganizationDao = require('../../src/daos/OrganizationDao');
+var FirebaseController = require('../../src/firebase/FirebaseController');
 
 var models = require('../../src/database/sequelize');
 var User = models.user;
@@ -24,10 +26,17 @@ describe('"OrganizationDao Tests"', () => {
     var organizationData = Object.create(organizationCreateData);
     var creatorRole = new CreatorRole();
     var memberRole = new MemberRole();
+    var firebaseMock;
 
     before(async () => {
+        firebaseMock = stub(FirebaseController, 'sendOrganizationInvitationNotification').resolves();
+
         user = await User.create(userCreateData());
         organizationData.creatorToken = user.token;
+    });
+
+    after(async () => {
+        firebaseMock.restore();
     });
 
     describe('Create Organization', () => {

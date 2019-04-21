@@ -13,6 +13,7 @@ const CONVERSATION_TOPIC = 'conversation_';
 
 const TYPE_NEW_MESSAGE = 'new_message';
 const TYPE_MENTION = 'mention';
+const TYPE_INVITATION = 'invitation';
 
 class FirebaseController{
     async sendMessage(message){
@@ -52,6 +53,22 @@ class FirebaseController{
                 channel: JSON.stringify(channel),
                 sender: JSON.stringify(sender),
                 type: TYPE_MENTION
+            }
+        };
+
+        this._sendToFirebaseDevices(data, tokens);
+    }
+
+    async sendOrganizationInvitationNotification(user, organization){
+        var tokens = await FirebaseTokensDao.getForUsers(user.username);
+        if (tokens.length == 0){
+            return;
+        }
+
+        var data = {
+            data: {
+                organization: JSON.stringify(organization),
+                type: TYPE_INVITATION
             }
         };
 

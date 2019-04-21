@@ -95,7 +95,7 @@ describe('"FirebaseController Tests"', () => {
         });
     });
 
-    describe('Send channel Message notification', () => {
+    describe('Send channel mention notification', () => {
         var user1, user2, user3;
         var organization;
         var channel;
@@ -141,6 +141,43 @@ describe('"FirebaseController Tests"', () => {
 
         it('should do nothing if no tokens are provided', async () => {
             await FirebaseController.sendChannelMessageNotification(message, [user3.username]);
+            assert.notCalled(mockUsers);
+        });
+    });
+
+    describe('Send organization invitation notification', () => {
+        var user, user2;
+        var organization;
+        var organizationData = Object.create(organizationCreateData);
+
+        before(async () => {
+            user = await User.create(userCreateData());
+            user2 = await User.create(userCreateData());
+            organizationData.creatorId = user.id;
+            organization = await Organization.create(organizationData);
+
+            await FirebaseToken.create({userId: user.id, token: 'token111'});
+            await FirebaseToken.create({userId: user.id, token: 'token222'});
+        });
+
+        beforeEach(async () => {
+            mockUsers.resetHistory();
+        });
+
+        it('should send message to firebase', async () => {
+            await FirebaseController.sendOrganizationInvitationNotification(user, organization);
+            assert.calledOnce(mockUsers);
+        });
+
+        it('should send message to correct user tokens', async () => {
+            await FirebaseController.sendOrganizationInvitationNotification(user, organization);
+            var args = mockUsers.getCall(0).args[1];
+            expect(args).to.include('token111');
+            expect(args).to.include('token222');
+        });
+
+        it('should do nothing if no tokens are provided', async () => {
+            await FirebaseController.sendOrganizationInvitationNotification(user2, organization);
             assert.notCalled(mockUsers);
         });
     });
