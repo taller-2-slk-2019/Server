@@ -8,6 +8,7 @@ var SequelizeValidationError = require('../../src/database/sequelize').Sequelize
 
 var MessageDao = require('../../src/daos/MessageDao');
 var FirebaseController = require('../../src/firebase/FirebaseController');
+var MessageNotificationsController = require('../../src/controllers/MessageNotificationsController');
 
 var Config = require('../../src/helpers/Config');
 var MessageParser = require('../../src/helpers/MessageParser');
@@ -36,9 +37,11 @@ describe('"MessageDao Tests"', () => {
     var messageData = Object.create(messageCreateData);
     var messageConvData = Object.create(messageCreateData);
     var firebaseMock;
+    var notificationsMock;
 
     before(async () => {
         firebaseMock = stub(FirebaseController, 'sendMessage').returns(true);
+        notificationsMock = stub(MessageNotificationsController, 'sendNotification').resolves();
 
         user = await User.create(userCreateData());
         organizationData.creatorId = user.id;
@@ -60,6 +63,7 @@ describe('"MessageDao Tests"', () => {
 
     after(async () => {
         firebaseMock.restore();
+        notificationsMock.restore();
     });
 
 

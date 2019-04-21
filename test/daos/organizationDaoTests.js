@@ -139,9 +139,9 @@ describe('"OrganizationDao Tests"', () => {
             expect(invited.length).to.eq(2);
         });
 
-        it('user1 must be invited', async () => {
+        it('users must be invited', async () => {
             var invited = await organization.getInvitedUsers();
-            expect(invited[0].id).to.eq(userToInvite1.id);
+            expect(invited[0].id).to.be.oneOf([userToInvite1.id, userToInvite2.id]);
         });
 
         it('user must not belong to organization', async () => {

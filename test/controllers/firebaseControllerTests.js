@@ -14,7 +14,7 @@ describe('"FirebaseController Tests"', () => {
     var mock;
 
     before(async () => {
-        mock = stub(FirebaseController, '_sendToFirebase').returns(true);
+        mock = stub(FirebaseController, '_sendToFirebaseTopic').returns(true);
     });
 
     beforeEach(async () => {
