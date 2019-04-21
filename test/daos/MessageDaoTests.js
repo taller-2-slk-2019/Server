@@ -40,7 +40,7 @@ describe('"MessageDao Tests"', () => {
     var notificationsMock;
 
     before(async () => {
-        firebaseMock = stub(FirebaseController, 'sendMessage').returns(true);
+        firebaseMock = stub(FirebaseController, 'sendMessage').resolves();
         notificationsMock = stub(MessageNotificationsController, 'sendNotification').resolves();
 
         user = await User.create(userCreateData());
