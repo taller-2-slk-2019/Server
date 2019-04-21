@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
   User.associate = function(models) {
     User.belongsToMany(models.organization, { through: models.userOrganizations });
     User.belongsToMany(models.organization, { through: models.organizationUserInvitation, as: 'organizationInvitations' });
-    User.hasMany(models.firebaseToken);
+    User.firebaseTokens = User.hasMany(models.firebaseToken);
   };
 
   return User;
