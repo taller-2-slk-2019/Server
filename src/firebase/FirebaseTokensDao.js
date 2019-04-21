@@ -26,6 +26,11 @@ class FirebaseTokensDao {
     async addToken(userToken, token){
         var user = await UserDao.findByToken(userToken);
 
+        var userTokens = await user.getFirebaseTokens();
+        if (userTokens.some(t => t.token == token)){
+            return;
+        }
+
         var data = {
             userId: user.id,
             token: token

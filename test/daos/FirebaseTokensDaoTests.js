@@ -62,6 +62,12 @@ describe('"FirebaseTokensDao Tests"', () => {
             expect(userTokens[0]).to.have.property('token', "mytoken12345");
         });
 
+        it('should not add same token to user', async () => {
+            await FirebaseTokensDao.addToken(user.token, "mytoken12345");
+            var userTokens = await user.getFirebaseTokens();
+            expect(userTokens.length).to.eq(1);
+        });
+
         it('should add another token to user', async () => {
             await FirebaseTokensDao.addToken(user.token, "mytoken123456");
             var userTokens = await user.getFirebaseTokens();
