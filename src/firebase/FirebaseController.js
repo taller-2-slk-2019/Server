@@ -15,7 +15,7 @@ const TYPE_NEW_MESSAGE = 'new_message';
 const TYPE_MENTION = 'mention';
 
 class FirebaseController{
-    sendMessage(message){
+    async sendMessage(message){
         // Send message to channel or conversation topic
         var topic;
         if (message.channelId){
