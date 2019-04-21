@@ -10,5 +10,6 @@ module.exports = (sequelize, DataTypes) => {
     Message.belongsTo(models.channel);
     Message.belongsTo(models.conversation);
   };
+  
   return Message;
 };
