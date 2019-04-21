@@ -16,7 +16,7 @@ const TYPE_MENTION = 'mention';
 
 class FirebaseController{
     sendMessage(message){
-        // Send message to channel or converation topic
+        // Send message to channel or conversation topic
         var topic;
         if (message.channelId){
             topic = CHANNEL_TOPIC + message.channelId;
@@ -39,7 +39,7 @@ class FirebaseController{
 
     async sendChannelMessageNotification(message, users){
         var tokens = await FirebaseTokensDao.getForUsers(users);
-        if (tokens.lenght == 0){
+        if (tokens.length == 0){
             return;
         }
 

@@ -1,3 +1,4 @@
+var logger = require('logops');
 var MessageParser = require('../helpers/MessageParser');
 var FirebaseController = require('../firebase/FirebaseController');
 var Config = require('../helpers/Config');
@@ -25,6 +26,7 @@ class MessageNotificationsController {
         var sender = await message.getSender();
         usersToNotify = usersToNotify.filter(username => {return username != sender.username;});
 
+        logger.info('Sending user mentioned notifications to: ' + usersToNotify);
         await FirebaseController.sendChannelMessageNotification(message, usersToNotify);
     }
 
