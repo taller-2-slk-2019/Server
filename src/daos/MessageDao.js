@@ -56,7 +56,7 @@ class MessageDao{
 
         var message = await Message.create(msg);
         FirebaseController.sendMessage(await this.findById(message.id));
-        await MessageNotifications.sendNotification(message);
+        MessageNotifications.sendNotification(message);
         return message;
     }
 
