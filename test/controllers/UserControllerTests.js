@@ -253,7 +253,7 @@ describe('"UsersController Tests"', () => {
 
             it('invitation organization must be correct', async () => {
                 var response = res.send.args[0][0];
-                expect(response[0].organization).to.eq(userOrganizationInvitationMock.name);
+                expect(response[0].organization.name).to.eq(userOrganizationInvitationMock.name);
             });
         });
 

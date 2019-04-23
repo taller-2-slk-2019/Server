@@ -50,8 +50,7 @@ class UsersController{
             var invitations = await UserDao.findUserInvitations(token);
             var result = invitations.map(invitation => {
                 return {token: invitation.organizationUserInvitation.token,
-                        organization: invitation.name,
-                        description: invitation.description,
+                        organization: invitation,
                         invitedAt: invitation.organizationUserInvitation.createdAt
                        };
             });
