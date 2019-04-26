@@ -8,30 +8,10 @@ services:
     image: hypechat4/hypechat
     build: .
     depends_on:
-      - db_migration
+      - postgres
     ports:
       - "3000:3000"
-    command: bash -c "sleep 40 && node src/app.js"
-    environment:
-        DOCKER: 1
-      
-  db_creation:
-    build: .
-    command: bash -c "sleep 20 && npx sequelize db:create"
-    links:
-      - postgres
-    depends_on:
-      - postgres
-    environment:
-        DOCKER: 1
-  
-  db_migration:
-    build: .
-    command: bash -c "sleep 25 && npx sequelize db:migrate"
-    links:
-      - db_creation
-    depends_on:
-      - db_creation
+    command: bash -c "sleep 20; npx sequelize db:create; npx sequelize db:migrate; node src/app.js"
     environment:
         DOCKER: 1
     
