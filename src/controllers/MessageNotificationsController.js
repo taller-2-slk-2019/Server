@@ -1,6 +1,7 @@
 var logger = require('logops');
 var MessageParser = require('../helpers/MessageParser');
 var FirebaseController = require('../firebase/FirebaseController');
+var TitoBot = require('../controllers/TitoBotController');
 var Config = require('../helpers/Config');
 
 class MessageNotificationsController {
@@ -13,7 +14,12 @@ class MessageNotificationsController {
 
         var mentionedUsers = MessageParser.getMentionedUsers(message.data);
 
-        //TODO check bot tito
+        //TODO chech bots
+        if (mentionedUsers.includes(TitoBot.titoBotName)){
+            // Tito bot
+            TitoBot.sendMessage(message);
+            return;
+        }
 
         var usersToNotify = await this._getAllMessageReceptors(message);
 
@@ -27,7 +33,7 @@ class MessageNotificationsController {
         usersToNotify = usersToNotify.filter(username => {return username != sender.username;});
 
         logger.info('Sending user mentioned notifications to: ' + usersToNotify);
-        await FirebaseController.sendChannelMessageNotification(message, usersToNotify);
+        FirebaseController.sendChannelMessageNotification(message, usersToNotify);
     }
 
     async _getAllMessageReceptors(message){

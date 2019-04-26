@@ -14,6 +14,7 @@ class Config{
     static get forbiddenWordsReplacement() { return '*****'; }
 
     static get mentionAllUsers() { return 'all'; }
+
 }
 
 module.exports = Config;
