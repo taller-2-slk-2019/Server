@@ -324,7 +324,7 @@ describe('"OrganizationDao Tests"', () => {
         });
         
         it('users must have correct id', async () => {
-            expect(users[0]).to.have.property('id', user.id);
+            expect([user.id, user2.id]).to.include(users[0].id);
         });
 
         it('users must belong to organization', async () => {

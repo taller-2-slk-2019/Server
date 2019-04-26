@@ -8,7 +8,7 @@ class BotsController{
 
     async sendMessageToBot(bot, message) {
         var name = bot.name;
-        var msg = message.data.replace(Config.messageUserMentionChar + name).trim();
+        var msg = message.data.replace(Config.messageUserMentionChar + name, '').trim();
 
         var data = {
             bot: name,
@@ -17,8 +17,11 @@ class BotsController{
             senderId: message.senderId
         };
 
-        axios.post(bot.url, data);
-        logger.info('Sending message to bot: ' + bot.name + " message: " + msg);
+        logger.info('Sending message to bot: ' + bot.name + " with message: " + msg);
+        axios.post(bot.url, data).catch(err => {
+            logger.error('Failed message to bot: ' + bot.name);
+            logger.error(err);
+        });
     }
 }
 

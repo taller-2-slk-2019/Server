@@ -3,6 +3,7 @@ var User = models.user;
 var Organization = models.organization;
 var Channel = models.channel;
 var Conversation = models.conversation;
+var Message = models.message;
 
 var { forEach } = require('p-iteration');
 
@@ -10,6 +11,7 @@ const { userCreateData } = require('./data/userData');
 const { organizationCreateData } = require('./data/organizationData');
 var { channelCreateData } = require('./data/channelData');
 var { conversationCreateData } = require('./data/conversationData');
+var { messageCreateData } = require('./data/messageData');
 
 class TestDatabaseHelper {
 
@@ -44,6 +46,22 @@ class TestDatabaseHelper {
         var conversation = await Conversation.create(data);
         await conversation.addUsers([user1, user2]);
         return conversation;
+    }
+
+    async createChannelMessage(msg, channel, user) {
+        var data = Object.create(messageCreateData);
+        data.senderId = user.id;
+        data.channelId = channel.id;
+        data.data = msg;
+        return await Message.create(data);
+    }
+
+    async createConversationMessage(msg, conversation, user) {
+        var data = Object.create(messageCreateData);
+        data.senderId = user.id;
+        data.conversationId = conversation.id;
+        data.data = msg;
+        return await Message.create(data);
     }
 }
 

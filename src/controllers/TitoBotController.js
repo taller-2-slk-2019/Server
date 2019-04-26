@@ -2,8 +2,8 @@ var BotsController = require('./BotsController');
 
 class TitoBotController {
 
-    static get titoBotName() { return 'tito'; }
-    static get titoBotBaseUrl() { return 'https://tito-bot.herokuapp.com/'; }
+    get titoBotName() { return 'tito'; }
+    get titoBotBaseUrl() { return 'https://tito-bot.herokuapp.com/'; }
 
     async sendMessage(message){
         var bot = {

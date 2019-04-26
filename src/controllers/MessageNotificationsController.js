@@ -14,7 +14,7 @@ class MessageNotificationsController {
 
         var mentionedUsers = MessageParser.getMentionedUsers(message.data);
 
-        //TODO chech bots
+        //TODO check bots
         if (mentionedUsers.includes(TitoBot.titoBotName)){
             // Tito bot
             TitoBot.sendMessage(message);
