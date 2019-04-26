@@ -11,12 +11,13 @@ services:
       - db_migration
     ports:
       - "3000:3000"
+    command: bash -c "sleep 40 && node src/app.js"
     environment:
         DOCKER: 1
       
   db_creation:
     build: .
-    command: ["npx", "sequelize", "db:create"]
+    command: bash -c "sleep 20 && npx sequelize db:create"
     links:
       - postgres
     depends_on:
@@ -26,7 +27,7 @@ services:
   
   db_migration:
     build: .
-    command: ["npx", "sequelize", "db:migrate"]
+    command: bash -c "sleep 25 && npx sequelize db:migrate"
     links:
       - db_creation
     depends_on:
