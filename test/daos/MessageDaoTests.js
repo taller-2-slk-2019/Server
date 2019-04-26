@@ -14,26 +14,18 @@ var Config = require('../../src/helpers/Config');
 var MessageParser = require('../../src/helpers/MessageParser');
 var models = require('../../src/database/sequelize');
 var Message = models.message;
-var Channel = models.channel;
 var Conversation = models.conversation;
 var ForbiddenWord = models.forbiddenWord;
-var User = models.user;
-var Organization = models.organization;
+var TestDatabaseHelper = require('../TestDatabaseHelper');
+
 var { UserNotBelongsToChannelError, UserNotBelongsToConversationError, MessageNotFoundError } = require('../../src/helpers/Errors');
 var { messageCreateData } = require('../data/messageData');
-var { conversationCreateData } = require('../data/conversationData');
-var { channelCreateData } = require('../data/channelData');
-var { userCreateData } = require('../data/userData');
-var { organizationCreateData } = require('../data/organizationData');
 
 describe('"MessageDao Tests"', () => {
     var user;
     var organization;
     var channel;
     var conversation;
-    var organizationData = Object.create(organizationCreateData);
-    var channelData = Object.create(channelCreateData);
-    var conversationData = Object.create(conversationCreateData);
     var messageData = Object.create(messageCreateData);
     var messageConvData = Object.create(messageCreateData);
     var firebaseMock;
@@ -43,16 +35,12 @@ describe('"MessageDao Tests"', () => {
         firebaseMock = stub(FirebaseController, 'sendMessage').resolves();
         notificationsMock = stub(MessageNotificationsController, 'sendNotification').resolves();
 
-        user = await User.create(userCreateData());
-        organizationData.creatorId = user.id;
-        organization = await Organization.create(organizationData);
-        channelData.creatorId = user.id;
-        channelData.organizationId = organization.id;
-        conversationData.organizationId = organization.id;
-        channel = await Channel.create(channelData);
-        await channel.setUsers([user]);
-        conversation = await Conversation.create(conversationData);
-        await conversation.setUsers([user]);
+        user = await TestDatabaseHelper.createUser();
+        var user2 = await TestDatabaseHelper.createUser();
+        organization = await TestDatabaseHelper.createOrganization([user]);
+        channel = await TestDatabaseHelper.createChannel(user, organization);
+        conversation = await TestDatabaseHelper.createConversation(user, user2, organization);
+
         messageData.senderToken = user.token;
         messageData.senderId = user.id;
         messageData.channelId = channel.id;
@@ -123,7 +111,7 @@ describe('"MessageDao Tests"', () => {
         });
 
         it('message sender must belong to channel', async () => {
-            var user2 = await User.create(userCreateData());
+            var user2 = await TestDatabaseHelper.createUser();
             data.senderToken = user2.token;
             await expect(MessageDao.createForChannel(data)).to.eventually.be.rejectedWith(UserNotBelongsToChannelError);
         });
@@ -185,7 +173,7 @@ describe('"MessageDao Tests"', () => {
         });
 
         it('message sender must belong to conversation', async () => {
-            var user2 = await User.create(userCreateData());
+            var user2 = await TestDatabaseHelper.createUser();
             data.senderToken = user2.token;
             await expect(MessageDao.createForConversation(data)).to.eventually.be.rejectedWith(UserNotBelongsToConversationError);
         });

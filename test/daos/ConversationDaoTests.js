@@ -9,27 +9,21 @@ var ConversationDao = require('../../src/daos/ConversationDao');
 
 var models = require('../../src/database/sequelize');
 var Conversation = models.conversation;
-var User = models.user;
-var Organization = models.organization;
+var TestDatabaseHelper = require('../TestDatabaseHelper');
+
 var { ConversationNotFoundError, UserNotBelongsToOrganizationError, InvalidConversationError } = require('../../src/helpers/Errors');
 var { conversationCreateData } = require('../data/conversationData');
-var { userCreateData } = require('../data/userData');
-var { organizationCreateData } = require('../data/organizationData');
 
 describe('"ConversationDao Tests"', () => {
     var user;
     var user2;
     var organization;
-    var organizationData = Object.create(organizationCreateData);
     var conversationData = Object.create(conversationCreateData);
 
     before(async () => {
-        user = await User.create(userCreateData());
-        user2 = await User.create(userCreateData());
-        organizationData.creatorId = user.id;
-        organization = await Organization.create(organizationData);
-        await organization.addUser(user, {through: {role: 'role'}});
-        await organization.addUser(user2, {through: {role: 'role'}});
+        user = await TestDatabaseHelper.createUser();
+        user2 = await TestDatabaseHelper.createUser();
+        organization = await TestDatabaseHelper.createOrganization([user, user2]);
         conversationData.organizationId = organization.id;
     });
 
@@ -75,7 +69,7 @@ describe('"ConversationDao Tests"', () => {
         var user3;
 
         before(async () => {
-            user3 = await User.create(userCreateData());
+            user3 = await TestDatabaseHelper.createUser();
         });
 
         it('conversation must not be created if user1 not belongs to organization', async () => {
@@ -129,14 +123,10 @@ describe('"ConversationDao Tests"', () => {
         var usr;
 
         before(async () => {
-            org = await Organization.create(organizationData);
-            var data = Object.create(conversationData);
-            data.organizationId = org.id;
-            usr = await User.create(userCreateData());
-            conversation = await Conversation.create(data);
-            await conversation.addUsers([user, usr]);
-            conversation2 = await Conversation.create(data);
-            await conversation2.addUsers([user, usr]);
+            org = await TestDatabaseHelper.createOrganization();
+            usr = await TestDatabaseHelper.createUser();
+            conversation = await TestDatabaseHelper.createConversation(user, usr, org);
+            conversation2 = await TestDatabaseHelper.createConversation(user, usr, org);;
         });
 
         it('get for user and organization must return 2 conversations', async () => {
@@ -145,7 +135,7 @@ describe('"ConversationDao Tests"', () => {
         });
 
         it('get for other user and organization must return 0 channels', async () => {
-            var usr2 = await User.create(userCreateData());
+            var usr2 = await TestDatabaseHelper.createUser();
             var conversations = await ConversationDao.get(usr2.token, org.id);
             expect(conversations.length).to.eq(0);
         });
@@ -163,14 +153,9 @@ describe('"ConversationDao Tests"', () => {
         var usr;
 
         before(async () => {
-            usr = await User.create(userCreateData());
-            org = await Organization.create(organizationData);
-            var data = Object.create(conversationData);
-            data.organizationId = org.id;
-            conversation = await Conversation.create(data);
-            
-            await conversation.addUser(user);
-            await conversation.addUser(usr);
+            usr = await TestDatabaseHelper.createUser();
+            org = await TestDatabaseHelper.createOrganization();
+            conversation = await TestDatabaseHelper.createConversation(user, usr, org);
         });
 
         it('find by user1 and user2 must return conversation', async () => {
@@ -179,14 +164,14 @@ describe('"ConversationDao Tests"', () => {
         });
 
         it('find by user1 and user2 must return conversation with correct id', async () => {
-            var conversation = await ConversationDao.findByUsers(org, user, usr);
-            expect(conversation).to.have.property('id', conversation.id);
+            var result = await ConversationDao.findByUsers(org, user, usr);
+            expect(result).to.have.property('id', conversation.id);
         });
 
         it('find by user1 and other user must return null', async () => {
-            var usr2 = await User.create(userCreateData());
-            var conversation = await ConversationDao.findByUsers(org, user, usr2);
-            expect(conversation).to.be.null;
+            var usr2 = await TestDatabaseHelper.createUser();
+            var result = await ConversationDao.findByUsers(org, user, usr2);
+            expect(result).to.be.null;
         });
 
     });

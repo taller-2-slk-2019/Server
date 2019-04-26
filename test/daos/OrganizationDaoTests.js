@@ -10,14 +10,13 @@ var OrganizationDao = require('../../src/daos/OrganizationDao');
 var FirebaseController = require('../../src/firebase/FirebaseController');
 
 var models = require('../../src/database/sequelize');
-var User = models.user;
 var Organization = models.organization;
-var Channel = models.channel;
+var TestDatabaseHelper = require('../TestDatabaseHelper');
+
 var { UserNotFoundError, OrganizationNotFoundError,
             InvalidOrganizationInvitationTokenError, UserNotBelongsToOrganizationError } = require('../../src/helpers/Errors');
-var { userCreateData } = require('../data/userData');
 var { organizationCreateData } = require('../data/organizationData');
-var { channelCreateData } = require('../data/channelData');
+
 var CreatorRole = require('../../src/models/userRoles/UserRoleCreator');
 var MemberRole = require('../../src/models/userRoles/UserRoleMember');
 
@@ -31,7 +30,7 @@ describe('"OrganizationDao Tests"', () => {
     before(async () => {
         firebaseMock = stub(FirebaseController, 'sendOrganizationInvitationNotification').resolves();
 
-        user = await User.create(userCreateData());
+        user = await TestDatabaseHelper.createUser();
         organizationData.creatorToken = user.token;
     });
 
@@ -93,7 +92,7 @@ describe('"OrganizationDao Tests"', () => {
         var organization;
 
         before(async () => {
-            expected = await Organization.create(organizationData);
+            expected = await TestDatabaseHelper.createOrganization();
             organization = await OrganizationDao.findById(expected.id);
         });
 
@@ -125,17 +124,13 @@ describe('"OrganizationDao Tests"', () => {
 
     describe('Invite Users', () => {
         var organization;
-        var invitedUser1Data = Object.create(userCreateData());
-        var invitedUser2Data = Object.create(userCreateData());
         var userToInvite1;
         var userToInvite2;
 
         before(async () => {
-            organization = await Organization.create(organizationData);
-            invitedUser1Data.email = "invited.user.to.organization@gmail.com";
-            invitedUser2Data.email = "invited.user.to.organization-2@gmail.com";
-            userToInvite1 = await User.create(invitedUser1Data);
-            userToInvite2 = await User.create(invitedUser2Data);
+            organization = await TestDatabaseHelper.createOrganization();
+            userToInvite1 = await TestDatabaseHelper.createUser("invited.user.to.organization-1@gmail.com");
+            userToInvite2 = await TestDatabaseHelper.createUser("invited.user.to.organization-2@gmail.com");
         });
 
         beforeEach(async () => {
@@ -179,13 +174,11 @@ describe('"OrganizationDao Tests"', () => {
 
     describe('Invite users with errors', () => {
         var organization;
-        var invitedUserData = Object.create(userCreateData());
         var userToInvite;
 
         before(async () => {
-            organization = await Organization.create(organizationData);
-            invitedUserData.email = "invited.user.to.organization2@gmail.com";
-            userToInvite = await User.create(invitedUserData);
+            organization = await TestDatabaseHelper.createOrganization();
+            userToInvite = await TestDatabaseHelper.createUser("invited.user.to.organization3@gmail.com");
             await organization.addUser(userToInvite, { through: {role: creatorRole.name } });
         });
 
@@ -209,14 +202,12 @@ describe('"OrganizationDao Tests"', () => {
 
     describe('Accept User Invitation', () => {
         var organization;
-        var invitedUserData = Object.create(userCreateData());
         var userToInvite;
         var token = "my-invitation-token-12345-to test invitations";
 
         before(async () => {
             organization = await Organization.create(organizationData);
-            invitedUserData.email = "invited.user.to.organization@will.be.accepted.com";
-            userToInvite = await User.create(invitedUserData);
+            userToInvite = await TestDatabaseHelper.createUser("invited.user.to.organization@will.be.accepted.com");
         });
 
         beforeEach(async () => {
@@ -259,18 +250,14 @@ describe('"OrganizationDao Tests"', () => {
         var channel;
 
         before(async () => {
-            organization = await Organization.create(organizationData);
-            usr = await User.create(userCreateData());
+            organization = await TestDatabaseHelper.createOrganization();;
+            usr = await TestDatabaseHelper.createUser();
         });
 
         beforeEach(async () => {
             await organization.setUsers([]);
             await organization.addUser(usr, { through: {role:'role'}});
-            var channelData = Object.create(channelCreateData);
-            channelData.creatorId = usr.id;
-            channelData.organizationId = organization.id;
-            channel = await Channel.create(channelData);
-            await channel.setUsers([usr]);
+            channel = await TestDatabaseHelper.createChannel(usr, organization);
 
             await OrganizationDao.removeUser(usr.id, organization.id);
         });
@@ -298,11 +285,9 @@ describe('"OrganizationDao Tests"', () => {
         var organizations;
 
         before(async () => {
-            organization1 = await Organization.create(organizationData);
-            user = await User.create(userCreateData());
-            await organization1.addUser(user, {through: {role:'role'}});
-            organization2 = await Organization.create(organizationData);
-            await organization2.addUser(user, {through: {role:'role'}});
+            user = await TestDatabaseHelper.createUser();
+            organization1 = await TestDatabaseHelper.createOrganization([user]);
+            organization2 = await TestDatabaseHelper.createOrganization([user]);
             
             organizations = await OrganizationDao.findForUser(user.token);
         });
@@ -328,12 +313,9 @@ describe('"OrganizationDao Tests"', () => {
         var users;
 
         before(async () => {
-            organization = await Organization.create(organizationData);
-            user = await User.create(userCreateData());
-            user2 = await User.create(userCreateData());
-            await organization.addUser(user, {through: {role:'role'}});
-            await organization.addUser(user2, {through: {role:'role'}});
-            
+            user = await TestDatabaseHelper.createUser();
+            user2 = await TestDatabaseHelper.createUser();
+            organization = await TestDatabaseHelper.createOrganization([user, user2]);
             users = await OrganizationDao.findOrganizationUsers(organization.id);
         });
 

@@ -11,22 +11,18 @@ var ForbiddenWordDao = require('../../src/daos/ForbiddenWordDao');
 var Config = require('../../src/helpers/Config');
 var models = require('../../src/database/sequelize');
 var ForbiddenWord = models.forbiddenWord;
-var Organization = models.organization;
-var User = models.user;
+var TestDatabaseHelper = require('../TestDatabaseHelper');
+
 var { ForbiddenWordAlreadyExistsError } = require('../../src/helpers/Errors');
-var { userCreateData } = require('../data/userData');
-var { organizationCreateData } = require('../data/organizationData');
 
 describe('"ForbiddenWordDao Tests"', () => {
     var user;
     var organization;
-    var organizationData = Object.create(organizationCreateData);
     var wordData;
 
     before(async () => {
-        user = await User.create(userCreateData());
-        organizationData.creatorId = user.id;
-        organization = await Organization.create(organizationData);
+        user = await TestDatabaseHelper.createUser();
+        organization = await TestDatabaseHelper.createOrganization([user]);
         wordData = {
             word: 'word',
             organizationId: organization.id

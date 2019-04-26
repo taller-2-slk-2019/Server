@@ -9,25 +9,20 @@ var ChannelDao = require('../../src/daos/ChannelDao');
 
 var models = require('../../src/database/sequelize');
 var Channel = models.channel;
-var User = models.user;
-var Organization = models.organization;
+var TestDatabaseHelper = require('../TestDatabaseHelper');
+
 var { UserNotFoundError, OrganizationNotFoundError, ChannelNotFoundError, UserAlreadyInChannelError, 
             UserNotBelongsToOrganizationError, UserNotBelongsToChannelError } = require('../../src/helpers/Errors');
 var { channelCreateData } = require('../data/channelData');
-var { userCreateData } = require('../data/userData');
-var { organizationCreateData } = require('../data/organizationData');
 
 describe('"ChannelDao Tests"', () => {
     var user;
     var organization;
-    var organizationData = Object.create(organizationCreateData);
     var channelData = Object.create(channelCreateData);
 
     before(async () => {
-        user = await User.create(userCreateData());
-        organizationData.creatorId = user.id;
-        organization = await Organization.create(organizationData);
-        await organization.addUser(user, {through: {role: 'role'}});
+        user = await TestDatabaseHelper.createUser();
+        organization = await TestDatabaseHelper.createOrganization([user]);
         channelData.creatorToken = user.token;
         channelData.organizationId = organization.id;
     });
@@ -140,7 +135,7 @@ describe('"ChannelDao Tests"', () => {
 
         before(async () => {
             channel = await Channel.create(channelData);
-            usr = await User.create(userCreateData());
+            usr = await TestDatabaseHelper.createUser();
             await organization.addUser(usr, { through: {role: 'role'}});
         });
 
@@ -164,7 +159,7 @@ describe('"ChannelDao Tests"', () => {
         });
 
         it('can not add user that does not belong to channel organization', async () => {
-            var user2 = await User.create(userCreateData());
+            var user2 = await TestDatabaseHelper.createUser();
             await expect(ChannelDao.addUser(channel.id, user2.id)).to.eventually.be.rejectedWith(UserNotBelongsToOrganizationError);
         });
 
@@ -176,7 +171,7 @@ describe('"ChannelDao Tests"', () => {
 
         before(async () => {
             channel = await Channel.create(channelData);
-            usr = await User.create(userCreateData());
+            usr = await TestDatabaseHelper.createUser();
         });
 
         beforeEach(async () => {
@@ -202,14 +197,10 @@ describe('"ChannelDao Tests"', () => {
         var usr;
 
         before(async () => {
-            org = await Organization.create(organizationData);
-            var data = Object.create(channelData);
-            data.organizationId = org.id;
-            channel = await Channel.create(data);
-            await channel.addUser(user);
-            channel2 = await Channel.create(data);
-            await channel2.addUser(user);
-            usr = await User.create(userCreateData());
+            org = await TestDatabaseHelper.createOrganization([user]);
+            channel = await TestDatabaseHelper.createChannel(user, org);
+            channel2 = await TestDatabaseHelper.createChannel(user, org);
+            usr = await TestDatabaseHelper.createUser();
         });
 
         it('get for user and organization must return 2 channels', async () => {
