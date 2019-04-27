@@ -8,6 +8,7 @@ chai.use(sinonChai);
 const { mockRequest, mockResponse } = require('mock-req-res');
 const channelDataMock = require('../mocks/channelDataMock');
 const userDataMock = require('../mocks/userForChannelMock');
+const channelStatisticsMock = require('../mocks/channelStatisticsMock');
 const { channelCreateData } = require('../data/channelData');
 
 var ChannelsController = require('../../src/controllers/ChannelsController');
@@ -22,6 +23,7 @@ describe('"ChannelsController Tests"', () => {
         var mock4;
         var mock5;
         var mock6;
+        var mock7;
 
         before(async () => {
             mock1 = stub(ChannelDao, 'create').resolves(channelDataMock);
@@ -30,6 +32,7 @@ describe('"ChannelsController Tests"', () => {
             mock4 = stub(ChannelDao, 'get').resolves([channelDataMock, channelDataMock, channelDataMock]);
             mock5 = stub(ChannelDao, 'findById').resolves(channelDataMock);
             mock6 = stub(ChannelDao, 'getChannelUsers').resolves([userDataMock, userDataMock, userDataMock]);
+            mock7 = stub(ChannelDao, 'getStatistics').resolves(channelStatisticsMock);
         });
 
         after(async () => {
@@ -39,6 +42,7 @@ describe('"ChannelsController Tests"', () => {
             mock4.restore();
             mock5.restore();
             mock6.restore();
+            mock7.restore();
         });
 
         describe('Create channel', () => {
@@ -180,6 +184,29 @@ describe('"ChannelsController Tests"', () => {
             });
         });
 
+        describe('Get statistics', () => {
+            var req = mockRequest();
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await ChannelsController.getStatistics(req, res);
+            });
+
+            it('response status must be 200', async () => {
+                expect(res.status).to.have.been.calledWith(200);
+            });
+            
+            it('stats must not be null', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.not.be.null;
+            });
+
+            it('message count must be correct', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('messageCount', channelStatisticsMock.messageCount);
+            });
+        });
     });
 
     describe('Methods with errors', () => {
@@ -189,6 +216,7 @@ describe('"ChannelsController Tests"', () => {
         var mock4;
         var mock5;
         var mock6;
+        var mock7;
 
         before(async () => {
             mock1 = stub(ChannelDao, 'create').rejects();
@@ -197,6 +225,7 @@ describe('"ChannelsController Tests"', () => {
             mock4 = stub(ChannelDao, 'get').rejects();
             mock5 = stub(ChannelDao, 'findById').rejects();
             mock6 = stub(ChannelDao, 'getChannelUsers').rejects();
+            mock7 = stub(ChannelDao, 'getStatistics').rejects();
         });
 
         after(async () => {
@@ -206,6 +235,7 @@ describe('"ChannelsController Tests"', () => {
             mock4.restore();
             mock5.restore();
             mock6.restore();
+            mock7.restore();
         });
 
 
@@ -311,6 +341,25 @@ describe('"ChannelsController Tests"', () => {
             beforeEach(async () => {
                 res = mockResponse();
                 await ChannelsController.getChannel(req, res);
+            });
+
+            it('response status must be 400', async () => {
+                expect(res.status).to.have.been.calledWith(400);
+            });
+
+            it('response must have an error', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('error');
+            });
+        });
+
+        describe('Get statistics with error', () => {
+            var req = mockRequest();
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await ChannelsController.getStatistics(req, res);
             });
 
             it('response status must be 400', async () => {

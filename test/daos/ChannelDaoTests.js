@@ -250,4 +250,26 @@ describe('"ChannelDao Tests"', () => {
             expect(belongs).to.be.true;
         });
     });
+
+    describe('Get statistics', () => {
+        var channel
+        var organization;
+        var user;
+        var stats;
+
+        before(async () => {
+            user = await TestDatabaseHelper.createUser();
+            organization = await TestDatabaseHelper.createOrganization([user]);
+            channel = await TestDatabaseHelper.createChannel(user, organization);
+            for (i = 0; i < 5; i++){
+                await TestDatabaseHelper.createChannelMessage("hola", channel, user);
+            }
+
+            stats = await ChannelDao.getStatistics(channel.id);
+        });
+
+        it('message count must be 5', async () => {
+            expect(stats.messageCount).to.eq(5);
+        });
+    });
 });

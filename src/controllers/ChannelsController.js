@@ -87,6 +87,17 @@ class ChannelsController{
         }
     }
 
+    async getStatistics(req, res){
+        var channelId = req.params.id;
+
+        try{
+            var stats = await ChannelDao.getStatistics(channelId);
+            sendSuccessResponse(res, stats);
+        } catch (err){
+            sendErrorResponse(res, err);
+        }
+    }
+
 }
 
 module.exports = new ChannelsController();

@@ -281,7 +281,6 @@ describe('"MessageDao Tests"', () => {
             var messages = await MessageDao.getForChannel(channel.id, 4);
             expect(messages).to.have.length.below(Config.messagesPerPage);
         });
-        
     });
 
     describe('Get conversation messages', () => {
@@ -355,6 +354,5 @@ describe('"MessageDao Tests"', () => {
         it('throws exception if id is -1', async () => {
             await expect(MessageDao.findById(-1)).to.eventually.be.rejectedWith(MessageNotFoundError);
         });
-
     });
 });
