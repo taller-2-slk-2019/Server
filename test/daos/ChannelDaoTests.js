@@ -188,6 +188,51 @@ describe('"ChannelDao Tests"', () => {
             var user2 = await TestDatabaseHelper.createUser();
             await expect(ChannelDao.addUser(channel.id, user2.id)).to.eventually.be.rejectedWith(UserNotBelongsToOrganizationError);
         });
+    });
+
+    describe('Add username', () => {
+        var channel;
+        var usr;
+
+        before(async () => {
+            channel = await Channel.create(channelData);
+            usr = await TestDatabaseHelper.createUser();
+            await organization.addUser(usr, { through: {role: 'role'}});
+        });
+
+        beforeEach(async () => {
+            titoMock.resetHistory();
+            firebaseMock.resetHistory();
+            await channel.setUsers([]);
+            await ChannelDao.addUsername(channel.id, usr.username);
+        });
+
+        it('channel must have 1 user', async () => {
+            var users = await channel.getUsers();
+            expect(users.length).to.eq(1);
+        });
+
+        it('user must be added to channel', async () => {
+            var users = await channel.getUsers();
+            expect(users[0].id).to.eq(usr.id);
+        });
+
+        it('should inform tito', async () => {
+            assert.calledOnce(titoMock);
+        });
+
+        it('should inform firebase', async () => {
+            assert.calledOnce(firebaseMock);
+        });
+
+        it('can not add user again to channel', async () => {
+            await expect(ChannelDao.addUsername(channel.id, usr.username)).to.eventually.be.rejectedWith(UserAlreadyInChannelError);
+        });
+
+        it('can not add user that does not belong to channel organization', async () => {
+            var user2 = await TestDatabaseHelper.createUser();
+            await expect(ChannelDao.addUsername(channel.id, user2.username)).to.eventually.be.rejectedWith(UserNotBelongsToOrganizationError);
+        });
 
     });
 

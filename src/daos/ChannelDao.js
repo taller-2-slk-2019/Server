@@ -43,18 +43,26 @@ class ChannelDao{
     }
 
     async addUser(channelId, userId){
+        var user = await UserDao.findById(userId);
+        await this._addUserToChannel(channelId, user);
+    }
+
+    async addUsername(channelId, username){
+        var user = await UserDao.findByUsername(username);
+        await this._addUserToChannel(channelId, user);
+    }
+
+    async _addUserToChannel(channelId, user){
         var channel = await this.findById(channelId);
 
         var organization = await channel.getOrganization();
 
-        var user = await UserDao.findById(userId);
-
         if (await channel.hasUser(user)){
-            throw new UserAlreadyInChannelError(channelId, userId);
+            throw new UserAlreadyInChannelError(channelId, user.id);
         }
 
         if (!(await organization.hasUser(user))){
-            throw new UserNotBelongsToOrganizationError(organization.id, userId);
+            throw new UserNotBelongsToOrganizationError(organization.id, user.id);
         }
 
         await channel.addUser(user);
