@@ -61,6 +61,25 @@ class MessagesController{
         }
     }
 
+    async createBotMessage(req, res) {
+        var data = {
+            type: Config.messageTypesWithText[0],
+            data: req.body.message,
+            bot: req.body.bot,
+            channelId: req.body.channelId
+        };
+
+        try {
+            await MessageDao.createForBot(data);
+            logger.info('Received message from bot: ' + data.bot + " in channel: " + data.channelId);
+            logger.info(data);
+            sendEmptySuccessResponse(res);
+            
+        } catch (err) {
+            sendErrorResponse(res, err);
+        }
+    }
+
 }
 
 module.exports = new MessagesController();

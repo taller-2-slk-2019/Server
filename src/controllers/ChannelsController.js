@@ -37,6 +37,30 @@ class ChannelsController{
         }
     }
 
+    async getChannel(req, res){
+        var id = req.params.id;
+
+        try{
+            var channel  = await ChannelDao.findById(id);
+            sendSuccessResponse(res, channel);
+            
+        } catch (err){
+            sendErrorResponse(res, err);
+        }
+    }
+
+    async getChannelUsers(req, res){
+        var id = req.params.id;
+
+        try{
+            var users  = await ChannelDao.getChannelUsers(id);
+            sendSuccessResponse(res, users);
+            
+        } catch (err){
+            sendErrorResponse(res, err);
+        }
+    }
+
     async addUser(req, res){
         var channelId = req.params.id;
         var userId = req.body.userId;
@@ -58,6 +82,17 @@ class ChannelsController{
             await ChannelDao.removeUser(userId, channelId);
             logger.info(`User ${userId} abandoned channel ${channelId}`);
             sendEmptySuccessResponse(res);
+        } catch (err){
+            sendErrorResponse(res, err);
+        }
+    }
+
+    async getStatistics(req, res){
+        var channelId = req.params.id;
+
+        try{
+            var stats = await ChannelDao.getStatistics(channelId);
+            sendSuccessResponse(res, stats);
         } catch (err){
             sendErrorResponse(res, err);
         }

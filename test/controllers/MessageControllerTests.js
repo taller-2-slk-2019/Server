@@ -20,12 +20,14 @@ describe('"MessagesController Tests"', () => {
         var mock2;
         var mock3;
         var mock4;
+        var mock5;
 
         before(async () => {
             mock1 = stub(MessageDao, 'createForChannel').resolves();
             mock2 = stub(MessageDao, 'getForChannel').resolves([messageMock, messageMock, messageMock]);
             mock3 = stub(MessageDao, 'createForConversation').resolves();
             mock4 = stub(MessageDao, 'getForConversation').resolves([messageMock, messageMock, messageMock]);
+            mock5 = stub(MessageDao, 'createForBot').resolves();
         });
 
         after(async () => {
@@ -33,6 +35,7 @@ describe('"MessagesController Tests"', () => {
             mock2.restore();
             mock3.restore();
             mock4.restore();
+            mock5.restore();
         });
 
         describe('Create Message for channel', () => {
@@ -65,6 +68,25 @@ describe('"MessagesController Tests"', () => {
                 req.body.channelId = null;
                 res = mockResponse();
                 await MessagesController.create(req, res);
+            });
+
+            it('response status must be 204', async () => {
+                expect(res.status).to.have.been.calledWith(204);
+            });
+
+            it('response body must be null', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.be.undefined;
+            });
+        });
+
+        describe('Create Message for bot', () => {
+            var req = mockRequest();
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await MessagesController.createBotMessage(req, res);
             });
 
             it('response status must be 204', async () => {
@@ -137,12 +159,14 @@ describe('"MessagesController Tests"', () => {
         var mock2;
         var mock3;
         var mock4;
+        var mock5;
 
         before(async () => {
             mock1 = stub(MessageDao, 'createForChannel').rejects();
             mock2 = stub(MessageDao, 'getForChannel').rejects();
             mock3 = stub(MessageDao, 'createForConversation').rejects();
             mock4 = stub(MessageDao, 'getForConversation').rejects();
+            mock5 = stub(MessageDao, 'createForBot').rejects();
         });
 
         after(async () => {
@@ -150,6 +174,7 @@ describe('"MessagesController Tests"', () => {
             mock2.restore();
             mock3.restore();
             mock4.restore();
+            mock5.restore();
         });
 
 
@@ -204,6 +229,25 @@ describe('"MessagesController Tests"', () => {
             beforeEach(async () => {
                 res = mockResponse();
                 await MessagesController.create(req, res);
+            });
+
+            it('response status must be 400', async () => {
+                expect(res.status).to.have.been.calledWith(400);
+            });
+
+            it('response must have an error', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('error');
+            });
+        });
+
+        describe('Create message for bot with error', () => {
+            var req = mockRequest();
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await MessagesController.createBotMessage(req, res);
             });
 
             it('response status must be 400', async () => {

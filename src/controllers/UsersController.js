@@ -43,6 +43,17 @@ class UsersController{
         }
     }
 
+    async getUser(req, res) {
+        var id = req.params.id;
+
+        try{
+            var user = await UserDao.findById(id);
+            sendSuccessResponse(res, user);
+        } catch (err){
+            sendErrorResponse(res, err);
+        }
+    }
+
     async getInvitations(req, res) {
         var token = req.query.userToken;
 

@@ -1,8 +1,10 @@
 var { filter } = require('p-iteration');
 var UserDao = require('./UserDao');
 var OrganizationDao = require('./OrganizationDao');
+var ChannelStatistics = require('../models/statistics/ChannelStatistics');
 var models = require('../database/sequelize');
 var Channel = models.channel;
+var Message = models.message;
 var { ChannelNotFoundError, UserAlreadyInChannelError, UserNotBelongsToOrganizationError, 
             UserNotBelongsToChannelError } = require('../helpers/Errors');
 
@@ -31,6 +33,11 @@ class ChannelDao{
             throw new ChannelNotFoundError(id);
         }
         return channel;
+    }
+
+    async getChannelUsers(id){
+        var channel = await this.findById(id);
+        return await channel.getUsers();
     }
 
     async addUser(channelId, userId){
@@ -73,6 +80,17 @@ class ChannelDao{
         });
 
         return userChannels;
+    }
+
+    async getStatistics(channelId){
+        await this.findById(channelId);
+
+        var stats = new ChannelStatistics();
+
+        var messageCount = await Message.count({where: {channelId: channelId}});
+        stats.setMessageCount(messageCount);
+
+        return stats;
     }
 
 }

@@ -45,6 +45,13 @@ class MessageDao{
         return await this._create(msg, organization);
     }
 
+    async createForBot(msg){
+        //TODO check bot is valid
+        var channel = await ChannelDao.findById(msg.channelId);
+        var organization = await channel.getOrganization();
+        return await this._create(msg, organization);
+    }
+
     async _create(msg, organization){
         if (Config.messageTypesWithText.includes(msg.type)){
             var forbiddenWords = (await organization.getForbiddenWords()).map((word) => {
@@ -56,7 +63,10 @@ class MessageDao{
 
         var message = await Message.create(msg);
         FirebaseController.sendMessage(await this.findById(message.id));
-        MessageNotifications.sendNotification(message);
+
+        if (!msg.bot){
+            MessageNotifications.sendNotification(message);
+        }
         return message;
     }
 

@@ -179,6 +179,44 @@ describe('"MessageDao Tests"', () => {
         });
     });
 
+    describe('Create message for bot', () => {
+        var msg;
+        var data = Object.create(messageCreateData);
+
+        beforeEach(async () => {
+            data.bot = "pepito";
+            data.channelId = channel.id;
+            msg = await MessageDao.createForBot(data);
+        });
+
+        it('message must be created', async () => {
+            expect(msg).to.not.be.null;
+        });
+
+        it('message must have an id', async () => {
+            expect(msg).to.have.property('id');
+        });
+
+        it('message channel must be correct', async () => {
+            var msgChannel = await msg.getChannel();
+            expect(msgChannel.id).to.eq(channel.id);
+        });
+
+        it('message must not have conversation', async () => {
+            var msgConversation = await msg.getConversation();
+            expect(msgConversation).to.be.null;
+        });
+
+        it('message sender must be null', async () => {
+            var sender = await msg.getSender();
+            expect(sender).to.be.null;
+        });
+
+        it('message bot must be correct', async () => {
+            expect(msg.bot).to.eq('pepito');
+        });
+    });
+
     describe('Create message with forbidden words', () => {
         var msg;
         var data;
@@ -243,7 +281,6 @@ describe('"MessageDao Tests"', () => {
             var messages = await MessageDao.getForChannel(channel.id, 4);
             expect(messages).to.have.length.below(Config.messagesPerPage);
         });
-        
     });
 
     describe('Get conversation messages', () => {
@@ -317,6 +354,5 @@ describe('"MessageDao Tests"', () => {
         it('throws exception if id is -1', async () => {
             await expect(MessageDao.findById(-1)).to.eventually.be.rejectedWith(MessageNotFoundError);
         });
-
     });
 });

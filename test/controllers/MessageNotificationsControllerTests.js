@@ -8,62 +8,46 @@ chai.use(sinonChai);
 
 var MessageNotificationsController = require('../../src/controllers/MessageNotificationsController');
 var FirebaseController = require('../../src/firebase/FirebaseController');
+var TitoBotController = require('../../src/controllers/TitoBotController');
 
-var models = require('../../src/database/sequelize');
-var Message = models.message;
-var Channel = models.channel;
-var User = models.user;
-var Organization = models.organization;
-var { messageCreateData } = require('../data/messageData');
-var { channelCreateData } = require('../data/channelData');
-var { userCreateData } = require('../data/userData');
-var { organizationCreateData } = require('../data/organizationData');
+var TestDatabaseHelper = require('../TestDatabaseHelper');
 var messageMock = require('../mocks/messageMock');
 
 describe('"MessageNotificationsController Tests"', () => {
-    var mock;
+    var mock, mock2;
+    var user1, user2, user3;
+    var organization;
+    var channel;
+    var message;
 
     before(async () => {
         mock = stub(FirebaseController, 'sendChannelMessageNotification').resolves();
+        mock2 = stub(TitoBotController, 'sendMessage').resolves();
+
+        user1 = await TestDatabaseHelper.createUser();
+        user2 = await TestDatabaseHelper.createUser();
+        user3 = await TestDatabaseHelper.createUser();
+        organization = await TestDatabaseHelper.createOrganization([user1]);
+        channel = await TestDatabaseHelper.createChannel(user1, organization);
+        await channel.setUsers([user1, user2, user3]);
     });
 
     beforeEach(async () => {
         mock.resetHistory();
+        mock2.resetHistory();
     });
 
     after(async () => {
         mock.restore();
+        mock2.restore();
     });
 
-    describe('Send Message Notification', () => {
-        var user1, user2, user3;
-        var organization;
-        var channel;
-        var message;
-        var organizationData = Object.create(organizationCreateData);
-        var channelData = Object.create(channelCreateData);
-        var messageData = Object.create(messageCreateData);
-
-        before(async () => {
-            user1 = await User.create(userCreateData());
-            user2 = await User.create(userCreateData());
-            user3 = await User.create(userCreateData());
-            organizationData.creatorId = user1.id;
-            organization = await Organization.create(organizationData);
-            channelData.creatorId = user1.id;
-            channelData.organizationId = organization.id;
-            channel = await Channel.create(channelData);
-            await channel.setUsers([user1, user2, user3]);
-            messageData.senderId = user1.id;
-            messageData.channelId = channel.id;
-        });
-    
+    describe('Send Message Notification', () => { 
         describe('Send message notifications only to mentioned users', () => {
             beforeEach(async () => {
                 mock.resetHistory();
-                var data = Object.create(messageData);
-                data.data = `@${user1.username} @${user2.username} @otherUser`;
-                message = await Message.create(data);
+                var data = `@${user1.username} @${user2.username} @otherUser`;
+                message = await TestDatabaseHelper.createChannelMessage(data, channel, user1);
                 await MessageNotificationsController.sendNotification(message);
             });
 
@@ -91,9 +75,7 @@ describe('"MessageNotificationsController Tests"', () => {
         describe('Send message notifications to all users', () => {
             beforeEach(async () => {
                 mock.resetHistory();
-                var data = Object.create(messageData);
-                data.data = `@all`;
-                message = await Message.create(data);
+                message = await TestDatabaseHelper.createChannelMessage("@all", channel, user1);
                 await MessageNotificationsController.sendNotification(message);
             });
 
@@ -139,6 +121,31 @@ describe('"MessageNotificationsController Tests"', () => {
             fileMessageMock.type = "file";
             await MessageNotificationsController.sendNotification(fileMessageMock);
             assert.notCalled(mock);
+        });
+    });
+
+    describe('Mentioned Tito bot', () => {
+        
+        beforeEach(async () => {
+            mock2.resetHistory();
+        });
+
+        it('should call tito controller if mentioned', async () => {
+            message = await TestDatabaseHelper.createChannelMessage("@tito hello", channel, user1);
+            await MessageNotificationsController.sendNotification(message);
+            assert.calledOnce(mock2);
+        });
+
+        it('should call tito controller if mentioned with other users', async () => {
+            message = await TestDatabaseHelper.createChannelMessage("@tito hello @other", channel, user1);
+            await MessageNotificationsController.sendNotification(message);
+            assert.calledOnce(mock2);
+        });
+
+        it('should not call tito controller if not mentioned', async () => {
+            message = await TestDatabaseHelper.createChannelMessage("@titon hello", channel, user1);
+            await MessageNotificationsController.sendNotification(message);
+            assert.notCalled(mock2);
         });
     });
 });

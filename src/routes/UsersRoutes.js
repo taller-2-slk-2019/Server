@@ -5,6 +5,8 @@ var usersController = require('../controllers/UsersController');
 
 router.get('/profile', usersController.getProfile);
 
+router.get('/:id', usersController.getUser);
+
 router.get('/', usersController.get);
 
 router.post('/', usersController.register);
