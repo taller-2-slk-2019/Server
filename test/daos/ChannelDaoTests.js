@@ -2,10 +2,15 @@ const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised');
 const expect = chai.expect;
 chai.use(chaiAsPromised);
+const { stub, assert } = require('sinon');
+const sinonChai = require('sinon-chai');
+chai.use(sinonChai);
 
 var SequelizeValidationError = require('../../src/database/sequelize').Sequelize.SequelizeValidationError;
 
 var ChannelDao = require('../../src/daos/ChannelDao');
+var TitoBotController = require('../../src/controllers/TitoBotController');
+var FirebaseController = require('../../src/firebase/FirebaseController');
 
 var models = require('../../src/database/sequelize');
 var Channel = models.channel;
@@ -16,15 +21,26 @@ var { UserNotFoundError, OrganizationNotFoundError, ChannelNotFoundError, UserAl
 var { channelCreateData } = require('../data/channelData');
 
 describe('"ChannelDao Tests"', () => {
+    var titoMock;
+    var firebaseMock;
+
     var user;
     var organization;
     var channelData = Object.create(channelCreateData);
 
     before(async () => {
+        titoMock = stub(TitoBotController, 'userAddedToChannel').resolves();
+        firebaseMock = stub(FirebaseController, 'sendChannelInvitationNotification').resolves();
+
         user = await TestDatabaseHelper.createUser();
         organization = await TestDatabaseHelper.createOrganization([user]);
         channelData.creatorToken = user.token;
         channelData.organizationId = organization.id;
+    });
+
+    after(async () => {
+        titoMock.restore();
+        firebaseMock.restore();
     });
 
 
@@ -140,6 +156,8 @@ describe('"ChannelDao Tests"', () => {
         });
 
         beforeEach(async () => {
+            titoMock.resetHistory();
+            firebaseMock.resetHistory();
             await channel.setUsers([]);
             await ChannelDao.addUser(channel.id, usr.id);
         });
@@ -152,6 +170,14 @@ describe('"ChannelDao Tests"', () => {
         it('user must be added to channel', async () => {
             var users = await channel.getUsers();
             expect(users[0].id).to.eq(usr.id);
+        });
+
+        it('should inform tito', async () => {
+            assert.calledOnce(titoMock);
+        });
+
+        it('should inform firebase', async () => {
+            assert.calledOnce(firebaseMock);
         });
 
         it('can not add user again to channel', async () => {

@@ -27,7 +27,7 @@ class TitoBotController {
 
         logger.info(`Tito bot: sending welcome to user ${user.id} in channel ${channel.id}`);
         axios.post(url, data).catch(err => {
-            logger.error('Failed message to tito bot');
+            logger.error('Failed welcome message to tito bot');
             logger.error(err);
         });
     }
