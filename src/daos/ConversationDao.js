@@ -32,7 +32,7 @@ class ConversationDao{
 
         var conversationModel = await Conversation.create({organizationId: organizationId});
         await conversationModel.addUsers([user1, user2]);
-        TitoBotController.conversationCreated(conversation, user1);
+        TitoBotController.conversationCreated(conversationModel, user1);
         return await Conversation.findByPk(conversationModel.id, this._getIncludeUsers(user1.id));
     }
 
