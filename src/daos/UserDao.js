@@ -30,6 +30,14 @@ class UserDao{
         return user;
     }
 
+    async findByUsername(username){
+        var user = await User.findOne({where: {username: username}});
+        if (!user) {
+            throw new UserNotFoundError(username);
+        }
+        return user;
+    }
+
     async findByToken(token){
         var user = await User.findOne({where: {token: token}});
         if (!user) {

@@ -1,20 +1,34 @@
 var logger = require('logops');
 var MessageParser = require('../helpers/MessageParser');
 var FirebaseController = require('../firebase/FirebaseController');
+var ChannelDao = require('../daos/ChannelDao');
+var TitoBot = require('../controllers/TitoBotController');
 var Config = require('../helpers/Config');
 
 class MessageNotificationsController {
 
     async sendNotification(message){
-        if (message.conversationId || !Config.messageTypesWithText.includes(message.type)){
-            //Don't mention users in conversations
+        await FirebaseController.sendMessage(message);
+
+        if (message.bot || message.conversationId || !Config.messageTypesWithText.includes(message.type)){
+            //Don't mention users in conversations or bot's messages
             return;
         }
 
         var mentionedUsers = MessageParser.getMentionedUsers(message.data);
 
-        //TODO check bot tito
+        //TODO check bots
+        if (mentionedUsers.includes(TitoBot.titoBotName)){
+            // Tito bot
+            TitoBot.sendMessage(message);
+            return;
+        }
 
+        await this._notifyMentionedUsers(message, mentionedUsers);
+        await this._addNewUsers(message, mentionedUsers);
+    }
+
+    async _notifyMentionedUsers(message, mentionedUsers){
         var usersToNotify = await this._getAllMessageReceptors(message);
 
         if (!mentionedUsers.includes(Config.mentionAllUsers)){
@@ -27,7 +41,23 @@ class MessageNotificationsController {
         usersToNotify = usersToNotify.filter(username => {return username != sender.username;});
 
         logger.info('Sending user mentioned notifications to: ' + usersToNotify);
-        await FirebaseController.sendChannelMessageNotification(message, usersToNotify);
+        FirebaseController.sendChannelMessageNotification(message, usersToNotify);
+    }
+
+    async _addNewUsers(message, mentionedUsers){
+        var channelUsers = await this._getAllMessageReceptors(message);
+
+        var newUsers = mentionedUsers.filter(username => {
+            return !channelUsers.includes(username);
+        });
+
+        logger.info(`Adding to channel ${message.channelId} mentioned users ` + newUsers);
+        newUsers.forEach(username => {
+            ChannelDao.addUsername(message.channelId, username).catch(err => {
+                logger.error(`Could not add user ${username} to channel ${message.channelId}`);
+                logger.error(err);
+            });
+        });
     }
 
     async _getAllMessageReceptors(message){

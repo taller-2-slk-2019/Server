@@ -150,6 +150,35 @@ describe('"UsersController Tests"', () => {
             });
         });
 
+        describe('Get User', () => {
+            var req = mockRequest({});
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await UserController.getUser(req, res);
+            });
+
+            it('response status must be 200', async () => {
+                expect(res.status).to.have.been.calledWith(200);
+            });
+            
+            it('user must not be null', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.not.be.null;
+            });
+
+            it('user id must be correct', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('id', userProfileMock.id);
+            });
+
+            it('user must not have token', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.not.have.property('token');
+            });
+        });
+
         describe('Get', () => {
             var req = mockRequest({});
             var res;
@@ -333,11 +362,31 @@ describe('"UsersController Tests"', () => {
 
             var req = mockRequest();
             var res;
-            req.params.id = 9999999
             
             beforeEach(async () => {
                 res = mockResponse();
                 await UserController.getProfile(req, res);
+            });
+
+            it('response status must be 400', async () => { 
+                expect(res.status).to.have.been.calledWith(400);
+            });
+            
+            it('response must have an error', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('error');
+            });
+        });
+
+        describe('Get User with error', () => {
+
+            var req = mockRequest();
+            var res;
+            req.params.id = 9999999
+            
+            beforeEach(async () => {
+                res = mockResponse();
+                await UserController.getUser(req, res);
             });
 
             it('response status must be 400', async () => { 

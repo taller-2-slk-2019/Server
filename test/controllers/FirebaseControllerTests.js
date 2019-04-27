@@ -10,15 +10,8 @@ var FirebaseController = require('../../src/firebase/FirebaseController');
 
 var messageMock = require('../mocks/messageMock');
 var models = require('../../src/database/sequelize');
-var Message = models.message;
-var Channel = models.channel;
-var User = models.user;
-var Organization = models.organization;
+var TestDatabaseHelper = require('../TestDatabaseHelper');
 var FirebaseToken = models.firebaseToken;
-var { messageCreateData } = require('../data/messageData');
-var { channelCreateData } = require('../data/channelData');
-var { userCreateData } = require('../data/userData');
-var { organizationCreateData } = require('../data/organizationData');
 
 describe('"FirebaseController Tests"', () => {
     var mockTopics;
@@ -100,22 +93,14 @@ describe('"FirebaseController Tests"', () => {
         var organization;
         var channel;
         var message;
-        var organizationData = Object.create(organizationCreateData);
-        var channelData = Object.create(channelCreateData);
-        var messageData = Object.create(messageCreateData);
 
         before(async () => {
-            user1 = await User.create(userCreateData());
-            user2 = await User.create(userCreateData());
-            user3 = await User.create(userCreateData());
-            organizationData.creatorId = user1.id;
-            organization = await Organization.create(organizationData);
-            channelData.creatorId = user1.id;
-            channelData.organizationId = organization.id;
-            channel = await Channel.create(channelData);
-            messageData.senderId = user1.id;
-            messageData.channelId = channel.id;
-            message = await Message.create(messageData);
+            user1 = await TestDatabaseHelper.createUser();
+            user2 = await TestDatabaseHelper.createUser();
+            user3 = await TestDatabaseHelper.createUser();
+            organization = await TestDatabaseHelper.createOrganization([user1]);
+            channel = await TestDatabaseHelper.createChannel(user1, organization);
+            message = await TestDatabaseHelper.createChannelMessage("hello", channel, user1);
 
             await FirebaseToken.create({userId: user1.id, token: 'token11'});
             await FirebaseToken.create({userId: user2.id, token: 'token22'});
@@ -148,13 +133,11 @@ describe('"FirebaseController Tests"', () => {
     describe('Send organization invitation notification', () => {
         var user, user2;
         var organization;
-        var organizationData = Object.create(organizationCreateData);
 
         before(async () => {
-            user = await User.create(userCreateData());
-            user2 = await User.create(userCreateData());
-            organizationData.creatorId = user.id;
-            organization = await Organization.create(organizationData);
+            user = await TestDatabaseHelper.createUser();
+            user2 = await TestDatabaseHelper.createUser();
+            organization = await TestDatabaseHelper.createOrganization([user]);
 
             await FirebaseToken.create({userId: user.id, token: 'token111'});
             await FirebaseToken.create({userId: user.id, token: 'token222'});
@@ -178,6 +161,43 @@ describe('"FirebaseController Tests"', () => {
 
         it('should do nothing if no tokens are provided', async () => {
             await FirebaseController.sendOrganizationInvitationNotification(user2, organization);
+            assert.notCalled(mockUsers);
+        });
+    });
+
+    describe('Send channel invitation notification', () => {
+        var user, user2;
+        var organization;
+        var channel;
+
+        before(async () => {
+            user = await TestDatabaseHelper.createUser();
+            user2 = await TestDatabaseHelper.createUser();
+            organization = await TestDatabaseHelper.createOrganization([user]);
+            channel = await TestDatabaseHelper.createChannel(user, organization);
+
+            await FirebaseToken.create({userId: user2.id, token: 'token1111'});
+            await FirebaseToken.create({userId: user2.id, token: 'token2222'});
+        });
+
+        beforeEach(async () => {
+            mockUsers.resetHistory();
+        });
+
+        it('should send message to firebase', async () => {
+            await FirebaseController.sendChannelInvitationNotification(user2, channel);
+            assert.calledOnce(mockUsers);
+        });
+
+        it('should send message to correct user tokens', async () => {
+            await FirebaseController.sendChannelInvitationNotification(user2, channel);
+            var args = mockUsers.getCall(0).args[1];
+            expect(args).to.include('token1111');
+            expect(args).to.include('token2222');
+        });
+
+        it('should do nothing if no tokens are provided', async () => {
+            await FirebaseController.sendOrganizationInvitationNotification(user, channel);
             assert.notCalled(mockUsers);
         });
     });

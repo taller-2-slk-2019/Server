@@ -1,11 +1,11 @@
-var FirebaseController = require('../firebase/FirebaseController');
 var UserDao = require('./UserDao');
 var ChannelDao = require('./ChannelDao');
 var ConversationDao = require('./ConversationDao');
 var models = require('../database/sequelize');
 var Message = models.message;
 var Config = require('../helpers/Config');
-var { UserNotBelongsToChannelError, UserNotBelongsToConversationError, MessageNotFoundError } = require('../helpers/Errors');
+var { UserNotBelongsToChannelError, UserNotBelongsToConversationError, 
+    MessageNotFoundError, InvalidMessageDataError } = require('../helpers/Errors');
 var MessageParser = require('../helpers/MessageParser');
 var MessageNotifications = require('../controllers/MessageNotificationsController');
 
@@ -45,6 +45,22 @@ class MessageDao{
         return await this._create(msg, organization);
     }
 
+    async createForBot(msg){
+        //TODO check bot is valid
+        var organization;
+        if (Number(msg.channelId)){
+            var channel = await ChannelDao.findById(msg.channelId);
+            organization = await channel.getOrganization();
+        } else if (Number(msg.conversationId)){
+            var conversation = await ConversationDao.findById(msg.conversationId);
+            organization = await conversation.getOrganization();
+        } else {
+            throw new InvalidMessageDataError();
+        }
+        
+        return await this._create(msg, organization);
+    }
+
     async _create(msg, organization){
         if (Config.messageTypesWithText.includes(msg.type)){
             var forbiddenWords = (await organization.getForbiddenWords()).map((word) => {
@@ -55,8 +71,8 @@ class MessageDao{
         }
 
         var message = await Message.create(msg);
-        FirebaseController.sendMessage(await this.findById(message.id));
-        MessageNotifications.sendNotification(message);
+        MessageNotifications.sendNotification(await this.findById(message.id));
+        
         return message;
     }
 

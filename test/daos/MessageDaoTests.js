@@ -7,52 +7,38 @@ const { stub, match } = require('sinon');
 var SequelizeValidationError = require('../../src/database/sequelize').Sequelize.SequelizeValidationError;
 
 var MessageDao = require('../../src/daos/MessageDao');
-var FirebaseController = require('../../src/firebase/FirebaseController');
 var MessageNotificationsController = require('../../src/controllers/MessageNotificationsController');
 
 var Config = require('../../src/helpers/Config');
 var MessageParser = require('../../src/helpers/MessageParser');
 var models = require('../../src/database/sequelize');
 var Message = models.message;
-var Channel = models.channel;
 var Conversation = models.conversation;
 var ForbiddenWord = models.forbiddenWord;
-var User = models.user;
-var Organization = models.organization;
-var { UserNotBelongsToChannelError, UserNotBelongsToConversationError, MessageNotFoundError } = require('../../src/helpers/Errors');
+var TestDatabaseHelper = require('../TestDatabaseHelper');
+
+var { UserNotBelongsToChannelError, UserNotBelongsToConversationError, 
+    MessageNotFoundError, InvalidMessageDataError } = require('../../src/helpers/Errors');
 var { messageCreateData } = require('../data/messageData');
-var { conversationCreateData } = require('../data/conversationData');
-var { channelCreateData } = require('../data/channelData');
-var { userCreateData } = require('../data/userData');
-var { organizationCreateData } = require('../data/organizationData');
 
 describe('"MessageDao Tests"', () => {
     var user;
     var organization;
     var channel;
     var conversation;
-    var organizationData = Object.create(organizationCreateData);
-    var channelData = Object.create(channelCreateData);
-    var conversationData = Object.create(conversationCreateData);
     var messageData = Object.create(messageCreateData);
     var messageConvData = Object.create(messageCreateData);
-    var firebaseMock;
     var notificationsMock;
 
     before(async () => {
-        firebaseMock = stub(FirebaseController, 'sendMessage').resolves();
         notificationsMock = stub(MessageNotificationsController, 'sendNotification').resolves();
 
-        user = await User.create(userCreateData());
-        organizationData.creatorId = user.id;
-        organization = await Organization.create(organizationData);
-        channelData.creatorId = user.id;
-        channelData.organizationId = organization.id;
-        conversationData.organizationId = organization.id;
-        channel = await Channel.create(channelData);
-        await channel.setUsers([user]);
-        conversation = await Conversation.create(conversationData);
-        await conversation.setUsers([user]);
+        user = await TestDatabaseHelper.createUser();
+        var user2 = await TestDatabaseHelper.createUser();
+        organization = await TestDatabaseHelper.createOrganization([user]);
+        channel = await TestDatabaseHelper.createChannel(user, organization);
+        conversation = await TestDatabaseHelper.createConversation(user, user2, organization);
+
         messageData.senderToken = user.token;
         messageData.senderId = user.id;
         messageData.channelId = channel.id;
@@ -62,7 +48,6 @@ describe('"MessageDao Tests"', () => {
     });
 
     after(async () => {
-        firebaseMock.restore();
         notificationsMock.restore();
     });
 
@@ -123,7 +108,7 @@ describe('"MessageDao Tests"', () => {
         });
 
         it('message sender must belong to channel', async () => {
-            var user2 = await User.create(userCreateData());
+            var user2 = await TestDatabaseHelper.createUser();
             data.senderToken = user2.token;
             await expect(MessageDao.createForChannel(data)).to.eventually.be.rejectedWith(UserNotBelongsToChannelError);
         });
@@ -185,9 +170,100 @@ describe('"MessageDao Tests"', () => {
         });
 
         it('message sender must belong to conversation', async () => {
-            var user2 = await User.create(userCreateData());
+            var user2 = await TestDatabaseHelper.createUser();
             data.senderToken = user2.token;
             await expect(MessageDao.createForConversation(data)).to.eventually.be.rejectedWith(UserNotBelongsToConversationError);
+        });
+    });
+
+    describe('Create channel message for bot', () => {
+        var msg;
+        var data = Object.create(messageCreateData);
+
+        beforeEach(async () => {
+            data.bot = "pepito";
+            data.channelId = channel.id;
+            msg = await MessageDao.createForBot(data);
+        });
+
+        it('message must be created', async () => {
+            expect(msg).to.not.be.null;
+        });
+
+        it('message must have an id', async () => {
+            expect(msg).to.have.property('id');
+        });
+
+        it('message channel must be correct', async () => {
+            var msgChannel = await msg.getChannel();
+            expect(msgChannel.id).to.eq(channel.id);
+        });
+
+        it('message must not have conversation', async () => {
+            var msgConversation = await msg.getConversation();
+            expect(msgConversation).to.be.null;
+        });
+
+        it('message sender must be null', async () => {
+            var sender = await msg.getSender();
+            expect(sender).to.be.null;
+        });
+
+        it('message bot must be correct', async () => {
+            expect(msg.bot).to.eq('pepito');
+        });
+    });
+
+    describe('Create conversation message for bot', () => {
+        var msg;
+        var data = Object.create(messageCreateData);
+
+        beforeEach(async () => {
+            data.bot = "pepito";
+            data.conversationId = conversation.id;
+            msg = await MessageDao.createForBot(data);
+        });
+
+        it('message must be created', async () => {
+            expect(msg).to.not.be.null;
+        });
+
+        it('message must have an id', async () => {
+            expect(msg).to.have.property('id');
+        });
+
+        it('message conversation must be correct', async () => {
+            var msgConversation = await msg.getConversation();
+            expect(msgConversation.id).to.eq(conversation.id);
+        });
+
+        it('message must not have channel', async () => {
+            var msgChannel = await msg.getChannel();
+            expect(msgChannel).to.be.null;
+        });
+
+        it('message sender must be null', async () => {
+            var sender = await msg.getSender();
+            expect(sender).to.be.null;
+        });
+
+        it('message bot must be correct', async () => {
+            expect(msg.bot).to.eq('pepito');
+        });
+    });
+
+    describe('Create message for bot with error', () => {
+        var msg;
+        var data = Object.create(messageCreateData);
+
+        beforeEach(async () => {
+            data.bot = "pepito";
+            data.channelId = 0;
+            data.conversationId = 0;
+        });
+
+        it('should fail', async () => {
+            await expect(MessageDao.createForBot(data)).to.eventually.be.rejectedWith(InvalidMessageDataError);
         });
     });
 
@@ -255,7 +331,6 @@ describe('"MessageDao Tests"', () => {
             var messages = await MessageDao.getForChannel(channel.id, 4);
             expect(messages).to.have.length.below(Config.messagesPerPage);
         });
-        
     });
 
     describe('Get conversation messages', () => {
@@ -329,6 +404,5 @@ describe('"MessageDao Tests"', () => {
         it('throws exception if id is -1', async () => {
             await expect(MessageDao.findById(-1)).to.eventually.be.rejectedWith(MessageNotFoundError);
         });
-
     });
 });

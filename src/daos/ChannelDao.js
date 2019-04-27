@@ -1,8 +1,12 @@
 var { filter } = require('p-iteration');
+var TitoBotController = require('../controllers/TitoBotController');
+var FirebaseController = require('../firebase/FirebaseController');
 var UserDao = require('./UserDao');
 var OrganizationDao = require('./OrganizationDao');
+var ChannelStatistics = require('../models/statistics/ChannelStatistics');
 var models = require('../database/sequelize');
 var Channel = models.channel;
+var Message = models.message;
 var { ChannelNotFoundError, UserAlreadyInChannelError, UserNotBelongsToOrganizationError, 
             UserNotBelongsToChannelError } = require('../helpers/Errors');
 
@@ -22,6 +26,8 @@ class ChannelDao{
 
         var channelModel = await Channel.create(channel);
         await channelModel.addUser(user);
+
+        TitoBotController.channelCreated(channelModel);
         return channelModel;
     }
 
@@ -33,22 +39,37 @@ class ChannelDao{
         return channel;
     }
 
+    async getChannelUsers(id){
+        var channel = await this.findById(id);
+        return await channel.getUsers();
+    }
+
     async addUser(channelId, userId){
+        var user = await UserDao.findById(userId);
+        await this._addUserToChannel(channelId, user);
+    }
+
+    async addUsername(channelId, username){
+        var user = await UserDao.findByUsername(username);
+        await this._addUserToChannel(channelId, user);
+    }
+
+    async _addUserToChannel(channelId, user){
         var channel = await this.findById(channelId);
 
         var organization = await channel.getOrganization();
 
-        var user = await UserDao.findById(userId);
-
         if (await channel.hasUser(user)){
-            throw new UserAlreadyInChannelError(channelId, userId);
+            throw new UserAlreadyInChannelError(channelId, user.id);
         }
 
         if (!(await organization.hasUser(user))){
-            throw new UserNotBelongsToOrganizationError(organization.id, userId);
+            throw new UserNotBelongsToOrganizationError(organization.id, user.id);
         }
 
         await channel.addUser(user);
+        TitoBotController.userAddedToChannel(channel, user);
+        FirebaseController.sendChannelInvitationNotification(user, channel);
     }
 
     async removeUser(userId, channelId){
@@ -73,6 +94,17 @@ class ChannelDao{
         });
 
         return userChannels;
+    }
+
+    async getStatistics(channelId){
+        await this.findById(channelId);
+
+        var stats = new ChannelStatistics();
+
+        var messageCount = await Message.count({where: {channelId: channelId}});
+        stats.setMessageCount(messageCount);
+
+        return stats;
     }
 
 }

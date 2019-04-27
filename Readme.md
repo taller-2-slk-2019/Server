@@ -27,6 +27,17 @@ https://coveralls.io/github/taller-2-slk-2019/Server
 
 - Ejecucion local: sudo docker-compose up
 
+### Bots
+
+Cuando son mencionados en un mensaje, los bots recibirán una llamada POST con el siguiente formato:
+
+{
+    bot: string,
+    message: string,
+    channelId: integer,
+    senderId: integer
+};
+
 ### Instalación
 
 - Instalar Node.js

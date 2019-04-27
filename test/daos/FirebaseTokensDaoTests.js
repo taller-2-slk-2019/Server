@@ -6,9 +6,9 @@ chai.use(chaiAsPromised);
 var FirebaseTokensDao = require('../../src/firebase/FirebaseTokensDao');
 
 var models = require('../../src/database/sequelize');
-var User = models.user;
+var TestDatabaseHelper = require('../TestDatabaseHelper');
 var FirebaseToken = models.firebaseToken;
-var { userCreateData } = require('../data/userData');
+
 
 describe('"FirebaseTokensDao Tests"', () => {
 
@@ -19,9 +19,9 @@ describe('"FirebaseTokensDao Tests"', () => {
         var result;
 
         before(async () => {
-            user1 = await User.create(userCreateData());
-            user2 = await User.create(userCreateData());
-            user3 = await User.create(userCreateData());
+            user1 = await TestDatabaseHelper.createUser();
+            user2 = await TestDatabaseHelper.createUser();
+            user3 = await TestDatabaseHelper.createUser();
             
             await FirebaseToken.create({userId: user1.id, token: 'token1'});
             await FirebaseToken.create({userId: user2.id, token: 'token2'});
@@ -48,7 +48,7 @@ describe('"FirebaseTokensDao Tests"', () => {
         var user;
 
         before(async () => {
-            user = await User.create(userCreateData());
+            user = await TestDatabaseHelper.createUser();
             await FirebaseTokensDao.addToken(user.token, "mytoken12345");
         });
 
@@ -80,7 +80,7 @@ describe('"FirebaseTokensDao Tests"', () => {
         var user;
 
         before(async () => {
-            user = await User.create(userCreateData());
+            user = await TestDatabaseHelper.createUser();
         });
 
         beforeEach(async () => {

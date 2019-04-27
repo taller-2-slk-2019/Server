@@ -8,13 +8,12 @@ var SequelizeValidationError = require('../../src/database/sequelize').Sequelize
 var UserDao = require('../../src/daos/UserDao');
 var OrganizationDao = require('../../src/daos/OrganizationDao');
 
+var TestDatabaseHelper = require('../TestDatabaseHelper');
 
 var models = require('../../src/database/sequelize');
 var User = models.user;
-var Organization = models.organization;
 var { UserNotFoundError } = require('../../src/helpers/Errors');
 var { userCreateData } = require('../data/userData');
-var { organizationCreateData } = require('../data/organizationData');
 
 describe('"UserDao Tests"', () => {
 
@@ -78,7 +77,7 @@ describe('"UserDao Tests"', () => {
         var user;
 
         before(async () => {
-            expected = await User.create(userCreateData());
+            expected = await TestDatabaseHelper.createUser();
             user = await UserDao.findById(expected.id);
         });
 
@@ -114,7 +113,7 @@ describe('"UserDao Tests"', () => {
         var user;
 
         before(async () => {
-            original = await User.create(userCreateData());
+            original = await TestDatabaseHelper.createUser();
             await UserDao.update(edited, original.token);
             user = await User.findByPk(original.id);
         });
@@ -149,14 +148,13 @@ describe('"UserDao Tests"', () => {
     });
 
     describe('Find by email', () => {
-        var data = Object.create(userCreateData());
-        data.email = "pepeTestFindEmail@unique.gmail.com";
         var expected;
         var user;
+        var email = "pepeTestFindEmail@unique.gmail.com";
 
         before(async () => {
-            expected = await User.create(data);
-            user = await UserDao.findByEmail(data.email);
+            expected = await TestDatabaseHelper.createUser(email);
+            user = await UserDao.findByEmail(email);
         });
 
         it('user must not be null', async () => {
@@ -168,13 +166,12 @@ describe('"UserDao Tests"', () => {
         });
         
         it('user email must be correct', async () => {
-            expect(user).to.have.property('email', data.email);
+            expect(user).to.have.property('email', email);
         });
 
         it('throws exception if email does not exist', async () => {
             await expect(UserDao.findByEmail("fdsfsdf@unexistantEmail.gmail.blabla.com")).to.eventually.be.rejectedWith(UserNotFoundError);
         });
-
     });
 
     describe('Find by token', () => {
@@ -198,6 +195,30 @@ describe('"UserDao Tests"', () => {
 
         it('throws exception if token does not exist', async () => {
             await expect(UserDao.findByToken("fdsfsdf@unexistantToken.gmail.blabla.com")).to.eventually.be.rejectedWith(UserNotFoundError);
+        });
+    });
+
+    describe('Find by username', () => {
+        var data = Object.create(userCreateData());
+        data.username = "uniqueUSername1234566789";
+        var expected;
+        var user;
+
+        before(async () => {
+            expected = await User.create(data);
+            user = await UserDao.findByUsername(data.username);
+        });
+
+        it('user must not be null', async () => {
+            expect(user).to.not.be.null;
+        });
+        
+        it('user must have correct id', async () => {
+            expect(user).to.have.property('id', expected.id);
+        });
+
+        it('throws exception if token does not exist', async () => {
+            await expect(UserDao.findByUsername("fdsfsdf@unexistantToken.gmail.blabla.com")).to.eventually.be.rejectedWith(UserNotFoundError);
         });
     });
 
@@ -226,13 +247,12 @@ describe('"UserDao Tests"', () => {
     });
 
     describe('Find user invitations', () => {
-        var data = Object.create(userCreateData());
         var user;
         var org;
 
         before(async () => {
-            user = await User.create(data);
-            org = await Organization.create(organizationCreateData);
+            user = await TestDatabaseHelper.createUser()
+            org = await TestDatabaseHelper.createOrganization();
         });
 
         beforeEach(async () => {
@@ -258,13 +278,12 @@ describe('"UserDao Tests"', () => {
     });
 
     describe('Delete user invitation', () => {
-        var data = Object.create(userCreateData());
         var user;
         var org;
 
         before(async () => {
-            user = await User.create(data);
-            org = await Organization.create(organizationCreateData);
+            user = await TestDatabaseHelper.createUser()
+            org = await TestDatabaseHelper.createOrganization();
         });
 
         beforeEach(async () => {
