@@ -9,13 +9,14 @@ chai.use(sinonChai);
 var MessageNotificationsController = require('../../src/controllers/MessageNotificationsController');
 var FirebaseController = require('../../src/firebase/FirebaseController');
 var TitoBotController = require('../../src/controllers/TitoBotController');
+var ChannelDao = require('../../src/daos/ChannelDao');
 
 var TestDatabaseHelper = require('../TestDatabaseHelper');
 var messageMock = require('../mocks/messageMock');
 
 describe('"MessageNotificationsController Tests"', () => {
-    var mock, mock2, firebaseMock;
-    var user1, user2, user3;
+    var mock, mock2, mock3, firebaseMock;
+    var user1, user2, user3, user4;
     var organization;
     var channel;
     var message;
@@ -24,10 +25,12 @@ describe('"MessageNotificationsController Tests"', () => {
         firebaseMock = stub(FirebaseController, 'sendMessage').resolves();
         mock = stub(FirebaseController, 'sendChannelMessageNotification').resolves();
         mock2 = stub(TitoBotController, 'sendMessage').resolves();
+        mock3 = stub(ChannelDao, 'addUsername').resolves();
 
         user1 = await TestDatabaseHelper.createUser();
         user2 = await TestDatabaseHelper.createUser();
         user3 = await TestDatabaseHelper.createUser();
+        user4 = await TestDatabaseHelper.createUser();
         organization = await TestDatabaseHelper.createOrganization([user1]);
         channel = await TestDatabaseHelper.createChannel(user1, organization);
         await channel.setUsers([user1, user2, user3]);
@@ -36,12 +39,14 @@ describe('"MessageNotificationsController Tests"', () => {
     beforeEach(async () => {
         mock.resetHistory();
         mock2.resetHistory();
+        mock3.resetHistory();
     });
 
     after(async () => {
         firebaseMock.restore();
         mock.restore();
         mock2.restore();
+        mock3.restore();
     });
 
     describe('Send Message Notification', () => { 
@@ -148,6 +153,35 @@ describe('"MessageNotificationsController Tests"', () => {
             message = await TestDatabaseHelper.createChannelMessage("@titon hello", channel, user1);
             await MessageNotificationsController.sendNotification(message);
             assert.notCalled(mock2);
+        });
+    });
+
+    describe('Add mentioned users to channel if they do not belong', () => {
+        beforeEach(async () => {
+            mock.resetHistory();
+            mock3.resetHistory();
+            message = await TestDatabaseHelper.createChannelMessage("@" + user4.username, channel, user1);
+            await MessageNotificationsController.sendNotification(message);
+        });
+
+        it('must not send notification to user4', async () => {
+            var users = mock.getCall(0).args[1];
+            expect(users).to.not.include(user4.username);
+        });
+
+        it('must add user to channel', async () => {
+            var addedUser = mock3.getCall(0).args[1];
+            expect(addedUser).to.eq(user4.username);
+        });
+
+        it('should not fail if can not add user to channel', async () => {
+            var msg = await TestDatabaseHelper.createChannelMessage("@lalala", channel, user1);
+            mock3.rejects();
+            mock3.resetHistory();
+            await MessageNotificationsController.sendNotification(msg);
+            var addedUser = mock3.getCall(0).args[1];
+            expect(addedUser).to.eq("lalala");
+            mock3.resolves();
         });
     });
 });

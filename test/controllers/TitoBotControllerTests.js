@@ -5,25 +5,32 @@ chai.use(chaiAsPromised);
 const { stub, assert } = require('sinon');
 const sinonChai = require('sinon-chai');
 chai.use(sinonChai);
+var axios = require('axios');
+var AxiosMock = require('axios-mock-adapter');
 
 var TitoBotController = require('../../src/controllers/TitoBotController');
 var BotsController = require('../../src/controllers/BotsController');
+var TestDatabaseHelper = require('../TestDatabaseHelper');
 
 var messageMock = require('../mocks/messageMock');
 
 describe('"TitoBotController Tests"', () => {
-    var mock;
+    var mock, mock2;
 
     before(async () => {
         mock = stub(BotsController, 'sendMessageToBot').resolves();
+        mock2 = new AxiosMock(axios);
+        mock2.onPost(TitoBotController.titoBotBaseUrl + 'welcome').reply(200, {});
     });
 
     beforeEach(async () => {
         mock.resetHistory();
+        mock2.reset();
     });
 
     after(async () => {
         mock.restore();
+        mock2.restore();
     });
 
     describe('Send Message', () => {
@@ -49,6 +56,33 @@ describe('"TitoBotController Tests"', () => {
         it('should send message with message', async () => {
             var args = mock.getCall(0).args[1];
             expect(args.id).to.eq(messageMock.id);
+        });
+    });
+
+    describe('User Added To Channel', () => {
+        var user, organization, channel;
+
+        before(async () => {
+            user = await TestDatabaseHelper.createUser();
+            organization = await TestDatabaseHelper.createOrganization([user]);
+            channel = await TestDatabaseHelper.createChannel(user, organization);
+        });
+
+        beforeEach(async () => {
+            mock2.reset();
+            await TitoBotController.userAddedToChannel(channel, user);
+        });
+
+        it('should send message to bot', async () => {
+            expect(mock2.history.post.length).to.eq(1);
+        });
+
+        it('should send message with channelId', async () => {
+            expect(JSON.parse(mock2.history.post[0].data).channelId).to.eq(channel.id);
+        });
+
+        it('should send message with userId', async () => {
+            expect(JSON.parse(mock2.history.post[0].data).userId).to.eq(user.id);
         });
     });
 });
