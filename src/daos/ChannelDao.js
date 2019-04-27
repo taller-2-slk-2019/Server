@@ -26,6 +26,8 @@ class ChannelDao{
 
         var channelModel = await Channel.create(channel);
         await channelModel.addUser(user);
+
+        TitoBotController.channelCreated(channelModel);
         return channelModel;
     }
 

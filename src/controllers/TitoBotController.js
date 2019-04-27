@@ -23,11 +23,38 @@ class TitoBotController {
             userId: user.id
         };
 
-        var url = this.titoBotBaseUrl + 'welcome';
-
+        var url = 'welcome';
         logger.info(`Tito bot: sending welcome to user ${user.id} in channel ${channel.id}`);
-        axios.post(url, data).catch(err => {
-            logger.error('Failed welcome message to tito bot');
+        this._sendToTito(url, data);
+    }
+
+    async channelCreated(channel){
+        var data = {
+            bot: this.titoBotName,
+            channelId: channel.id,
+            userId: channel.creatorId
+        };
+
+        var url = 'channel';
+        logger.info(`Tito bot: sending creation for channel ${channel.id}`);
+        this._sendToTito(url, data);
+    }
+
+    async conversationCreated(conversation, user){
+        var data = {
+            bot: this.titoBotName,
+            conversationId: conversation.id,
+            userId: user.id
+        };
+
+        var url = 'conversation';
+        logger.info(`Tito bot: sending creation for conversation ${conversation.id}`);
+        this._sendToTito(url, data);
+    }
+
+    async _sendToTito(url, data){
+        axios.post(this.titoBotBaseUrl + url, data).catch(err => {
+            logger.error('Failed message to tito bot: ' + url);
             logger.error(err);
         });
     }

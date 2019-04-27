@@ -2,6 +2,9 @@ const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised');
 const expect = chai.expect;
 chai.use(chaiAsPromised);
+const { stub, assert } = require('sinon');
+const sinonChai = require('sinon-chai');
+chai.use(sinonChai);
 
 var SequelizeValidationError = require('../../src/database/sequelize').Sequelize.SequelizeValidationError;
 
@@ -10,28 +13,36 @@ var ConversationDao = require('../../src/daos/ConversationDao');
 var models = require('../../src/database/sequelize');
 var Conversation = models.conversation;
 var TestDatabaseHelper = require('../TestDatabaseHelper');
+var TitoBotController = require('../../src/controllers/TitoBotController');
 
 var { ConversationNotFoundError, UserNotBelongsToOrganizationError, InvalidConversationError } = require('../../src/helpers/Errors');
 var { conversationCreateData } = require('../data/conversationData');
 
 describe('"ConversationDao Tests"', () => {
+    var titoMock;
     var user;
     var user2;
     var organization;
     var conversationData = Object.create(conversationCreateData);
 
     before(async () => {
+        titoMock = stub(TitoBotController, 'conversationCreated').resolves();
+
         user = await TestDatabaseHelper.createUser();
         user2 = await TestDatabaseHelper.createUser();
         organization = await TestDatabaseHelper.createOrganization([user, user2]);
         conversationData.organizationId = organization.id;
     });
 
+    after(async () => {
+        titoMock.restore();
+    });
 
     describe('Create conversation', () => {
         var conversation;
 
         before(async () => {
+            titoMock.resetHistory();
             conversation = await ConversationDao.create(organization.id, user2.id, user.token);
         });
 
@@ -61,6 +72,10 @@ describe('"ConversationDao Tests"', () => {
         it('conversation for same users must return the same', async () => {
             var conversation2 = await ConversationDao.create(organization.id, user2.id, user.token);
             expect(conversation2).to.have.property('id', conversation.id);
+        });
+
+        it('should inform tito', async () => {
+            assert.calledOnce(titoMock);
         });
     });
 

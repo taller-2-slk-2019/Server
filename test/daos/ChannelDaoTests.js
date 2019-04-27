@@ -21,7 +21,7 @@ var { UserNotFoundError, OrganizationNotFoundError, ChannelNotFoundError, UserAl
 var { channelCreateData } = require('../data/channelData');
 
 describe('"ChannelDao Tests"', () => {
-    var titoMock;
+    var titoMock, titoMock2;
     var firebaseMock;
 
     var user;
@@ -30,6 +30,7 @@ describe('"ChannelDao Tests"', () => {
 
     before(async () => {
         titoMock = stub(TitoBotController, 'userAddedToChannel').resolves();
+        titoMock2 = stub(TitoBotController, 'channelCreated').resolves();
         firebaseMock = stub(FirebaseController, 'sendChannelInvitationNotification').resolves();
 
         user = await TestDatabaseHelper.createUser();
@@ -40,6 +41,7 @@ describe('"ChannelDao Tests"', () => {
 
     after(async () => {
         titoMock.restore();
+        titoMock2.restore();
         firebaseMock.restore();
     });
 
@@ -48,6 +50,7 @@ describe('"ChannelDao Tests"', () => {
         var channel;
 
         beforeEach(async () => {
+            titoMock2.resetHistory();
             channel = await ChannelDao.create(channelData);
         });
 
@@ -77,6 +80,10 @@ describe('"ChannelDao Tests"', () => {
         it('creator must belong to channel', async () => {
             var users = await channel.getUsers();
             expect(users[0].id).to.eq(user.id);
+        });
+
+        it('should inform tito', async () => {
+            assert.calledOnce(titoMock2);
         });
     });
 

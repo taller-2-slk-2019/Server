@@ -21,6 +21,8 @@ describe('"TitoBotController Tests"', () => {
         mock = stub(BotsController, 'sendMessageToBot').resolves();
         mock2 = new AxiosMock(axios);
         mock2.onPost(TitoBotController.titoBotBaseUrl + 'welcome').reply(200, {});
+        mock2.onPost(TitoBotController.titoBotBaseUrl + 'channel').reply(200, {});
+        mock2.onPost(TitoBotController.titoBotBaseUrl + 'conversation').reply(200, {});
     });
 
     beforeEach(async () => {
@@ -79,6 +81,61 @@ describe('"TitoBotController Tests"', () => {
 
         it('should send message with channelId', async () => {
             expect(JSON.parse(mock2.history.post[0].data).channelId).to.eq(channel.id);
+        });
+
+        it('should send message with userId', async () => {
+            expect(JSON.parse(mock2.history.post[0].data).userId).to.eq(user.id);
+        });
+    });
+
+    describe('Channel created', () => {
+        var user, organization, channel;
+
+        before(async () => {
+            user = await TestDatabaseHelper.createUser();
+            organization = await TestDatabaseHelper.createOrganization([user]);
+            channel = await TestDatabaseHelper.createChannel(user, organization);
+        });
+
+        beforeEach(async () => {
+            mock2.reset();
+            await TitoBotController.channelCreated(channel);
+        });
+
+        it('should send message to bot', async () => {
+            expect(mock2.history.post.length).to.eq(1);
+        });
+
+        it('should send message with channelId', async () => {
+            expect(JSON.parse(mock2.history.post[0].data).channelId).to.eq(channel.id);
+        });
+
+        it('should send message with userId', async () => {
+            expect(JSON.parse(mock2.history.post[0].data).userId).to.eq(user.id);
+        });
+    });
+
+    describe('Conversation created', () => {
+        var user, user2, organization, conversation;
+
+        before(async () => {
+            user = await TestDatabaseHelper.createUser();
+            user2 = await TestDatabaseHelper.createUser();
+            organization = await TestDatabaseHelper.createOrganization([user]);
+            conversation = await TestDatabaseHelper.createConversation(user, user2, organization);
+        });
+
+        beforeEach(async () => {
+            mock2.reset();
+            await TitoBotController.conversationCreated(conversation, user);
+        });
+
+        it('should send message to bot', async () => {
+            expect(mock2.history.post.length).to.eq(1);
+        });
+
+        it('should send message with conversationId', async () => {
+            expect(JSON.parse(mock2.history.post[0].data).conversationId).to.eq(conversation.id);
         });
 
         it('should send message with userId', async () => {
