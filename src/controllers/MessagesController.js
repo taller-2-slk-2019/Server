@@ -72,6 +72,7 @@ class MessagesController{
         try {
             await MessageDao.createForBot(data);
             logger.info('Received message from bot: ' + data.bot + " in channel: " + data.channelId);
+            logger.info(data);
             sendEmptySuccessResponse(res);
             
         } catch (err) {
