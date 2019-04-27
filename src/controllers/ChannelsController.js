@@ -37,6 +37,18 @@ class ChannelsController{
         }
     }
 
+    async getChannel(req, res){
+        var id = req.params.id;
+
+        try{
+            var channel  = await ChannelDao.findById(id);
+            sendSuccessResponse(res, channel);
+            
+        } catch (err){
+            sendErrorResponse(res, err);
+        }
+    }
+
     async addUser(req, res){
         var channelId = req.params.id;
         var userId = req.body.userId;

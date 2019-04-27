@@ -5,6 +5,8 @@ var channelsController = require('../controllers/ChannelsController');
 
 router.get('/', channelsController.get);
 
+router.get('/:id', channelsController.getChannel);
+
 router.post('/', channelsController.create);
 
 router.post('/:id/users', channelsController.addUser);

@@ -19,12 +19,14 @@ describe('"ChannelsController Tests"', () => {
         var mock2;
         var mock3;
         var mock4;
+        var mock5;
 
         before(async () => {
             mock1 = stub(ChannelDao, 'create').resolves(channelDataMock);
             mock2 = stub(ChannelDao, 'addUser').resolves();
             mock3 = stub(ChannelDao, 'removeUser').resolves();
             mock4 = stub(ChannelDao, 'get').resolves([channelDataMock, channelDataMock, channelDataMock]);
+            mock5 = stub(ChannelDao, 'findById').resolves(channelDataMock);
         });
 
         after(async () => {
@@ -32,6 +34,7 @@ describe('"ChannelsController Tests"', () => {
             mock2.restore();
             mock3.restore();
             mock4.restore();
+            mock5.restore();
         });
 
         describe('Create channel', () => {
@@ -120,6 +123,30 @@ describe('"ChannelsController Tests"', () => {
             });
         });
 
+        describe('Get channel', () => {
+            var req = mockRequest();
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await ChannelsController.getChannel(req, res);
+            });
+
+            it('response status must be 200', async () => {
+                expect(res.status).to.have.been.calledWith(200);
+            });
+            
+            it('channel must not be null', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.not.be.null;
+            });
+
+            it('channel id must be correct', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('id', channelDataMock.id);
+            });
+        });
+
     });
 
     describe('Methods with errors', () => {
@@ -127,12 +154,14 @@ describe('"ChannelsController Tests"', () => {
         var mock2;
         var mock3;
         var mock4;
+        var mock5;
 
         before(async () => {
             mock1 = stub(ChannelDao, 'create').rejects();
             mock2 = stub(ChannelDao, 'addUser').rejects();
             mock3 = stub(ChannelDao, 'removeUser').rejects();
             mock4 = stub(ChannelDao, 'get').rejects();
+            mock5 = stub(ChannelDao, 'findById').rejects();
         });
 
         after(async () => {
@@ -140,6 +169,7 @@ describe('"ChannelsController Tests"', () => {
             mock2.restore();
             mock3.restore();
             mock4.restore();
+            mock5.restore();
         });
 
 
@@ -219,5 +249,23 @@ describe('"ChannelsController Tests"', () => {
             });
         });
 
+        describe('Get channel with error', () => {
+            var req = mockRequest();
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await ChannelsController.getChannel(req, res);
+            });
+
+            it('response status must be 400', async () => {
+                expect(res.status).to.have.been.calledWith(400);
+            });
+
+            it('response must have an error', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('error');
+            });
+        });
     });
 });
