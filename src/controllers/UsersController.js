@@ -1,6 +1,7 @@
 var logger = require('logops');
 var UserDao = require('../daos/UserDao');
 var OrganizationDao = require('../daos/OrganizationDao');
+const MessageDao = require('../daos/MessageDao');
 var { sendSuccessResponse, sendErrorResponse, sendEmptySuccessResponse } = require('../helpers/ResponseHelper');
 var { InvalidLocationError } = require('../helpers/Errors');
 var Token = require('../helpers/Token');
@@ -26,7 +27,7 @@ class UsersController{
             var user = await UserDao.create(data);
             logger.info("User created: " + user.id);
             sendSuccessResponse(res, user);
-            
+
         } catch (err){
             sendErrorResponse(res, err);
         }
@@ -54,9 +55,31 @@ class UsersController{
                         invitedAt: invitation.organizationUserInvitation.createdAt
                        };
             });
-            
+
             sendSuccessResponse(res, result);
         } catch (err){
+            sendErrorResponse(res, err);
+        }
+    }
+
+    async getStats(req, res) {
+        var userToken = req.query.userToken;
+
+        try {
+            const userOrganizations = OrganizationDao.findForUser(userToken);
+            const userMessages = MessageDao.findAllByUser(userToken);
+
+            Promise.all([
+                userOrganizations.catch(error => {
+                    return error;
+                }),
+                userMessages.catch(error => {
+                    return error;
+                }),
+            ]).then(results => {
+                sendSuccessResponse(res, results);
+            });
+        } catch (err) {
             sendErrorResponse(res, err);
         }
     }
@@ -82,7 +105,7 @@ class UsersController{
             sendErrorResponse(res, err);
         }
     }
-    
+
     async updateProfile(req, res) {
         var data = {
             name: req.body.name,
@@ -116,7 +139,7 @@ class UsersController{
             await UserDao.update(data, token);
             logger.info("Location from user " + token + " updated");
             sendEmptySuccessResponse(res);
-            
+
         } catch (err){
             sendErrorResponse(res, err);
         }

@@ -70,6 +70,15 @@ class MessageDao{
         return await this._get({ conversationId: conversation.id }, offset);
     }
 
+    async findAllByUser(userId) {
+
+        return Message.findAll({
+            where: {
+                sender: userId
+            }
+        });
+    }
+
     async _get(where, offset){
         var limit = Config.messagesPerPage;
 
