@@ -1,5 +1,6 @@
 var models = require('../src/database/sequelize');
 var User = models.user;
+var AdminUser = models.adminUser;
 var Organization = models.organization;
 var Channel = models.channel;
 var Conversation = models.conversation;
@@ -8,6 +9,7 @@ var Message = models.message;
 var { forEach } = require('p-iteration');
 
 const { userCreateData } = require('./data/userData');
+const { adminUserCreateData } = require('./data/adminUserData');
 const { organizationCreateData } = require('./data/organizationData');
 var { channelCreateData } = require('./data/channelData');
 var { conversationCreateData } = require('./data/conversationData');
@@ -21,6 +23,12 @@ class TestDatabaseHelper {
             data.email = email;
         }
         return await User.create(data)
+    }
+
+    async createAdminUser(username = 'admin') {
+        var data = Object.create(adminUserCreateData());
+        data.username = username;
+        return await AdminUser.create(data)
     }
 
     async createOrganization(users = []) {

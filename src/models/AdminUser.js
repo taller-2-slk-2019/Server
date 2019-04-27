@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
     token: { type: DataTypes.STRING, allowNull: false, validate: { notNull: true } },
   }, {
     defaultScope: {
-      attributes: { exclude: ['token', 'password'] }
+      attributes: { exclude: ['password'] }
     }
   });
 
