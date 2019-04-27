@@ -4,7 +4,8 @@ var ConversationDao = require('./ConversationDao');
 var models = require('../database/sequelize');
 var Message = models.message;
 var Config = require('../helpers/Config');
-var { UserNotBelongsToChannelError, UserNotBelongsToConversationError, MessageNotFoundError } = require('../helpers/Errors');
+var { UserNotBelongsToChannelError, UserNotBelongsToConversationError, 
+    MessageNotFoundError, InvalidMessageDataError } = require('../helpers/Errors');
 var MessageParser = require('../helpers/MessageParser');
 var MessageNotifications = require('../controllers/MessageNotificationsController');
 
@@ -46,8 +47,17 @@ class MessageDao{
 
     async createForBot(msg){
         //TODO check bot is valid
-        var channel = await ChannelDao.findById(msg.channelId);
-        var organization = await channel.getOrganization();
+        var organization;
+        if (Number(msg.channelId)){
+            var channel = await ChannelDao.findById(msg.channelId);
+            organization = await channel.getOrganization();
+        } else if (Number(msg.conversationId)){
+            var conversation = await ConversationDao.findById(msg.conversationId);
+            organization = await conversation.getOrganization();
+        } else {
+            throw new InvalidMessageDataError();
+        }
+        
         return await this._create(msg, organization);
     }
 

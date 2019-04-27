@@ -80,8 +80,29 @@ describe('"MessagesController Tests"', () => {
             });
         });
 
-        describe('Create Message for bot', () => {
+        describe('Create channel Message for bot', () => {
             var req = mockRequest();
+            req.body.channelId = 1;
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await MessagesController.createBotMessage(req, res);
+            });
+
+            it('response status must be 204', async () => {
+                expect(res.status).to.have.been.calledWith(204);
+            });
+
+            it('response body must be null', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.be.undefined;
+            });
+        });
+
+        describe('Create conversation Message for bot', () => {
+            var req = mockRequest();
+            req.body.conversationId = 1;
             var res;
 
             beforeEach(async () => {

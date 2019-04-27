@@ -66,12 +66,14 @@ class MessagesController{
             type: Config.messageTypesWithText[0],
             data: req.body.message,
             bot: req.body.bot,
-            channelId: req.body.channelId
+            channelId: req.body.channelId,
+            conversationId: req.body.conversationId
         };
 
         try {
             await MessageDao.createForBot(data);
-            logger.info('Received message from bot: ' + data.bot + " in channel: " + data.channelId);
+            logger.info(`Received message from bot ${data.bot} in 
+                ${data.channelId ? 'channel ' + data.channelId : 'conversation ' + data.conversationId}`);
             logger.info(data);
             sendEmptySuccessResponse(res);
             

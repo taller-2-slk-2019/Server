@@ -17,7 +17,8 @@ var Conversation = models.conversation;
 var ForbiddenWord = models.forbiddenWord;
 var TestDatabaseHelper = require('../TestDatabaseHelper');
 
-var { UserNotBelongsToChannelError, UserNotBelongsToConversationError, MessageNotFoundError } = require('../../src/helpers/Errors');
+var { UserNotBelongsToChannelError, UserNotBelongsToConversationError, 
+    MessageNotFoundError, InvalidMessageDataError } = require('../../src/helpers/Errors');
 var { messageCreateData } = require('../data/messageData');
 
 describe('"MessageDao Tests"', () => {
@@ -175,7 +176,7 @@ describe('"MessageDao Tests"', () => {
         });
     });
 
-    describe('Create message for bot', () => {
+    describe('Create channel message for bot', () => {
         var msg;
         var data = Object.create(messageCreateData);
 
@@ -210,6 +211,59 @@ describe('"MessageDao Tests"', () => {
 
         it('message bot must be correct', async () => {
             expect(msg.bot).to.eq('pepito');
+        });
+    });
+
+    describe('Create conversation message for bot', () => {
+        var msg;
+        var data = Object.create(messageCreateData);
+
+        beforeEach(async () => {
+            data.bot = "pepito";
+            data.conversationId = conversation.id;
+            msg = await MessageDao.createForBot(data);
+        });
+
+        it('message must be created', async () => {
+            expect(msg).to.not.be.null;
+        });
+
+        it('message must have an id', async () => {
+            expect(msg).to.have.property('id');
+        });
+
+        it('message conversation must be correct', async () => {
+            var msgConversation = await msg.getConversation();
+            expect(msgConversation.id).to.eq(conversation.id);
+        });
+
+        it('message must not have channel', async () => {
+            var msgChannel = await msg.getChannel();
+            expect(msgChannel).to.be.null;
+        });
+
+        it('message sender must be null', async () => {
+            var sender = await msg.getSender();
+            expect(sender).to.be.null;
+        });
+
+        it('message bot must be correct', async () => {
+            expect(msg.bot).to.eq('pepito');
+        });
+    });
+
+    describe('Create message for bot with error', () => {
+        var msg;
+        var data = Object.create(messageCreateData);
+
+        beforeEach(async () => {
+            data.bot = "pepito";
+            data.channelId = 0;
+            data.conversationId = 0;
+        });
+
+        it('should fail', async () => {
+            await expect(MessageDao.createForBot(data)).to.eventually.be.rejectedWith(InvalidMessageDataError);
         });
     });
 
