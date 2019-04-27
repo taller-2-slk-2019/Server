@@ -14,13 +14,14 @@ var TestDatabaseHelper = require('../TestDatabaseHelper');
 var messageMock = require('../mocks/messageMock');
 
 describe('"MessageNotificationsController Tests"', () => {
-    var mock, mock2;
+    var mock, mock2, firebaseMock;
     var user1, user2, user3;
     var organization;
     var channel;
     var message;
 
     before(async () => {
+        firebaseMock = stub(FirebaseController, 'sendMessage').resolves();
         mock = stub(FirebaseController, 'sendChannelMessageNotification').resolves();
         mock2 = stub(TitoBotController, 'sendMessage').resolves();
 
@@ -38,6 +39,7 @@ describe('"MessageNotificationsController Tests"', () => {
     });
 
     after(async () => {
+        firebaseMock.restore();
         mock.restore();
         mock2.restore();
     });

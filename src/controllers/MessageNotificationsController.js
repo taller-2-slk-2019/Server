@@ -7,8 +7,10 @@ var Config = require('../helpers/Config');
 class MessageNotificationsController {
 
     async sendNotification(message){
-        if (message.conversationId || !Config.messageTypesWithText.includes(message.type)){
-            //Don't mention users in conversations
+        await FirebaseController.sendMessage(message);
+
+        if (message.bot || message.conversationId || !Config.messageTypesWithText.includes(message.type)){
+            //Don't mention users in conversations or bot's messages
             return;
         }
 

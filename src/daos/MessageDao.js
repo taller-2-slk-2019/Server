@@ -1,4 +1,3 @@
-var FirebaseController = require('../firebase/FirebaseController');
 var UserDao = require('./UserDao');
 var ChannelDao = require('./ChannelDao');
 var ConversationDao = require('./ConversationDao');
@@ -62,11 +61,8 @@ class MessageDao{
         }
 
         var message = await Message.create(msg);
-        FirebaseController.sendMessage(await this.findById(message.id));
-
-        if (!msg.bot){
-            MessageNotifications.sendNotification(message);
-        }
+        MessageNotifications.sendNotification(await this.findById(message.id));
+        
         return message;
     }
 
