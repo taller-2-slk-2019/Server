@@ -164,4 +164,41 @@ describe('"FirebaseController Tests"', () => {
             assert.notCalled(mockUsers);
         });
     });
+
+    describe('Send channel invitation notification', () => {
+        var user, user2;
+        var organization;
+        var channel;
+
+        before(async () => {
+            user = await TestDatabaseHelper.createUser();
+            user2 = await TestDatabaseHelper.createUser();
+            organization = await TestDatabaseHelper.createOrganization([user]);
+            channel = await TestDatabaseHelper.createChannel(user, organization);
+
+            await FirebaseToken.create({userId: user2.id, token: 'token1111'});
+            await FirebaseToken.create({userId: user2.id, token: 'token2222'});
+        });
+
+        beforeEach(async () => {
+            mockUsers.resetHistory();
+        });
+
+        it('should send message to firebase', async () => {
+            await FirebaseController.sendChannelInvitationNotification(user2, channel);
+            assert.calledOnce(mockUsers);
+        });
+
+        it('should send message to correct user tokens', async () => {
+            await FirebaseController.sendChannelInvitationNotification(user2, channel);
+            var args = mockUsers.getCall(0).args[1];
+            expect(args).to.include('token1111');
+            expect(args).to.include('token2222');
+        });
+
+        it('should do nothing if no tokens are provided', async () => {
+            await FirebaseController.sendOrganizationInvitationNotification(user, channel);
+            assert.notCalled(mockUsers);
+        });
+    });
 });

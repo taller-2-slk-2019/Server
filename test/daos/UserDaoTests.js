@@ -172,7 +172,6 @@ describe('"UserDao Tests"', () => {
         it('throws exception if email does not exist', async () => {
             await expect(UserDao.findByEmail("fdsfsdf@unexistantEmail.gmail.blabla.com")).to.eventually.be.rejectedWith(UserNotFoundError);
         });
-
     });
 
     describe('Find by token', () => {
@@ -196,6 +195,30 @@ describe('"UserDao Tests"', () => {
 
         it('throws exception if token does not exist', async () => {
             await expect(UserDao.findByToken("fdsfsdf@unexistantToken.gmail.blabla.com")).to.eventually.be.rejectedWith(UserNotFoundError);
+        });
+    });
+
+    describe('Find by username', () => {
+        var data = Object.create(userCreateData());
+        data.username = "uniqueUSername1234566789";
+        var expected;
+        var user;
+
+        before(async () => {
+            expected = await User.create(data);
+            user = await UserDao.findByUsername(data.username);
+        });
+
+        it('user must not be null', async () => {
+            expect(user).to.not.be.null;
+        });
+        
+        it('user must have correct id', async () => {
+            expect(user).to.have.property('id', expected.id);
+        });
+
+        it('throws exception if token does not exist', async () => {
+            await expect(UserDao.findByUsername("fdsfsdf@unexistantToken.gmail.blabla.com")).to.eventually.be.rejectedWith(UserNotFoundError);
         });
     });
 
