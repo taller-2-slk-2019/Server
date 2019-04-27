@@ -33,6 +33,11 @@ class ChannelDao{
         return channel;
     }
 
+    async getChannelUsers(id){
+        var channel = await this.findById(id);
+        return await channel.getUsers();
+    }
+
     async addUser(channelId, userId){
         var channel = await this.findById(channelId);
 

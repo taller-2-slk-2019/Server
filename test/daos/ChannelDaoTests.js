@@ -220,4 +220,34 @@ describe('"ChannelDao Tests"', () => {
         });
 
     });
+
+    describe('Find Channel Users', () => {
+        var channel
+        var organization;
+        var user;
+        var user2;
+        var users;
+
+        before(async () => {
+            user = await TestDatabaseHelper.createUser();
+            user2 = await TestDatabaseHelper.createUser();
+            organization = await TestDatabaseHelper.createOrganization([user, user2]);
+            channel = await TestDatabaseHelper.createChannel(user, organization);
+            await channel.addUser(user2);
+            users = await ChannelDao.getChannelUsers(channel.id);
+        });
+
+        it('must return 2 users', async () => {
+            expect(users.length).to.eq(2);
+        });
+        
+        it('users must have correct id', async () => {
+            expect([user.id, user2.id]).to.include(users[0].id);
+        });
+
+        it('users must belong to channel', async () => {
+            var belongs = await channel.hasUser(users[0]);
+            expect(belongs).to.be.true;
+        });
+    });
 });
