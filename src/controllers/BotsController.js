@@ -2,9 +2,9 @@ var logger = require('logops');
 const axios = require('axios');
 var Config = require('../helpers/Config');
 //var BotDao = require('../daos/BotDao');
-//var { sendSuccessResponse, sendErrorResponse, sendEmptySuccessResponse } = require('../helpers/ResponseHelper');
+//var { sendErrorResponse, sendEmptySuccessResponse } = require('../helpers/ResponseHelper');
 
-class BotsController{
+class BotsController {
 
     async sendMessageToBot(bot, message) {
         var name = bot.name;
