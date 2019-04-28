@@ -7,9 +7,11 @@ const sinonChai = require('sinon-chai');
 chai.use(sinonChai);
 const { mockRequest, mockResponse } = require('mock-req-res');
 const forbiddenWordMock = require('../mocks/forbiddenWordMock');
+const adminMock = require('../mocks/adminMock');
 
 var ForbiddenWordsController = require('../../src/controllers/ForbiddenWordsController');
 var ForbiddenWordDao = require('../../src/daos/ForbiddenWordDao');
+var AdminDao = require('../../src/daos/AdminUserDao');
 
 describe('"ForbiddenWordsController Tests"', () => {
 
@@ -17,17 +19,20 @@ describe('"ForbiddenWordsController Tests"', () => {
         var mock1;
         var mock2;
         var mock3;
+        var mock4;
 
         before(async () => {
             mock1 = stub(ForbiddenWordDao, 'get').resolves([forbiddenWordMock, forbiddenWordMock, forbiddenWordMock]);
             mock2 = stub(ForbiddenWordDao, 'create').resolves(forbiddenWordMock);
             mock3 = stub(ForbiddenWordDao, 'delete').resolves();
+            mock4 = stub(AdminDao, 'findByToken').resolves(adminMock);
         });
 
         after(async () => {
             mock1.restore();
             mock2.restore();
             mock3.restore();
+            mock4.restore();
         });
 
         describe('Add word', () => {
@@ -103,17 +108,20 @@ describe('"ForbiddenWordsController Tests"', () => {
         var mock1;
         var mock2;
         var mock3;
+        var mock4;
 
         before(async () => {
             mock1 = stub(ForbiddenWordDao, 'get').rejects();
             mock2 = stub(ForbiddenWordDao, 'create').rejects();
             mock3 = stub(ForbiddenWordDao, 'delete').rejects();
+            mock4 = stub(AdminDao, 'findByToken').resolves(adminMock);
         });
 
         after(async () => {
             mock1.restore();
             mock2.restore();
             mock3.restore();
+            mock4.restore();
         });
 
 
@@ -162,6 +170,66 @@ describe('"ForbiddenWordsController Tests"', () => {
             beforeEach(async () => {
                 res = mockResponse();
                 await ForbiddenWordsController.get(req, res);
+            });
+
+            it('response status must be 400', async () => {
+                expect(res.status).to.have.been.calledWith(400);
+            });
+
+            it('response must have an error', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('error');
+            });
+        });
+    });
+
+    describe('Methods with admin errors', () => {
+        var mock1;
+        var mock2;
+        var mock3;
+        var mock4;
+
+        before(async () => {
+            mock1 = stub(ForbiddenWordDao, 'get').rejects();
+            mock2 = stub(ForbiddenWordDao, 'create').rejects();
+            mock3 = stub(ForbiddenWordDao, 'delete').rejects();
+            mock4 = stub(AdminDao, 'findByToken').rejects();
+        });
+
+        after(async () => {
+            mock1.restore();
+            mock2.restore();
+            mock3.restore();
+            mock4.restore();
+        });
+
+
+        describe('Add word with error', () => {
+            var req = mockRequest();
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await ForbiddenWordsController.add(req, res);
+            });
+
+            it('response status must be 400', async () => {
+                expect(res.status).to.have.been.calledWith(400);
+            });
+
+            it('response must have an error', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('error');
+            });
+        });
+
+        describe('Delete word with error', () => {
+            var req = mockRequest();
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await ForbiddenWordsController.delete(req, res);
             });
 
             it('response status must be 400', async () => {
