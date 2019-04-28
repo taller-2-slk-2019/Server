@@ -14,6 +14,8 @@ const { userCreateData } = require('../data/userData');
 var UserController = require('../../src/controllers/UsersController');
 var UserDao = require('../../src/daos/UserDao');
 var OrganizationDao = require('../../src/daos/OrganizationDao');
+var UserStatistics = require('../../src/models/statistics/UserStatistics')
+var UserService = require('../../src/services/UserService')
 
 describe('"UsersController Tests"', () => {
 
@@ -34,6 +36,7 @@ describe('"UsersController Tests"', () => {
             mock5 = stub(UserDao, 'findByToken').resolves(userProfileMock);
             mock6 = stub(UserDao, 'findUserInvitations').resolves([userOrganizationInvitationMock, userOrganizationInvitationMock]);
             mock7 = stub(UserDao, 'deleteUserInvitation').resolves();
+            mock8 = stub(UserService, 'getStatistics').resolves(new UserStatistics(['org1'], 2));
         });
 
         after(async () => {
@@ -302,6 +305,25 @@ describe('"UsersController Tests"', () => {
             it('response body must be null', async () => {
                 var response = res.send.args[0][0];
                 expect(response).to.be.undefined;
+            });
+        });
+
+        describe('Get statistics', () => {
+            var req = mockRequest();
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await UserController.getStatistics(req, res);
+            });
+
+            it('response status must be 200', async () => {
+                expect(res.status).to.have.been.calledWith(200);
+            });
+
+            it('response body must be null', async () => {
+                var response = res.send.args[0][0];
+                expect(response.messagesSent).to.eq(2);
             });
         });
     });

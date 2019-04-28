@@ -4,6 +4,8 @@ var OrganizationDao = require('../daos/OrganizationDao');
 var { sendSuccessResponse, sendErrorResponse, sendEmptySuccessResponse } = require('../helpers/ResponseHelper');
 var { InvalidLocationError } = require('../helpers/Errors');
 var Token = require('../helpers/Token');
+const userService = require ('../services/UserService');
+
 
 class UsersController{
 
@@ -26,7 +28,7 @@ class UsersController{
             var user = await UserDao.create(data);
             logger.info("User created: " + user.id);
             sendSuccessResponse(res, user);
-            
+
         } catch (err){
             sendErrorResponse(res, err);
         }
@@ -65,11 +67,21 @@ class UsersController{
                         invitedAt: invitation.organizationUserInvitation.createdAt
                        };
             });
-            
+
             sendSuccessResponse(res, result);
         } catch (err){
             sendErrorResponse(res, err);
         }
+    }
+
+    async getStatistics(req, res) {
+        const userToken = req.query.userToken;
+
+        userService.getStatistics(userToken)
+            .then(results => {
+                sendSuccessResponse(res, results);
+            })
+            .catch(reason => sendErrorResponse(res, reason));
     }
 
     async deleteInvitation(req, res) {
@@ -93,7 +105,7 @@ class UsersController{
             sendErrorResponse(res, err);
         }
     }
-    
+
     async updateProfile(req, res) {
         var data = {
             name: req.body.name,
@@ -127,7 +139,7 @@ class UsersController{
             await UserDao.update(data, token);
             logger.info("Location from user " + token + " updated");
             sendEmptySuccessResponse(res);
-            
+
         } catch (err){
             sendErrorResponse(res, err);
         }

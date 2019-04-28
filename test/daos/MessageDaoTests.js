@@ -384,7 +384,7 @@ describe('"MessageDao Tests"', () => {
         it('message must not be null', async () => {
             expect(message).to.not.be.null;
         });
-        
+
         it('message must have correct id', async () => {
             expect(message).to.have.property('id', expected.id);
         });
@@ -403,6 +403,26 @@ describe('"MessageDao Tests"', () => {
 
         it('throws exception if id is -1', async () => {
             await expect(MessageDao.findById(-1)).to.eventually.be.rejectedWith(MessageNotFoundError);
+        });
+    });
+
+    describe('get messages count by user', () => {
+        var expected;
+        var message;
+
+        before(async () => {
+            expected = await Message.create(messageData);
+
+        });
+
+        it('should return 25 for user id 1', async () => {
+            message = await MessageDao.getMessagesCountByUser(user.id);
+            expect(message).to.be.equal(25);
+        });
+
+        it('count must be zero for a unknown user', async () => {
+            message = await MessageDao.getMessagesCountByUser(200);
+            expect(message).to.be.equal(0);
         });
     });
 });
