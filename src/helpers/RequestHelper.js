@@ -1,7 +1,7 @@
 var AdminDao = require('../daos/AdminUserDao');
 
 var checkIsAdmin = async function(req){
-    await AdminDao.findByToken(req.get('adminToken'));
+    await AdminDao.findByToken(req.query.adminToken);
 };
 
 module.exports = {
