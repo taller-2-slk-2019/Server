@@ -117,6 +117,16 @@ class OrganizationDao{
         await organization.removeUser(user);
     }
 
+    async delete(organizationId){
+        var organization = await this.findById(organizationId);
+        var channels = await organization.getChannels();
+        await forEach(channels, async (channel) => {
+            await channel.destroy();
+        });
+
+        await organization.destroy();
+    }
+
 }
 
 module.exports = new OrganizationDao();

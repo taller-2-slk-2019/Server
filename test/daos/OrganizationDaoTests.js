@@ -11,6 +11,7 @@ var FirebaseController = require('../../src/firebase/FirebaseController');
 
 var models = require('../../src/database/sequelize');
 var Organization = models.organization;
+var Channel = models.channel;
 var TestDatabaseHelper = require('../TestDatabaseHelper');
 
 var { UserNotFoundError, OrganizationNotFoundError,
@@ -357,6 +358,33 @@ describe('"OrganizationDao Tests"', () => {
         it('users must belong to organization', async () => {
             var belongs = await users[0].hasOrganization(organization);
             expect(belongs).to.be.true;
+        });
+    });
+
+    describe('Delete', () => {
+        var channel
+        var organization;
+        var user;
+
+        before(async () => {
+            user = await TestDatabaseHelper.createUser();
+            organization = await TestDatabaseHelper.createOrganization([user]);
+            channel = await TestDatabaseHelper.createChannel(user, organization);
+            await OrganizationDao.delete(organization.id);
+        });
+
+        it('organization must be deleted', async () => {
+            var org = await Organization.findByPk(organization.id);
+            expect(org).to.be.null;
+        });
+
+        it('delete again fails', async () => {
+            await expect(OrganizationDao.delete(organization.id)).to.eventually.be.rejectedWith(OrganizationNotFoundError);
+        });
+
+        it('organization channels must be deleted', async () => {
+            var c = await Channel.findByPk(channel.id);
+            expect(c).to.be.null;
         });
     });
 

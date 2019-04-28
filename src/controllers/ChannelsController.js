@@ -106,6 +106,7 @@ class ChannelsController{
             await checkIsAdmin(req);
             
             await ChannelDao.delete(channelId);
+            logger.info(`Channel ${channelId} deleted`);
             sendEmptySuccessResponse(res);
         } catch (err){
             sendErrorResponse(res, err);

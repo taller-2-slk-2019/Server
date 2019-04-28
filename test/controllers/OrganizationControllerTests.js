@@ -12,11 +12,13 @@ const { organizationCreateData } = require('../data/organizationData');
 
 var OrganizationsController = require('../../src/controllers/OrganizationsController');
 var OrganizationDao = require('../../src/daos/OrganizationDao');
+var AdminDao = require('../../src/daos/AdminUserDao');
+const adminMock = require('../mocks/adminMock');
 
 describe('"OrganizationsController Tests"', () => {
 
     describe('Methods without errors', () => {
-        var mock1, mock2, mock3, mock4, mock5, mock6, mock7;
+        var mock1, mock2, mock3, mock4, mock5, mock6, mock7, mock8, mock9;
 
         before(async () => {
             mock1 = stub(OrganizationDao, 'findById').resolves(organizationDataMock);
@@ -26,6 +28,8 @@ describe('"OrganizationsController Tests"', () => {
             mock5 = stub(OrganizationDao, 'acceptUserInvitation').resolves();
             mock6 = stub(OrganizationDao, 'removeUser').resolves();
             mock7 = stub(OrganizationDao, 'get').resolves([organizationDataMock, organizationDataMock]);
+            mock8 = stub(OrganizationDao, 'delete').resolves();
+            mock9 = stub(AdminDao, 'findByToken').resolves(adminMock);
         });
 
         after(async () => {
@@ -36,6 +40,8 @@ describe('"OrganizationsController Tests"', () => {
             mock5.restore();
             mock6.restore();
             mock7.restore();
+            mock8.restore();
+            mock9.restore();
         });
 
         describe('Get Profile Method', () => {
@@ -207,10 +213,29 @@ describe('"OrganizationsController Tests"', () => {
                 expect(response).to.be.undefined;
             });
         });
+
+        describe('Delete Method', () => {
+            var req = mockRequest();
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await OrganizationsController.delete(req, res);
+            });
+
+            it('response status must be 204', async () => {
+                expect(res.status).to.have.been.calledWith(204);
+            });
+
+            it('response body must be null', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.be.undefined;
+            });
+        });
     });
 
     describe('Methods with errors', () => {
-        var mock1, mock2, mock3, mock4, mock5, mock6, mock7;
+        var mock1, mock2, mock3, mock4, mock5, mock6, mock7, mock8, mock9;
 
         before(async () => {
             mock1 = stub(OrganizationDao, 'findById').rejects();
@@ -220,6 +245,8 @@ describe('"OrganizationsController Tests"', () => {
             mock5 = stub(OrganizationDao, 'acceptUserInvitation').rejects();
             mock6 = stub(OrganizationDao, 'removeUser').rejects();
             mock7 = stub(OrganizationDao, 'get').rejects();
+            mock8 = stub(OrganizationDao, 'delete').rejects();
+            mock9 = stub(AdminDao, 'findByToken').resolves(adminMock);
         });
 
         after(async () => {
@@ -230,6 +257,8 @@ describe('"OrganizationsController Tests"', () => {
             mock5.restore();
             mock6.restore();
             mock7.restore();
+            mock8.restore();
+            mock9.restore();
         });
 
 
@@ -360,6 +389,60 @@ describe('"OrganizationsController Tests"', () => {
             beforeEach(async () => {
                 res = mockResponse();
                 await OrganizationsController.removeUser(req, res);
+            });
+
+            it('response status must be 400', async () => {
+                expect(res.status).to.have.been.calledWith(400);
+            });
+
+            it('response must have an error', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('error');
+            });
+        });
+
+        describe('Delete Method with error', () => {
+            var req = mockRequest();
+            var res;
+
+            beforeEach(async () => {
+                req.params.id = -1;
+                res = mockResponse();
+                await OrganizationsController.delete(req, res);
+            });
+
+            it('response status must be 400', async () => {
+                expect(res.status).to.have.been.calledWith(400);
+            });
+
+            it('response must have an error', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('error');
+            });
+        });
+    });
+
+    describe('Methods with admin errors', () => {
+        var mock1, mock2;
+
+        before(async () => {
+            mock1 = stub(OrganizationDao, 'delete').rejects();
+            mock2 = stub(AdminDao, 'findByToken').resolves(adminMock);
+        });
+
+        after(async () => {
+            mock1.restore();
+            mock2.restore();
+        });
+
+        describe('Delete Method with admin error', () => {
+            var req = mockRequest();
+            var res;
+
+            beforeEach(async () => {
+                req.params.id = -1;
+                res = mockResponse();
+                await OrganizationsController.delete(req, res);
             });
 
             it('response status must be 400', async () => {
