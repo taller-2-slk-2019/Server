@@ -79,7 +79,7 @@ describe('"BotDao Tests"', () => {
         var bots;
 
         before(async () => {
-            await organization.setBots([]);
+            await Bot.destroy({truncate: true});
             bot1 = await TestDatabaseHelper.createBot(organization, 'bot1');
             bot2 = await TestDatabaseHelper.createBot(organization, 'bot2');
             bots = await BotDao.get(organization.id);
@@ -95,6 +95,32 @@ describe('"BotDao Tests"', () => {
 
         it('must return correct bots', async () => {
             expect([bots[0].id, bots[1].id]).to.include(bot1.id);
+        });
+    });
+
+    describe('Find by name', () => {
+        var bot1;
+        var bot2;
+
+        before(async () => {
+            await Bot.destroy({truncate: true});
+            bot1 = await TestDatabaseHelper.createBot(organization, 'bot3');
+            bot2 = await TestDatabaseHelper.createBot(organization, 'bot4');
+        });
+
+        it('bot must not be null', async () => {
+            var bot = await BotDao.findByName('bot4', organization.id);
+            expect(bot).to.not.be.null;
+        });
+
+        it('must return correct bots', async () => {
+            var bot = await BotDao.findByName('bot4', organization.id);
+            expect(bot).to.have.property('name', 'bot4');
+        });
+
+        it('must return null if name does not exist', async () => {
+            var bot = await BotDao.findByName('bot5', organization.id);
+            expect(bot).to.be.null;
         });
     });
 });

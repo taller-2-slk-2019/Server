@@ -24,6 +24,14 @@ class BotDao{
         return Bot.create(botData);
     }
 
+    async findByName(name, organizationId){
+        var org = await OrganizationDao.findById(organizationId);
+
+        var bots = await org.getBots({where: {name: name}});
+
+        return bots.length > 0 ? bots[0] : null;
+    }
+
     async delete(id){
         await Bot.destroy({
             where: {
