@@ -306,6 +306,33 @@ describe('"OrganizationDao Tests"', () => {
         });
     });
 
+    describe('Get', () => {
+        var organization1;
+        var organization2;
+        var user1;
+        var user2;
+        var organizations;
+
+        before(async () => {
+            user1 = await TestDatabaseHelper.createUser();
+            user2 = await TestDatabaseHelper.createUser();
+            organization1 = await TestDatabaseHelper.createOrganization([user1]);
+            organization2 = await TestDatabaseHelper.createOrganization([user2]);
+            
+            organizations = await OrganizationDao.get();
+        });
+
+        it('must return 2 organizations', async () => {
+            expect(organizations.length).to.be.above(2);
+        });
+        
+        it('organizations must have correct id', async () => {
+            var ids = organizations.map(org => {return org.id});
+            expect(ids).to.include(organization1.id);
+            expect(ids).to.include(organization2.id);
+        });
+    });
+
     describe('Find Organization Users', () => {
         var organization;
         var user;

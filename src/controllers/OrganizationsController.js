@@ -18,7 +18,12 @@ class OrganizationsController{
         var user = req.query.userToken;
         
         try {
-            var orgs = await OrganizationDao.findForUser(user);
+            var orgs = [];
+            if (user){
+                orgs = await OrganizationDao.findForUser(user);
+            } else {
+                orgs = await OrganizationDao.get();
+            }
             sendSuccessResponse(res, orgs);
         } catch (err){
             sendErrorResponse(res, err);

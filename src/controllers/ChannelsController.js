@@ -1,6 +1,7 @@
 var logger = require('logops');
 var ChannelDao = require('../daos/ChannelDao');
 var { sendSuccessResponse, sendErrorResponse, sendEmptySuccessResponse } = require('../helpers/ResponseHelper');
+var { checkIsAdmin } = require('../helpers/RequestHelper');
 
 class ChannelsController{
 
@@ -93,6 +94,19 @@ class ChannelsController{
         try{
             var stats = await ChannelDao.getStatistics(channelId);
             sendSuccessResponse(res, stats);
+        } catch (err){
+            sendErrorResponse(res, err);
+        }
+    }
+
+    async delete(req, res){
+        var channelId = req.params.id;
+
+        try{
+            await checkIsAdmin(req);
+            
+            await ChannelDao.delete(channelId);
+            sendEmptySuccessResponse(res);
         } catch (err){
             sendErrorResponse(res, err);
         }

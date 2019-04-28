@@ -7,7 +7,9 @@ module.exports = (sequelize, DataTypes) => {
     longitude: { type: DataTypes.FLOAT, allowNull: false, validate: { notNull: true } },
     description: { type: DataTypes.STRING, allowNull: false, validate: { notNull: true } },
     welcome: { type: DataTypes.STRING, allowNull: false, validate: { notNull: true } }
-  }, {});
+  }, {
+    paranoid: true
+  });
 
   Organization.associate = function(models) {
     Organization.belongsToMany(models.user, { through: models.userOrganizations });

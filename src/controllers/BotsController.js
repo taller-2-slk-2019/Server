@@ -2,7 +2,7 @@ var logger = require('logops');
 const axios = require('axios');
 var Config = require('../helpers/Config');
 var BotDao = require('../daos/BotDao');
-var AdminDao = require('../daos/AdminUserDao');
+var { checkIsAdmin } = require('../helpers/RequestHelper');
 var { sendSuccessResponse, sendErrorResponse, sendEmptySuccessResponse } = require('../helpers/ResponseHelper');
 
 class BotsController {
@@ -45,7 +45,7 @@ class BotsController {
         };
         
         try{
-            await AdminDao.findByToken(req.get('adminToken'));
+            await checkIsAdmin(req);
 
             var bot = await BotDao.create(data);
             logger.info(`Bot '${data.name}' added to organization ${data.organizationId}`);
@@ -60,7 +60,7 @@ class BotsController {
         var botId = req.params.id;
 
         try{
-            await AdminDao.findByToken(req.get('adminToken'));
+            await checkIsAdmin(req);
             
             await BotDao.delete(botId);
             logger.info(`Bot '${botId}' deleted`);

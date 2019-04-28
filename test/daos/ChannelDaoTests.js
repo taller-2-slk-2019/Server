@@ -268,7 +268,7 @@ describe('"ChannelDao Tests"', () => {
         });
     });
 
-    describe('Get channels', () => {
+    describe('Get channels for user', () => {
         var channel;
         var channel2;
         var org;
@@ -296,7 +296,26 @@ describe('"ChannelDao Tests"', () => {
             var hasUser = await channels[0].hasUser(user);
             expect(hasUser).to.be.true;
         });
+    });
 
+    describe('Get channels', () => {
+        var channel;
+        var channel2;
+        var org;
+        var usr;
+
+        before(async () => {
+            org = await TestDatabaseHelper.createOrganization([user]);
+            channel = await TestDatabaseHelper.createChannel(user, org);
+            channel2 = await TestDatabaseHelper.createChannel(user, org);
+            usr = await TestDatabaseHelper.createUser();
+        });
+
+        it('get for user and organization must return 2 channels', async () => {
+            var channels = await ChannelDao.get(null, org.id);
+            var orgChannels = await org.getChannels();
+            expect(channels.length).to.eq(orgChannels.length);
+        });
     });
 
     describe('Find Channel Users', () => {
@@ -348,6 +367,28 @@ describe('"ChannelDao Tests"', () => {
 
         it('message count must be 5', async () => {
             expect(stats.messageCount).to.eq(5);
+        });
+    });
+
+    describe('Delete', () => {
+        var channel
+        var organization;
+        var user;
+
+        before(async () => {
+            user = await TestDatabaseHelper.createUser();
+            organization = await TestDatabaseHelper.createOrganization([user]);
+            channel = await TestDatabaseHelper.createChannel(user, organization);
+            await ChannelDao.delete(channel.id);
+        });
+
+        it('channel must be deleted', async () => {
+            var c = await Channel.findByPk(channel.id);
+            expect(c).to.be.null;
+        });
+
+        it('delete again fails', async () => {
+            await expect(ChannelDao.delete(channel.id)).to.eventually.be.rejectedWith(ChannelNotFoundError);
         });
     });
 });

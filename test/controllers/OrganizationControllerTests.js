@@ -16,12 +16,7 @@ var OrganizationDao = require('../../src/daos/OrganizationDao');
 describe('"OrganizationsController Tests"', () => {
 
     describe('Methods without errors', () => {
-        var mock1;
-        var mock2;
-        var mock3;
-        var mock4;
-        var mock5;
-        var mock6;
+        var mock1, mock2, mock3, mock4, mock5, mock6, mock7;
 
         before(async () => {
             mock1 = stub(OrganizationDao, 'findById').resolves(organizationDataMock);
@@ -30,6 +25,7 @@ describe('"OrganizationsController Tests"', () => {
             mock4 = stub(OrganizationDao, 'findForUser').resolves([organizationsForUserMock, organizationsForUserMock]);
             mock5 = stub(OrganizationDao, 'acceptUserInvitation').resolves();
             mock6 = stub(OrganizationDao, 'removeUser').resolves();
+            mock7 = stub(OrganizationDao, 'get').resolves([organizationDataMock, organizationDataMock]);
         });
 
         after(async () => {
@@ -39,6 +35,7 @@ describe('"OrganizationsController Tests"', () => {
             mock4.restore();
             mock5.restore();
             mock6.restore();
+            mock7.restore();
         });
 
         describe('Get Profile Method', () => {
@@ -68,6 +65,7 @@ describe('"OrganizationsController Tests"', () => {
 
         describe('Get for user Method', () => {
             var req = mockRequest();
+            req.query.userToken = "token";
             var res;
 
             beforeEach(async () => {
@@ -92,6 +90,36 @@ describe('"OrganizationsController Tests"', () => {
             it('returned organizations must have role', async () => {
                 var response = res.send.args[0][0];
                 expect(response[0].userOrganizations).to.have.property('role');
+            });
+        });
+
+        describe('Get all Method', () => {
+            var req = mockRequest();
+            req.query.userToken = null;
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await OrganizationsController.get(req, res);
+            });
+
+            it('response status must be 200', async () => {
+                expect(res.status).to.have.been.calledWith(200);
+            });
+
+            it('organizations must not be null', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.be.an('array');
+            });
+
+            it('returned organization must have correct id', async () => {
+                var response = res.send.args[0][0];
+                expect(response[0]).to.have.property('id', organizationDataMock.id);
+            });
+
+            it('returned organizations must not have role', async () => {
+                var response = res.send.args[0][0];
+                expect(response[0].userOrganizations).to.be.undefined;
             });
         });
 
@@ -182,12 +210,7 @@ describe('"OrganizationsController Tests"', () => {
     });
 
     describe('Methods with errors', () => {
-        var mock1;
-        var mock2;
-        var mock3;
-        var mock4;
-        var mock5;
-        var mock6;
+        var mock1, mock2, mock3, mock4, mock5, mock6, mock7;
 
         before(async () => {
             mock1 = stub(OrganizationDao, 'findById').rejects();
@@ -196,6 +219,7 @@ describe('"OrganizationsController Tests"', () => {
             mock4 = stub(OrganizationDao, 'findForUser').rejects();
             mock5 = stub(OrganizationDao, 'acceptUserInvitation').rejects();
             mock6 = stub(OrganizationDao, 'removeUser').rejects();
+            mock7 = stub(OrganizationDao, 'get').rejects();
         });
 
         after(async () => {
@@ -205,6 +229,7 @@ describe('"OrganizationsController Tests"', () => {
             mock4.restore();
             mock5.restore();
             mock6.restore();
+            mock7.restore();
         });
 
 
@@ -230,6 +255,28 @@ describe('"OrganizationsController Tests"', () => {
 
         describe('Get for user Method with error', () => {
             var req = mockRequest();
+            req.query.userToken = "token";
+            var res;
+
+            beforeEach(async () => {
+                req.params.id = -1;
+                res = mockResponse();
+                await OrganizationsController.get(req, res);
+            });
+
+            it('response status must be 400', async () => {
+                expect(res.status).to.have.been.calledWith(400);
+            });
+
+            it('response must have an error', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('error');
+            });
+        });
+
+        describe('Get all Method with error', () => {
+            var req = mockRequest();
+            req.query.userToken = null;
             var res;
 
             beforeEach(async () => {

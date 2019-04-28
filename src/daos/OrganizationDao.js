@@ -37,6 +37,10 @@ class OrganizationDao{
         return await user.getOrganizations();
     }
 
+    async get(){
+        return await Organization.findAll();
+    }
+
     async findOrganizationUsers(organizationId){
         var org = await this.findById(organizationId);
 
