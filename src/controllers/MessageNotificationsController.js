@@ -2,6 +2,8 @@ var logger = require('logops');
 var MessageParser = require('../helpers/MessageParser');
 var FirebaseController = require('../firebase/FirebaseController');
 var ChannelDao = require('../daos/ChannelDao');
+var BotDao = require('../daos/BotDao');
+var BotsController = require('../controllers/BotsController');
 var TitoBot = require('../controllers/TitoBotController');
 var Config = require('../helpers/Config');
 
@@ -17,11 +19,20 @@ class MessageNotificationsController {
 
         var mentionedUsers = MessageParser.getMentionedUsers(message.data);
 
-        //TODO check bots
         if (mentionedUsers.includes(TitoBot.titoBotName)){
             // Tito bot
             TitoBot.sendMessage(message);
             return;
+        }
+
+        if (mentionedUsers.length > 0){
+            var channel = await message.getChannel();
+            // check if first mentioned user is a bot
+            var bot = await BotDao.findByName(mentionedUsers[0], channel.organizationId);
+            if (bot){
+                BotsController.sendMessageToBot(bot, message);
+                return;
+            }
         }
 
         await this._notifyMentionedUsers(message, mentionedUsers);
