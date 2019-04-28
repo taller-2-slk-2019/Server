@@ -14,6 +14,13 @@ class UserNotFoundError extends Error {
     }
 }
 
+class AdminUserNotFoundError extends Error {
+    constructor(user) {
+        super("Admin not found: " + user);
+        this.name = this.constructor.name;
+    }
+}
+
 class OrganizationNotFoundError extends Error {
     constructor(organizationId) {
         super("Organization not found: " + organizationId);
@@ -112,8 +119,16 @@ class ForbiddenWordAlreadyExistsError extends Error {
     }
 }
 
+class BotAlreadyExistsError extends Error {
+    constructor(bot, organizationId) {
+        super(`Bot '${bot}' already exists in organization ${organizationId}`);
+        this.name = this.constructor.name;
+    }
+}
+
 module.exports = {
     UserNotFoundError,
+    AdminUserNotFoundError,
     OrganizationNotFoundError,
     InvalidOrganizationInvitationTokenError,
     InvalidLocationError,
@@ -128,5 +143,6 @@ module.exports = {
     InvalidConversationError,
     UserNotBelongsToConversationError,
     InvalidQueryError,
-    MessageNotFoundError
+    MessageNotFoundError,
+    BotAlreadyExistsError
 };

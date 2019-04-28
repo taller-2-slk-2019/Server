@@ -1,5 +1,6 @@
 var logger = require('logops');
 var ForbiddenWordDao = require('../daos/ForbiddenWordDao');
+var { checkIsAdmin } = require('../helpers/RequestHelper');
 var { sendSuccessResponse, sendErrorResponse, sendEmptySuccessResponse } = require('../helpers/ResponseHelper');
 
 class ForbiddenWordsController{
@@ -23,6 +24,8 @@ class ForbiddenWordsController{
         };
         
         try{
+            await checkIsAdmin(req);
+
             var forbiddenWord = await ForbiddenWordDao.create(data);
             logger.info(`Forbidden word '${data.word}' added to organization ${data.organizationId}`);
             sendSuccessResponse(res, forbiddenWord);
@@ -36,6 +39,8 @@ class ForbiddenWordsController{
         var wordId = req.params.id;
 
         try{
+            await checkIsAdmin(req);
+            
             await ForbiddenWordDao.delete(wordId);
             logger.info(`Forbidden word '${wordId}' deleted`);
             sendEmptySuccessResponse(res);

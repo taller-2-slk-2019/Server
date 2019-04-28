@@ -85,10 +85,13 @@ class ChannelDao{
 
     async get(userToken, organizationId){
         var org = await OrganizationDao.findById(organizationId);
-        var user = await UserDao.findByToken(userToken);
 
         var orgChannels = await org.getChannels();
+        if (!userToken){
+            return orgChannels;
+        }
 
+        var user = await UserDao.findByToken(userToken);
         var userChannels = await filter(orgChannels, async (channel) => {
             return await channel.hasUser(user);
         });
@@ -105,6 +108,11 @@ class ChannelDao{
         stats.setMessageCount(messageCount);
 
         return stats;
+    }
+
+    async delete(channelId){
+        var channel = await this.findById(channelId);
+        await channel.destroy();
     }
 
 }

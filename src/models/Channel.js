@@ -5,7 +5,9 @@ module.exports = (sequelize, DataTypes) => {
     isPublic: { type: DataTypes.BOOLEAN, allowNull: false, validate: { notNull: true } },
     description: { type: DataTypes.STRING, allowNull: false, validate: { notNull: true } },
     welcome: { type: DataTypes.STRING, allowNull: false, validate: { notNull: true } },
-  }, {});
+  }, {
+    paranoid: true
+  });
 
   Channel.associate = function(models) {
     Channel.creator = Channel.belongsTo(models.user, { as: "creator" });

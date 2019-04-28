@@ -5,8 +5,6 @@ var organizationsController = require('../controllers/OrganizationsController');
 
 router.get('/', organizationsController.get);
 
-router.get('/:id', organizationsController.getProfile);
-
 router.post('/', organizationsController.create);
 
 router.post('/:id/invitations', organizationsController.inviteUsers);
@@ -14,6 +12,10 @@ router.post('/:id/invitations', organizationsController.inviteUsers);
 router.post('/users', organizationsController.addUser);
 
 router.delete('/:id/users/:userId', organizationsController.removeUser);
+
+router.get('/:id', organizationsController.getProfile);
+
+router.delete('/:id', organizationsController.delete);
 
 
 module.exports = router;

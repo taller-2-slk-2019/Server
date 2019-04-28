@@ -5,7 +5,8 @@ module.exports = (sequelize, DataTypes) => {
     url: { type: DataTypes.STRING, allowNull: false, validate: { notNull: true } }
   }, {});
 
-  Bot.associate = function() {
+  Bot.associate = function(models) {
+    Bot.belongsTo(models.organization);
   };
 
   return Bot;

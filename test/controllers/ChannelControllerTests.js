@@ -13,17 +13,13 @@ const { channelCreateData } = require('../data/channelData');
 
 var ChannelsController = require('../../src/controllers/ChannelsController');
 var ChannelDao = require('../../src/daos/ChannelDao');
+var AdminDao = require('../../src/daos/AdminUserDao');
+const adminMock = require('../mocks/adminMock');
 
 describe('"ChannelsController Tests"', () => {
 
     describe('Methods without errors', () => {
-        var mock1;
-        var mock2;
-        var mock3;
-        var mock4;
-        var mock5;
-        var mock6;
-        var mock7;
+        var mock1, mock2, mock3, mock4, mock5, mock6, mock7, mock8, mock9;
 
         before(async () => {
             mock1 = stub(ChannelDao, 'create').resolves(channelDataMock);
@@ -33,6 +29,8 @@ describe('"ChannelsController Tests"', () => {
             mock5 = stub(ChannelDao, 'findById').resolves(channelDataMock);
             mock6 = stub(ChannelDao, 'getChannelUsers').resolves([userDataMock, userDataMock, userDataMock]);
             mock7 = stub(ChannelDao, 'getStatistics').resolves(channelStatisticsMock);
+            mock8 = stub(ChannelDao, 'delete').resolves();
+            mock9 = stub(AdminDao, 'findByToken').resolves(adminMock);
         });
 
         after(async () => {
@@ -43,6 +41,8 @@ describe('"ChannelsController Tests"', () => {
             mock5.restore();
             mock6.restore();
             mock7.restore();
+            mock8.restore();
+            mock9.restore();
         });
 
         describe('Create channel', () => {
@@ -136,6 +136,25 @@ describe('"ChannelsController Tests"', () => {
             });
         });
 
+        describe('Delete channel', () => {
+            var req = mockRequest();
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await ChannelsController.delete(req, res);
+            });
+
+            it('response status must be 204', async () => {
+                expect(res.status).to.have.been.calledWith(204);
+            });
+
+            it('response body must be null', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.be.undefined;
+            });
+        });
+
         describe('Get channels', () => {
             var req = mockRequest();
             var res;
@@ -210,13 +229,7 @@ describe('"ChannelsController Tests"', () => {
     });
 
     describe('Methods with errors', () => {
-        var mock1;
-        var mock2;
-        var mock3;
-        var mock4;
-        var mock5;
-        var mock6;
-        var mock7;
+        var mock1, mock2, mock3, mock4, mock5, mock6, mock7, mock8, mock9;
 
         before(async () => {
             mock1 = stub(ChannelDao, 'create').rejects();
@@ -226,6 +239,8 @@ describe('"ChannelsController Tests"', () => {
             mock5 = stub(ChannelDao, 'findById').rejects();
             mock6 = stub(ChannelDao, 'getChannelUsers').rejects();
             mock7 = stub(ChannelDao, 'getStatistics').rejects();
+            mock8 = stub(ChannelDao, 'delete').rejects();
+            mock9 = stub(AdminDao, 'findByToken').resolves(adminMock);
         });
 
         after(async () => {
@@ -236,6 +251,8 @@ describe('"ChannelsController Tests"', () => {
             mock5.restore();
             mock6.restore();
             mock7.restore();
+            mock8.restore();
+            mock9.restore();
         });
 
 
@@ -315,6 +332,25 @@ describe('"ChannelsController Tests"', () => {
             });
         });
 
+        describe('Delete channel with error', () => {
+            var req = mockRequest();
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await ChannelsController.delete(req, res);
+            });
+
+            it('response status must be 400', async () => {
+                expect(res.status).to.have.been.calledWith(400);
+            });
+
+            it('response must have an error', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('error');
+            });
+        });
+
         describe('Get channels with error', () => {
             var req = mockRequest();
             var res;
@@ -360,6 +396,39 @@ describe('"ChannelsController Tests"', () => {
             beforeEach(async () => {
                 res = mockResponse();
                 await ChannelsController.getStatistics(req, res);
+            });
+
+            it('response status must be 400', async () => {
+                expect(res.status).to.have.been.calledWith(400);
+            });
+
+            it('response must have an error', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('error');
+            });
+        });
+    });    
+
+    describe('Methods with admin errors', () => {
+        var mock1, mock2;
+
+        before(async () => {
+            mock1 = stub(ChannelDao, 'delete').rejects();
+            mock2 = stub(AdminDao, 'findByToken').rejects();
+        });
+
+        after(async () => {
+            mock1.restore();
+            mock2.restore();
+        });
+
+        describe('Delete channel with error', () => {
+            var req = mockRequest();
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await ChannelsController.delete(req, res);
             });
 
             it('response status must be 400', async () => {

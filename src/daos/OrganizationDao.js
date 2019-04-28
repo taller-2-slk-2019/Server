@@ -37,6 +37,10 @@ class OrganizationDao{
         return await user.getOrganizations();
     }
 
+    async get(){
+        return await Organization.findAll();
+    }
+
     async findOrganizationUsers(organizationId){
         var org = await this.findById(organizationId);
 
@@ -111,6 +115,16 @@ class OrganizationDao{
             await channel.removeUser(user);
         });
         await organization.removeUser(user);
+    }
+
+    async delete(organizationId){
+        var organization = await this.findById(organizationId);
+        var channels = await organization.getChannels();
+        await forEach(channels, async (channel) => {
+            await channel.destroy();
+        });
+
+        await organization.destroy();
     }
 
 }

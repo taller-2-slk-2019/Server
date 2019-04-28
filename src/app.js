@@ -33,6 +33,9 @@ app.use('/forbiddenWords', forbiddenWordsRouter);
 var botsRouter = require('./routes/BotsRoutes');
 app.use('/bots', botsRouter);
 
+var adminRouter = require('./routes/AdminUsersRoutes');
+app.use('/admin', adminRouter);
+
 var firebaseRouter = require('./routes/FirebaseRoutes');
 app.use('/firebase', firebaseRouter);
 

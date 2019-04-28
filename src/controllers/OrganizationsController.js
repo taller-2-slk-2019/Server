@@ -1,6 +1,7 @@
 var logger = require('logops');
 var OrganizationDao = require('../daos/OrganizationDao');
 var { sendSuccessResponse, sendEmptySuccessResponse, sendErrorResponse } = require('../helpers/ResponseHelper');
+var { checkIsAdmin } = require('../helpers/RequestHelper');
 
 class OrganizationsController{
 
@@ -18,7 +19,12 @@ class OrganizationsController{
         var user = req.query.userToken;
         
         try {
-            var orgs = await OrganizationDao.findForUser(user);
+            var orgs = [];
+            if (user){
+                orgs = await OrganizationDao.findForUser(user);
+            } else {
+                orgs = await OrganizationDao.get();
+            }
             sendSuccessResponse(res, orgs);
         } catch (err){
             sendErrorResponse(res, err);
@@ -78,6 +84,20 @@ class OrganizationsController{
         try{
             await OrganizationDao.removeUser(userId, organizationId);
             logger.info(`User ${userId} abandoned organization ${organizationId}`);
+            sendEmptySuccessResponse(res);
+        } catch (err){
+            sendErrorResponse(res, err);
+        }
+    }
+
+    async delete(req, res){
+        var organizationId = req.params.id;
+
+        try{
+            await checkIsAdmin(req);
+            
+            await OrganizationDao.delete(organizationId);
+            logger.info(`Organization ${organizationId} deleted`);
             sendEmptySuccessResponse(res);
         } catch (err){
             sendErrorResponse(res, err);
