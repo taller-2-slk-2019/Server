@@ -282,19 +282,49 @@ describe('"ChannelDao Tests"', () => {
         });
 
         it('get for user and organization must return 2 channels', async () => {
-            var channels = await ChannelDao.get(user.token, org.id);
+            var channels = await ChannelDao.get(user.token, org.id, true);
             expect(channels.length).to.eq(2);
         });
 
         it('get for other user and organization must return 0 channels', async () => {
-            var channels = await ChannelDao.get(usr.token, org.id);
+            var channels = await ChannelDao.get(usr.token, org.id, true);
             expect(channels.length).to.eq(0);
         });
 
         it('user must belong to returned channels', async () => {
-            var channels = await ChannelDao.get(user.token, org.id);
+            var channels = await ChannelDao.get(user.token, org.id, true);
             var hasUser = await channels[0].hasUser(user);
             expect(hasUser).to.be.true;
+        });
+    });
+
+    describe('Get channels that user not belongs to', () => {
+        var channel;
+        var channel2;
+        var org;
+        var usr;
+
+        before(async () => {
+            org = await TestDatabaseHelper.createOrganization([user]);
+            channel = await TestDatabaseHelper.createChannel(user, org);
+            channel2 = await TestDatabaseHelper.createChannel(user, org, false);
+            usr = await TestDatabaseHelper.createUser();
+        });
+
+        it('get for user and organization must return 1 channel', async () => {
+            var channels = await ChannelDao.get(usr.token, org.id, false);
+            expect(channels.length).to.eq(1);
+        });
+
+        it('get for other user and organization must return 0 channels', async () => {
+            var channels = await ChannelDao.get(user.token, org.id, false);
+            expect(channels.length).to.eq(0);
+        });
+
+        it('user must belong to returned channels', async () => {
+            var channels = await ChannelDao.get(usr.token, org.id, false);
+            var hasUser = await channels[0].hasUser(usr);
+            expect(hasUser).to.be.false;
         });
     });
 

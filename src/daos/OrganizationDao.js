@@ -61,7 +61,6 @@ class OrganizationDao{
                 return;
             }
             
-
             var existingUser = await organization.hasUser(user);
             if (existingUser){
                 failed.push(userEmail);

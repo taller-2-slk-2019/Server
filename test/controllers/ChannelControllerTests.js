@@ -160,6 +160,7 @@ describe('"ChannelsController Tests"', () => {
             var res;
 
             beforeEach(async () => {
+                mock4.resetHistory();
                 res = mockResponse();
                 await ChannelsController.get(req, res);
             });
@@ -176,6 +177,42 @@ describe('"ChannelsController Tests"', () => {
             it('response must have 3 channels', async () => {
                 var response = res.send.args[0][0];
                 expect(response.length).to.eq(3);
+            });
+
+            it('Get should be called with userIsMember=true', async () => {
+                var call = mock4.getCall(0).args[2];
+                expect(call).to.be.true;
+            });
+        });
+
+        describe('Get public channels', () => {
+            var req = mockRequest();
+            req.query.userIsMember = false;
+            var res;
+
+            beforeEach(async () => {
+                mock4.resetHistory();
+                res = mockResponse();
+                await ChannelsController.get(req, res);
+            });
+
+            it('response status must be 200', async () => {
+                expect(res.status).to.have.been.calledWith(200);
+            });
+            
+            it('response must have channels', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.be.an('array');
+            });
+
+            it('response must have 3 channels', async () => {
+                var response = res.send.args[0][0];
+                expect(response.length).to.eq(3);
+            });
+
+            it('Get should be called with userIsMember=false', async () => {
+                var call = mock4.getCall(0).args[2];
+                expect(call).to.be.false;
             });
         });
 

@@ -10,6 +10,9 @@ logger.format = logger.formatters.dev;
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 
+var boolParser = require('express-query-boolean');
+app.use(boolParser());
+
 
 //Set routers
 var usersRouter = require('./routes/UsersRoutes');

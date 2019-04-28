@@ -83,7 +83,7 @@ class ChannelDao{
         await channel.removeUser(user);
     }
 
-    async get(userToken, organizationId){
+    async get(userToken, organizationId, userIsMember){
         var org = await OrganizationDao.findById(organizationId);
 
         var orgChannels = await org.getChannels();
@@ -93,7 +93,10 @@ class ChannelDao{
 
         var user = await UserDao.findByToken(userToken);
         var userChannels = await filter(orgChannels, async (channel) => {
-            return await channel.hasUser(user);
+            if (userIsMember){
+                return await channel.hasUser(user);
+            }
+            return channel.isPublic && !(await channel.hasUser(user));
         });
 
         return userChannels;

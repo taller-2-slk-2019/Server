@@ -28,9 +28,13 @@ class ChannelsController{
     async get(req, res){
         var userToken = req.query.userToken;
         var organizationId = req.query.organizationId;
+        var userIsMember = req.query.userIsMember;
+        if (userIsMember === undefined){
+            userIsMember = true; //Default value
+        }
 
         try{
-            var channels  = await ChannelDao.get(userToken, organizationId);
+            var channels  = await ChannelDao.get(userToken, organizationId, userIsMember);
             sendSuccessResponse(res, channels);
             
         } catch (err){
