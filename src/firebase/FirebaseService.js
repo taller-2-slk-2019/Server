@@ -16,7 +16,7 @@ const TYPE_MENTION = 'mention';
 const TYPE_INVITATION = 'invitation';
 const TYPE_CHANNEL_INVITATION = 'channel_invitation';
 
-class FirebaseController{
+class FirebaseService{
     async sendMessage(message){
         // Send message to channel or conversation topic
         var topic;
@@ -117,4 +117,4 @@ class FirebaseController{
 
 }
 
-module.exports = new FirebaseController();
+module.exports = new FirebaseService();

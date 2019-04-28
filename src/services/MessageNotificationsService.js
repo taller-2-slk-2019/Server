@@ -1,16 +1,16 @@
 var logger = require('logops');
 var MessageParser = require('../helpers/MessageParser');
-var FirebaseController = require('../firebase/FirebaseController');
+var FirebaseService = require('../firebase/FirebaseService');
 var ChannelDao = require('../daos/ChannelDao');
 var BotDao = require('../daos/BotDao');
 var BotsController = require('../controllers/BotsController');
-var TitoBot = require('../controllers/TitoBotController');
+var TitoBot = require('../services/TitoBotService');
 var Config = require('../helpers/Config');
 
-class MessageNotificationsController {
+class MessageNotificationsService {
 
     async sendNotification(message){
-        await FirebaseController.sendMessage(message);
+        await FirebaseService.sendMessage(message);
 
         if (message.bot || message.conversationId || !Config.messageTypesWithText.includes(message.type)){
             //Don't mention users in conversations or bot's messages
@@ -52,7 +52,7 @@ class MessageNotificationsController {
         usersToNotify = usersToNotify.filter(username => {return username != sender.username;});
 
         logger.info('Sending user mentioned notifications to: ' + usersToNotify);
-        FirebaseController.sendChannelMessageNotification(message, usersToNotify);
+        FirebaseService.sendChannelMessageNotification(message, usersToNotify);
     }
 
     async _addNewUsers(message, mentionedUsers){
@@ -78,4 +78,4 @@ class MessageNotificationsController {
     }
 }
 
-module.exports = new MessageNotificationsController();
+module.exports = new MessageNotificationsService();

@@ -1,8 +1,8 @@
 var logger = require('logops');
 const axios = require('axios');
-var BotsController = require('./BotsController');
+var BotsController = require('../controllers/BotsController');
 
-class TitoBotController {
+class TitoBotService {
 
     get titoBotName() { return 'tito'; }
     get titoBotBaseUrl() { return 'https://tito-bot.herokuapp.com/'; }
@@ -60,4 +60,4 @@ class TitoBotController {
     }
 }
 
-module.exports = new TitoBotController();
+module.exports = new TitoBotService();

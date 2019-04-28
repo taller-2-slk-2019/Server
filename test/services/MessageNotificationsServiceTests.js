@@ -6,16 +6,16 @@ const { stub, assert } = require('sinon');
 const sinonChai = require('sinon-chai');
 chai.use(sinonChai);
 
-var MessageNotificationsController = require('../../src/controllers/MessageNotificationsController');
-var FirebaseController = require('../../src/firebase/FirebaseController');
-var TitoBotController = require('../../src/controllers/TitoBotController');
+var MessageNotificationsService = require('../../src/services/MessageNotificationsService');
+var FirebaseService = require('../../src/firebase/FirebaseService');
+var TitoBotService = require('../../src/services/TitoBotService');
 var BotsController = require('../../src/controllers/BotsController');
 var ChannelDao = require('../../src/daos/ChannelDao');
 
 var TestDatabaseHelper = require('../TestDatabaseHelper');
 var messageMock = require('../mocks/messageMock');
 
-describe('"MessageNotificationsController Tests"', () => {
+describe('"MessageNotificationsService Tests"', () => {
     var mock, mock2, mock3, mock4, firebaseMock;
     var user1, user2, user3, user4;
     var organization;
@@ -23,9 +23,9 @@ describe('"MessageNotificationsController Tests"', () => {
     var message;
 
     before(async () => {
-        firebaseMock = stub(FirebaseController, 'sendMessage').resolves();
-        mock = stub(FirebaseController, 'sendChannelMessageNotification').resolves();
-        mock2 = stub(TitoBotController, 'sendMessage').resolves();
+        firebaseMock = stub(FirebaseService, 'sendMessage').resolves();
+        mock = stub(FirebaseService, 'sendChannelMessageNotification').resolves();
+        mock2 = stub(TitoBotService, 'sendMessage').resolves();
         mock3 = stub(ChannelDao, 'addUsername').resolves();
         mock4 = stub(BotsController, 'sendMessageToBot').resolves();
 
@@ -59,7 +59,7 @@ describe('"MessageNotificationsController Tests"', () => {
                 mock.resetHistory();
                 var data = `@${user1.username} @${user2.username} @otherUser`;
                 message = await TestDatabaseHelper.createChannelMessage(data, channel, user1);
-                await MessageNotificationsController.sendNotification(message);
+                await MessageNotificationsService.sendNotification(message);
             });
 
             it('must send notification to user2', async () => {
@@ -87,7 +87,7 @@ describe('"MessageNotificationsController Tests"', () => {
             beforeEach(async () => {
                 mock.resetHistory();
                 message = await TestDatabaseHelper.createChannelMessage("@all", channel, user1);
-                await MessageNotificationsController.sendNotification(message);
+                await MessageNotificationsService.sendNotification(message);
             });
 
             it('must send notification to user2', async () => {
@@ -123,14 +123,14 @@ describe('"MessageNotificationsController Tests"', () => {
             var conversationMessageMock = Object.create(messageMock);
             conversationMessageMock.channelId = null;
             conversationMessageMock.conversationId = 1;
-            await MessageNotificationsController.sendNotification(conversationMessageMock);
+            await MessageNotificationsService.sendNotification(conversationMessageMock);
             assert.notCalled(mock);
         });
 
         it('should do nothing if is not a text message', async () => {
             var fileMessageMock = Object.create(messageMock);
             fileMessageMock.type = "file";
-            await MessageNotificationsController.sendNotification(fileMessageMock);
+            await MessageNotificationsService.sendNotification(fileMessageMock);
             assert.notCalled(mock);
         });
     });
@@ -143,19 +143,19 @@ describe('"MessageNotificationsController Tests"', () => {
 
         it('should call tito controller if mentioned', async () => {
             message = await TestDatabaseHelper.createChannelMessage("@tito hello", channel, user1);
-            await MessageNotificationsController.sendNotification(message);
+            await MessageNotificationsService.sendNotification(message);
             assert.calledOnce(mock2);
         });
 
         it('should call tito controller if mentioned with other users', async () => {
             message = await TestDatabaseHelper.createChannelMessage("@tito hello @other", channel, user1);
-            await MessageNotificationsController.sendNotification(message);
+            await MessageNotificationsService.sendNotification(message);
             assert.calledOnce(mock2);
         });
 
         it('should not call tito controller if not mentioned', async () => {
             message = await TestDatabaseHelper.createChannelMessage("@titon hello", channel, user1);
-            await MessageNotificationsController.sendNotification(message);
+            await MessageNotificationsService.sendNotification(message);
             assert.notCalled(mock2);
         });
     });
@@ -165,7 +165,7 @@ describe('"MessageNotificationsController Tests"', () => {
             mock.resetHistory();
             mock3.resetHistory();
             message = await TestDatabaseHelper.createChannelMessage("@" + user4.username, channel, user1);
-            await MessageNotificationsController.sendNotification(message);
+            await MessageNotificationsService.sendNotification(message);
         });
 
         it('must not send notification to user4', async () => {
@@ -182,7 +182,7 @@ describe('"MessageNotificationsController Tests"', () => {
             var msg = await TestDatabaseHelper.createChannelMessage("@lalala", channel, user1);
             mock3.rejects();
             mock3.resetHistory();
-            await MessageNotificationsController.sendNotification(msg);
+            await MessageNotificationsService.sendNotification(msg);
             var addedUser = mock3.getCall(0).args[1];
             expect(addedUser).to.eq("lalala");
             mock3.resolves();
@@ -199,7 +199,7 @@ describe('"MessageNotificationsController Tests"', () => {
         beforeEach(async () => {
             mock4.resetHistory();
             message = await TestDatabaseHelper.createChannelMessage("@bot hello", channel, user1);
-            await MessageNotificationsController.sendNotification(message);
+            await MessageNotificationsService.sendNotification(message);
         });
 
         it('must call bot', async () => {
@@ -227,7 +227,7 @@ describe('"MessageNotificationsController Tests"', () => {
 
         it('no mentions should do nothing', async () => {
             message = await TestDatabaseHelper.createChannelMessage("hello channel", channel, user1);
-            await MessageNotificationsController.sendNotification(message);
+            await MessageNotificationsService.sendNotification(message);
             assert.notCalled(mock2);
             assert.notCalled(mock3);
             assert.notCalled(mock4);
@@ -235,7 +235,7 @@ describe('"MessageNotificationsController Tests"', () => {
 
         it('bot should be first mentioned', async () => {
             message = await TestDatabaseHelper.createChannelMessage("hello channel @lalal @bot0 help", channel, user1);
-            await MessageNotificationsController.sendNotification(message);
+            await MessageNotificationsService.sendNotification(message);
             assert.notCalled(mock2);
             assert.notCalled(mock4);
         });

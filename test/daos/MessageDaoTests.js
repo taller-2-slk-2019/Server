@@ -7,7 +7,7 @@ const { stub, match } = require('sinon');
 var SequelizeValidationError = require('../../src/database/sequelize').Sequelize.SequelizeValidationError;
 
 var MessageDao = require('../../src/daos/MessageDao');
-var MessageNotificationsController = require('../../src/controllers/MessageNotificationsController');
+var MessageNotificationsService = require('../../src/services/MessageNotificationsService');
 
 var Config = require('../../src/helpers/Config');
 var MessageParser = require('../../src/helpers/MessageParser');
@@ -31,7 +31,7 @@ describe('"MessageDao Tests"', () => {
     var notificationsMock;
 
     before(async () => {
-        notificationsMock = stub(MessageNotificationsController, 'sendNotification').resolves();
+        notificationsMock = stub(MessageNotificationsService, 'sendNotification').resolves();
 
         user = await TestDatabaseHelper.createUser();
         var user2 = await TestDatabaseHelper.createUser();

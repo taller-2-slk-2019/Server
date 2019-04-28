@@ -1,6 +1,6 @@
 var { filter } = require('p-iteration');
-var TitoBotController = require('../controllers/TitoBotController');
-var FirebaseController = require('../firebase/FirebaseController');
+var TitoBotService = require('../services/TitoBotService');
+var FirebaseService = require('../firebase/FirebaseService');
 var UserDao = require('./UserDao');
 var OrganizationDao = require('./OrganizationDao');
 var ChannelStatistics = require('../models/statistics/ChannelStatistics');
@@ -27,7 +27,7 @@ class ChannelDao{
         var channelModel = await Channel.create(channel);
         await channelModel.addUser(user);
 
-        TitoBotController.channelCreated(channelModel);
+        TitoBotService.channelCreated(channelModel);
         return channelModel;
     }
 
@@ -68,8 +68,8 @@ class ChannelDao{
         }
 
         await channel.addUser(user);
-        TitoBotController.userAddedToChannel(channel, user);
-        FirebaseController.sendChannelInvitationNotification(user, channel);
+        TitoBotService.userAddedToChannel(channel, user);
+        FirebaseService.sendChannelInvitationNotification(user, channel);
     }
 
     async removeUser(userId, channelId){

@@ -7,7 +7,7 @@ const { stub, match } = require('sinon');
 var SequelizeValidationError = require('../../src/database/sequelize').Sequelize.SequelizeValidationError;
 
 var OrganizationDao = require('../../src/daos/OrganizationDao');
-var FirebaseController = require('../../src/firebase/FirebaseController');
+var FirebaseService = require('../../src/firebase/FirebaseService');
 
 var models = require('../../src/database/sequelize');
 var Organization = models.organization;
@@ -29,7 +29,7 @@ describe('"OrganizationDao Tests"', () => {
     var firebaseMock;
 
     before(async () => {
-        firebaseMock = stub(FirebaseController, 'sendOrganizationInvitationNotification').resolves();
+        firebaseMock = stub(FirebaseService, 'sendOrganizationInvitationNotification').resolves();
 
         user = await TestDatabaseHelper.createUser();
         organizationData.creatorToken = user.token;

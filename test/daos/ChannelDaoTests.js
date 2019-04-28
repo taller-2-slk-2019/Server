@@ -9,8 +9,8 @@ chai.use(sinonChai);
 var SequelizeValidationError = require('../../src/database/sequelize').Sequelize.SequelizeValidationError;
 
 var ChannelDao = require('../../src/daos/ChannelDao');
-var TitoBotController = require('../../src/controllers/TitoBotController');
-var FirebaseController = require('../../src/firebase/FirebaseController');
+var TitoBotService = require('../../src/services/TitoBotService');
+var FirebaseService = require('../../src/firebase/FirebaseService');
 
 var models = require('../../src/database/sequelize');
 var Channel = models.channel;
@@ -29,9 +29,9 @@ describe('"ChannelDao Tests"', () => {
     var channelData = Object.create(channelCreateData);
 
     before(async () => {
-        titoMock = stub(TitoBotController, 'userAddedToChannel').resolves();
-        titoMock2 = stub(TitoBotController, 'channelCreated').resolves();
-        firebaseMock = stub(FirebaseController, 'sendChannelInvitationNotification').resolves();
+        titoMock = stub(TitoBotService, 'userAddedToChannel').resolves();
+        titoMock2 = stub(TitoBotService, 'channelCreated').resolves();
+        firebaseMock = stub(FirebaseService, 'sendChannelInvitationNotification').resolves();
 
         user = await TestDatabaseHelper.createUser();
         organization = await TestDatabaseHelper.createOrganization([user]);

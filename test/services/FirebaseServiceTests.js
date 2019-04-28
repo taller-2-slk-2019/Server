@@ -6,20 +6,20 @@ const { stub, assert } = require('sinon');
 const sinonChai = require('sinon-chai');
 chai.use(sinonChai);
 
-var FirebaseController = require('../../src/firebase/FirebaseController');
+var FirebaseService = require('../../src/firebase/FirebaseService');
 
 var messageMock = require('../mocks/messageMock');
 var models = require('../../src/database/sequelize');
 var TestDatabaseHelper = require('../TestDatabaseHelper');
 var FirebaseToken = models.firebaseToken;
 
-describe('"FirebaseController Tests"', () => {
+describe('"FirebaseService Tests"', () => {
     var mockTopics;
     var mockUsers;
 
     before(async () => {
-        mockTopics = stub(FirebaseController, '_sendToFirebaseTopic').returns(true);
-        mockUsers = stub(FirebaseController, '_sendToFirebaseDevices').returns(true);
+        mockTopics = stub(FirebaseService, '_sendToFirebaseTopic').returns(true);
+        mockUsers = stub(FirebaseService, '_sendToFirebaseDevices').returns(true);
     });
 
     beforeEach(async () => {
@@ -39,7 +39,7 @@ describe('"FirebaseController Tests"', () => {
 
             beforeEach(async () => {
                 mockTopics.resetHistory();
-                FirebaseController.sendMessage(channelMessageMock);
+                FirebaseService.sendMessage(channelMessageMock);
             });
 
             it('should send message to firebase', async () => {
@@ -59,7 +59,7 @@ describe('"FirebaseController Tests"', () => {
 
             beforeEach(async () => {
                 mockTopics.resetHistory();
-                FirebaseController.sendMessage(conversationMessageMock);
+                FirebaseService.sendMessage(conversationMessageMock);
             });
 
             it('should send message to firebase', async () => {
@@ -79,7 +79,7 @@ describe('"FirebaseController Tests"', () => {
 
             beforeEach(async () => {
                 mockTopics.resetHistory();
-                FirebaseController.sendMessage(message);
+                FirebaseService.sendMessage(message);
             });
 
             it('should not send message to firebase', async () => {
@@ -112,12 +112,12 @@ describe('"FirebaseController Tests"', () => {
         });
 
         it('should send message to firebase', async () => {
-            await FirebaseController.sendChannelMessageNotification(message, [user1.username, user2.username, user3.username]);
+            await FirebaseService.sendChannelMessageNotification(message, [user1.username, user2.username, user3.username]);
             assert.calledOnce(mockUsers);
         });
 
         it('should send message to correct user tokens', async () => {
-            await FirebaseController.sendChannelMessageNotification(message, [user1.username, user2.username, user3.username]);
+            await FirebaseService.sendChannelMessageNotification(message, [user1.username, user2.username, user3.username]);
             var args = mockUsers.getCall(0).args[1];
             expect(args).to.include('token11');
             expect(args).to.include('token22');
@@ -125,7 +125,7 @@ describe('"FirebaseController Tests"', () => {
         });
 
         it('should do nothing if no tokens are provided', async () => {
-            await FirebaseController.sendChannelMessageNotification(message, [user3.username]);
+            await FirebaseService.sendChannelMessageNotification(message, [user3.username]);
             assert.notCalled(mockUsers);
         });
     });
@@ -148,19 +148,19 @@ describe('"FirebaseController Tests"', () => {
         });
 
         it('should send message to firebase', async () => {
-            await FirebaseController.sendOrganizationInvitationNotification(user, organization);
+            await FirebaseService.sendOrganizationInvitationNotification(user, organization);
             assert.calledOnce(mockUsers);
         });
 
         it('should send message to correct user tokens', async () => {
-            await FirebaseController.sendOrganizationInvitationNotification(user, organization);
+            await FirebaseService.sendOrganizationInvitationNotification(user, organization);
             var args = mockUsers.getCall(0).args[1];
             expect(args).to.include('token111');
             expect(args).to.include('token222');
         });
 
         it('should do nothing if no tokens are provided', async () => {
-            await FirebaseController.sendOrganizationInvitationNotification(user2, organization);
+            await FirebaseService.sendOrganizationInvitationNotification(user2, organization);
             assert.notCalled(mockUsers);
         });
     });
@@ -185,19 +185,19 @@ describe('"FirebaseController Tests"', () => {
         });
 
         it('should send message to firebase', async () => {
-            await FirebaseController.sendChannelInvitationNotification(user2, channel);
+            await FirebaseService.sendChannelInvitationNotification(user2, channel);
             assert.calledOnce(mockUsers);
         });
 
         it('should send message to correct user tokens', async () => {
-            await FirebaseController.sendChannelInvitationNotification(user2, channel);
+            await FirebaseService.sendChannelInvitationNotification(user2, channel);
             var args = mockUsers.getCall(0).args[1];
             expect(args).to.include('token1111');
             expect(args).to.include('token2222');
         });
 
         it('should do nothing if no tokens are provided', async () => {
-            await FirebaseController.sendOrganizationInvitationNotification(user, channel);
+            await FirebaseService.sendOrganizationInvitationNotification(user, channel);
             assert.notCalled(mockUsers);
         });
     });

@@ -1,5 +1,5 @@
 var { filter } = require('p-iteration');
-var TitoBotController = require('../controllers/TitoBotController');
+var TitoBotService = require('../services/TitoBotService');
 var UserDao = require('./UserDao');
 var OrganizationDao = require('./OrganizationDao');
 var models = require('../database/sequelize');
@@ -32,7 +32,7 @@ class ConversationDao{
 
         var conversationModel = await Conversation.create({organizationId: organizationId});
         await conversationModel.addUsers([user1, user2]);
-        TitoBotController.conversationCreated(conversationModel, user1);
+        TitoBotService.conversationCreated(conversationModel, user1);
         return await Conversation.findByPk(conversationModel.id, this._getIncludeUsers(user1.id));
     }
 

@@ -7,7 +7,7 @@ var Config = require('../helpers/Config');
 var { UserNotBelongsToChannelError, UserNotBelongsToConversationError, 
     MessageNotFoundError, InvalidMessageDataError } = require('../helpers/Errors');
 var MessageParser = require('../helpers/MessageParser');
-var MessageNotifications = require('../controllers/MessageNotificationsController');
+var MessageNotifications = require('../services/MessageNotificationsService');
 
 class MessageDao{
     async findById(id){
