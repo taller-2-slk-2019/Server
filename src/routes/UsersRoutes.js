@@ -5,8 +5,6 @@ var usersController = require('../controllers/UsersController');
 
 router.get('/profile', usersController.getProfile);
 
-router.get('/:id', usersController.getUser);
-
 router.get('/', usersController.get);
 
 router.post('/', usersController.register);
@@ -19,5 +17,6 @@ router.get('/invitations', usersController.getInvitations);
 
 router.delete('/invitations/:token', usersController.deleteInvitation);
 
+router.get('/:id', usersController.getUser);
 
 module.exports = router;
