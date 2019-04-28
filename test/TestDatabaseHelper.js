@@ -5,6 +5,7 @@ var Organization = models.organization;
 var Channel = models.channel;
 var Conversation = models.conversation;
 var Message = models.message;
+var Bot = models.bot;
 
 var { forEach } = require('p-iteration');
 
@@ -14,6 +15,7 @@ const { organizationCreateData } = require('./data/organizationData');
 var { channelCreateData } = require('./data/channelData');
 var { conversationCreateData } = require('./data/conversationData');
 var { messageCreateData } = require('./data/messageData');
+var { botCreateData } = require('./data/botData');
 
 class TestDatabaseHelper {
 
@@ -70,6 +72,15 @@ class TestDatabaseHelper {
         data.conversationId = conversation.id;
         data.data = msg;
         return await Message.create(data);
+    }
+
+    async createBot(organization, name = '') {
+        var data = Object.create(botCreateData());
+        if (name){
+            data.name = name;
+        }
+        data.organizationId = organization.id;
+        return await Bot.create(data);
     }
 }
 

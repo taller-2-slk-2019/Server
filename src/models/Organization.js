@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
     Organization.hasMany(models.channel);
     Organization.hasMany(models.conversation);
     Organization.hasMany(models.forbiddenWord);
+    Organization.hasMany(models.bot);
   };
 
   return Organization;

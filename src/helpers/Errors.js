@@ -119,6 +119,13 @@ class ForbiddenWordAlreadyExistsError extends Error {
     }
 }
 
+class BotAlreadyExistsError extends Error {
+    constructor(bot, organizationId) {
+        super(`Bot '${bot}' already exists in organization ${organizationId}`);
+        this.name = this.constructor.name;
+    }
+}
+
 module.exports = {
     UserNotFoundError,
     AdminUserNotFoundError,
@@ -136,5 +143,6 @@ module.exports = {
     InvalidConversationError,
     UserNotBelongsToConversationError,
     InvalidQueryError,
-    MessageNotFoundError
+    MessageNotFoundError,
+    BotAlreadyExistsError
 };

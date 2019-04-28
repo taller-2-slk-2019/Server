@@ -1,8 +1,9 @@
 var logger = require('logops');
 const axios = require('axios');
 var Config = require('../helpers/Config');
-//var BotDao = require('../daos/BotDao');
-//var { sendErrorResponse, sendEmptySuccessResponse } = require('../helpers/ResponseHelper');
+var BotDao = require('../daos/BotDao');
+var AdminDao = require('../daos/AdminUserDao');
+var { sendSuccessResponse, sendErrorResponse, sendEmptySuccessResponse } = require('../helpers/ResponseHelper');
 
 class BotsController {
 
@@ -22,6 +23,52 @@ class BotsController {
             logger.error('Failed message to bot: ' + bot.name);
             logger.error(err);
         });
+    }
+
+    async get(req, res){
+        var organizationId = req.query.organizationId;
+
+        try{
+            var bots  = await BotDao.get(organizationId);
+            sendSuccessResponse(res, bots);
+            
+        } catch (err){
+            sendErrorResponse(res, err);
+        }
+    }
+
+    async create(req, res){
+        var data = {
+            name: req.body.name,
+            url: req.body.url,
+            organizationId: req.body.organizationId
+        };
+        
+        try{
+            await AdminDao.findByToken(req.get('adminToken'));
+
+            var bot = await BotDao.create(data);
+            logger.info(`Bot '${data.name}' added to organization ${data.organizationId}`);
+            sendSuccessResponse(res, bot);
+
+        } catch (err){
+            sendErrorResponse(res, err);
+        }
+    }
+
+    async delete(req, res){
+        var botId = req.params.id;
+
+        try{
+            await AdminDao.findByToken(req.get('adminToken'));
+            
+            await BotDao.delete(botId);
+            logger.info(`Bot '${botId}' deleted`);
+            sendEmptySuccessResponse(res);
+
+        } catch (err){
+            sendErrorResponse(res, err);
+        }
     }
 }
 
