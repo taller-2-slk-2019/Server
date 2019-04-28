@@ -13,7 +13,7 @@ const { userCreateData } = require('../data/userData');
 
 var UserController = require('../../src/controllers/UsersController');
 var UserDao = require('../../src/daos/UserDao');
-var OrganizationDao = require('../../src/daos/OrganizationDao');
+var OrganizationService = require('../../src/services/OrganizationService');
 var UserStatistics = require('../../src/models/statistics/UserStatistics')
 var UserService = require('../../src/services/UserService')
 
@@ -32,7 +32,7 @@ describe('"UsersController Tests"', () => {
             mock1 = stub(UserDao, 'create').resolves(userProfileMock);
             mock2 = stub(UserDao, 'update').resolves();
             mock3 = stub(UserDao, 'findById').resolves(userProfileMock);
-            mock4 = stub(OrganizationDao, 'findOrganizationUsers').resolves([userForOrganizationMock, userForOrganizationMock]);
+            mock4 = stub(OrganizationService, 'findOrganizationUsers').resolves([userForOrganizationMock, userForOrganizationMock]);
             mock5 = stub(UserDao, 'findByToken').resolves(userProfileMock);
             mock6 = stub(UserDao, 'findUserInvitations').resolves([userOrganizationInvitationMock, userOrganizationInvitationMock]);
             mock7 = stub(UserDao, 'deleteUserInvitation').resolves();
@@ -341,7 +341,7 @@ describe('"UsersController Tests"', () => {
             mock1 = stub(UserDao, 'create').rejects();
             mock2 = stub(UserDao, 'update').rejects();
             mock3 = stub(UserDao, 'findById').rejects();
-            mock4 = stub(OrganizationDao, 'findOrganizationUsers').rejects();
+            mock4 = stub(OrganizationService, 'findOrganizationUsers').rejects();
             mock5 = stub(UserDao, 'findByToken').rejects();
             mock6 = stub(UserDao, 'findUserInvitations').rejects();
             mock7 = stub(UserDao, 'deleteUserInvitation').rejects();

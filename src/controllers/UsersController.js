@@ -1,10 +1,10 @@
 var logger = require('logops');
 var UserDao = require('../daos/UserDao');
-var OrganizationDao = require('../daos/OrganizationDao');
+var OrganizationService = require('../services/OrganizationService');
 var { sendSuccessResponse, sendErrorResponse, sendEmptySuccessResponse } = require('../helpers/ResponseHelper');
 var { InvalidLocationError } = require('../helpers/Errors');
 var Token = require('../helpers/Token');
-const userService = require ('../services/UserService');
+const UserService = require ('../services/UserService');
 
 
 class UsersController{
@@ -77,11 +77,12 @@ class UsersController{
     async getStatistics(req, res) {
         const userToken = req.query.userToken;
 
-        userService.getStatistics(userToken)
-            .then(results => {
-                sendSuccessResponse(res, results);
-            })
-            .catch(reason => sendErrorResponse(res, reason));
+        try{
+            var stats = await UserService.getStatistics(userToken);
+            sendSuccessResponse(res, stats);
+        } catch (err){
+            sendErrorResponse(res, err);
+        }
     }
 
     async deleteInvitation(req, res) {
@@ -99,7 +100,7 @@ class UsersController{
         var organizationId = req.query.organizationId;
 
         try{
-            var users = await OrganizationDao.findOrganizationUsers(organizationId);
+            var users = await OrganizationService.findOrganizationUsers(organizationId);
             sendSuccessResponse(res, users);
         } catch (err){
             sendErrorResponse(res, err);
