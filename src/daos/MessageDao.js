@@ -86,11 +86,10 @@ class MessageDao{
         return await this._get({ conversationId: conversation.id }, offset);
     }
 
-    async findAllByUser(userId) {
-
-        return Message.findAll({
+    async getMessagesCountByUser(userId) {
+        return await Message.count({
             where: {
-                sender: userId
+                senderId: userId
             }
         });
     }
