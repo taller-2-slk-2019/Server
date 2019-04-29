@@ -1,16 +1,16 @@
 var logger = require('logops');
 var MessageParser = require('../helpers/MessageParser');
-var FirebaseController = require('../firebase/FirebaseController');
-var ChannelDao = require('../daos/ChannelDao');
+var FirebaseService = require('../firebase/FirebaseService');
+var ChannelService = require('../services/ChannelService');
 var BotDao = require('../daos/BotDao');
 var BotsController = require('../controllers/BotsController');
-var TitoBot = require('../controllers/TitoBotController');
+var TitoBot = require('../services/TitoBotService');
 var Config = require('../helpers/Config');
 
-class MessageNotificationsController {
+class MessageNotificationsService {
 
     async sendNotification(message){
-        await FirebaseController.sendMessage(message);
+        await FirebaseService.sendMessage(message);
 
         if (message.bot || message.conversationId || !Config.messageTypesWithText.includes(message.type)){
             //Don't mention users in conversations or bot's messages
@@ -35,8 +35,10 @@ class MessageNotificationsController {
             }
         }
 
-        await this._notifyMentionedUsers(message, mentionedUsers);
-        await this._addNewUsers(message, mentionedUsers);
+        await Promise.all([
+                    this._notifyMentionedUsers(message, mentionedUsers),
+                    this._addNewUsers(message, mentionedUsers)
+                ]);
     }
 
     async _notifyMentionedUsers(message, mentionedUsers){
@@ -52,7 +54,7 @@ class MessageNotificationsController {
         usersToNotify = usersToNotify.filter(username => {return username != sender.username;});
 
         logger.info('Sending user mentioned notifications to: ' + usersToNotify);
-        FirebaseController.sendChannelMessageNotification(message, usersToNotify);
+        FirebaseService.sendChannelMessageNotification(message, usersToNotify);
     }
 
     async _addNewUsers(message, mentionedUsers){
@@ -64,7 +66,7 @@ class MessageNotificationsController {
 
         logger.info(`Adding to channel ${message.channelId} mentioned users ` + newUsers);
         newUsers.forEach(username => {
-            ChannelDao.addUsername(message.channelId, username).catch(err => {
+            ChannelService.addUsername(message.channelId, username).catch(err => {
                 logger.error(`Could not add user ${username} to channel ${message.channelId}`);
                 logger.error(err);
             });
@@ -78,4 +80,4 @@ class MessageNotificationsController {
     }
 }
 
-module.exports = new MessageNotificationsController();
+module.exports = new MessageNotificationsService();

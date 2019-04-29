@@ -1,5 +1,6 @@
 var logger = require('logops');
 var ChannelDao = require('../daos/ChannelDao');
+var ChannelService = require('../services/ChannelService');
 var { sendSuccessResponse, sendErrorResponse, sendEmptySuccessResponse } = require('../helpers/ResponseHelper');
 var { checkIsAdmin } = require('../helpers/RequestHelper');
 
@@ -34,7 +35,12 @@ class ChannelsController{
         }
 
         try{
-            var channels  = await ChannelDao.get(userToken, organizationId, userIsMember);
+            var channels = [];
+            if (userToken){
+                channels  = await ChannelService.getForUser(organizationId, userToken, userIsMember);
+            } else {
+                channels  = await ChannelService.get(organizationId);
+            }
             sendSuccessResponse(res, channels);
             
         } catch (err){
@@ -58,7 +64,7 @@ class ChannelsController{
         var id = req.params.id;
 
         try{
-            var users  = await ChannelDao.getChannelUsers(id);
+            var users  = await ChannelService.getChannelUsers(id);
             sendSuccessResponse(res, users);
             
         } catch (err){
@@ -70,7 +76,7 @@ class ChannelsController{
         var channelId = req.params.id;
         var userId = req.body.userId;
         try{
-            await ChannelDao.addUser(channelId, userId);
+            await ChannelService.addUser(channelId, userId);
             logger.info(`User ${userId} added to channel ${channelId}`);
             sendEmptySuccessResponse(res);
 
@@ -84,7 +90,7 @@ class ChannelsController{
         var channelId = req.params.id;
 
         try{
-            await ChannelDao.removeUser(userId, channelId);
+            await ChannelService.removeUser(userId, channelId);
             logger.info(`User ${userId} abandoned channel ${channelId}`);
             sendEmptySuccessResponse(res);
         } catch (err){
@@ -96,7 +102,7 @@ class ChannelsController{
         var channelId = req.params.id;
 
         try{
-            var stats = await ChannelDao.getStatistics(channelId);
+            var stats = await ChannelService.getStatistics(channelId);
             sendSuccessResponse(res, stats);
         } catch (err){
             sendErrorResponse(res, err);

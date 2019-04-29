@@ -8,21 +8,21 @@ chai.use(sinonChai);
 var axios = require('axios');
 var AxiosMock = require('axios-mock-adapter');
 
-var TitoBotController = require('../../src/controllers/TitoBotController');
+var TitoBotService = require('../../src/services/TitoBotService');
 var BotsController = require('../../src/controllers/BotsController');
 var TestDatabaseHelper = require('../TestDatabaseHelper');
 
 var messageMock = require('../mocks/messageMock');
 
-describe('"TitoBotController Tests"', () => {
+describe('"TitoBotService Tests"', () => {
     var mock, mock2;
 
     before(async () => {
         mock = stub(BotsController, 'sendMessageToBot').resolves();
         mock2 = new AxiosMock(axios);
-        mock2.onPost(TitoBotController.titoBotBaseUrl + 'welcome').reply(200, {});
-        mock2.onPost(TitoBotController.titoBotBaseUrl + 'channel').reply(200, {});
-        mock2.onPost(TitoBotController.titoBotBaseUrl + 'conversation').reply(200, {});
+        mock2.onPost(TitoBotService.titoBotBaseUrl + 'welcome').reply(200, {});
+        mock2.onPost(TitoBotService.titoBotBaseUrl + 'channel').reply(200, {});
+        mock2.onPost(TitoBotService.titoBotBaseUrl + 'conversation').reply(200, {});
     });
 
     beforeEach(async () => {
@@ -38,7 +38,7 @@ describe('"TitoBotController Tests"', () => {
     describe('Send Message', () => {
         beforeEach(async () => {
             mock.resetHistory();
-            await TitoBotController.sendMessage(messageMock);
+            await TitoBotService.sendMessage(messageMock);
         });
 
         it('should send message to bot', async () => {
@@ -47,7 +47,7 @@ describe('"TitoBotController Tests"', () => {
 
         it('should send message with bot name', async () => {
             var args = mock.getCall(0).args[0];
-            expect(args).to.have.property('name', TitoBotController.titoBotName);
+            expect(args).to.have.property('name', TitoBotService.titoBotName);
         });
 
         it('should send message with bot url', async () => {
@@ -72,7 +72,7 @@ describe('"TitoBotController Tests"', () => {
 
         beforeEach(async () => {
             mock2.reset();
-            await TitoBotController.userAddedToChannel(channel, user);
+            await TitoBotService.userAddedToChannel(channel, user);
         });
 
         it('should send message to bot', async () => {
@@ -99,7 +99,7 @@ describe('"TitoBotController Tests"', () => {
 
         beforeEach(async () => {
             mock2.reset();
-            await TitoBotController.channelCreated(channel);
+            await TitoBotService.channelCreated(channel);
         });
 
         it('should send message to bot', async () => {
@@ -127,7 +127,7 @@ describe('"TitoBotController Tests"', () => {
 
         beforeEach(async () => {
             mock2.reset();
-            await TitoBotController.conversationCreated(conversation, user);
+            await TitoBotService.conversationCreated(conversation, user);
         });
 
         it('should send message to bot', async () => {

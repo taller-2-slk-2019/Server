@@ -13,7 +13,7 @@ var ConversationDao = require('../../src/daos/ConversationDao');
 var models = require('../../src/database/sequelize');
 var Conversation = models.conversation;
 var TestDatabaseHelper = require('../TestDatabaseHelper');
-var TitoBotController = require('../../src/controllers/TitoBotController');
+var TitoBotService = require('../../src/services/TitoBotService');
 
 var { ConversationNotFoundError, UserNotBelongsToOrganizationError, InvalidConversationError } = require('../../src/helpers/Errors');
 var { conversationCreateData } = require('../data/conversationData');
@@ -26,7 +26,7 @@ describe('"ConversationDao Tests"', () => {
     var conversationData = Object.create(conversationCreateData);
 
     before(async () => {
-        titoMock = stub(TitoBotController, 'conversationCreated').resolves();
+        titoMock = stub(TitoBotService, 'conversationCreated').resolves();
 
         user = await TestDatabaseHelper.createUser();
         user2 = await TestDatabaseHelper.createUser();

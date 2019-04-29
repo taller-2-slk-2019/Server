@@ -6,8 +6,9 @@ var { ForbiddenWordAlreadyExistsError } = require('../helpers/Errors');
 class ForbiddenWordDao{
 
     async get(organizationId){
-        var org = await OrganizationDao.findById(organizationId);
-        return await org.getForbiddenWords();
+        return await ForbiddenWord.findAll({
+            where: {organizationId: organizationId}
+        });
     }
 
     async create(wordData){

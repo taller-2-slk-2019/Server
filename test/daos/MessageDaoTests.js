@@ -7,7 +7,7 @@ const { stub, match } = require('sinon');
 var SequelizeValidationError = require('../../src/database/sequelize').Sequelize.SequelizeValidationError;
 
 var MessageDao = require('../../src/daos/MessageDao');
-var MessageNotificationsController = require('../../src/controllers/MessageNotificationsController');
+var MessageNotificationsService = require('../../src/services/MessageNotificationsService');
 
 var Config = require('../../src/helpers/Config');
 var MessageParser = require('../../src/helpers/MessageParser');
@@ -31,7 +31,7 @@ describe('"MessageDao Tests"', () => {
     var notificationsMock;
 
     before(async () => {
-        notificationsMock = stub(MessageNotificationsController, 'sendNotification').resolves();
+        notificationsMock = stub(MessageNotificationsService, 'sendNotification').resolves();
 
         user = await TestDatabaseHelper.createUser();
         var user2 = await TestDatabaseHelper.createUser();
@@ -384,7 +384,7 @@ describe('"MessageDao Tests"', () => {
         it('message must not be null', async () => {
             expect(message).to.not.be.null;
         });
-        
+
         it('message must have correct id', async () => {
             expect(message).to.have.property('id', expected.id);
         });

@@ -7,7 +7,7 @@ var Config = require('../helpers/Config');
 var { UserNotBelongsToChannelError, UserNotBelongsToConversationError, 
     MessageNotFoundError, InvalidMessageDataError } = require('../helpers/Errors');
 var MessageParser = require('../helpers/MessageParser');
-var MessageNotifications = require('../controllers/MessageNotificationsController');
+var MessageNotifications = require('../services/MessageNotificationsService');
 
 class MessageDao{
     async findById(id){
@@ -20,8 +20,10 @@ class MessageDao{
     }
 
     async createForChannel(msg){
-        var user = await UserDao.findByToken(msg.senderToken);
-        var channel = await ChannelDao.findById(msg.channelId);
+        var [user, channel] = await Promise.all([
+                    UserDao.findByToken(msg.senderToken),
+                    ChannelDao.findById(msg.channelId)
+                ]);
         msg.senderId = user.id;
 
         if (!(await channel.hasUser(user))){
@@ -33,8 +35,10 @@ class MessageDao{
     }
 
     async createForConversation(msg){
-        var user = await UserDao.findByToken(msg.senderToken);
-        var conversation = await ConversationDao.findById(msg.conversationId);
+        var [user, conversation] = await Promise.all([
+                    UserDao.findByToken(msg.senderToken),
+                    ConversationDao.findById(msg.conversationId)
+                ]);
         msg.senderId = user.id;
 
         if (!(await conversation.hasUser(user))){

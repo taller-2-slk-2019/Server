@@ -1,5 +1,7 @@
 var logger = require('logops');
 var OrganizationDao = require('../daos/OrganizationDao');
+var OrganizationService = require('../services/OrganizationService');
+var UserService = require('../services/UserService');
 var { sendSuccessResponse, sendEmptySuccessResponse, sendErrorResponse } = require('../helpers/ResponseHelper');
 var { checkIsAdmin } = require('../helpers/RequestHelper');
 
@@ -21,7 +23,7 @@ class OrganizationsController{
         try {
             var orgs = [];
             if (user){
-                orgs = await OrganizationDao.findForUser(user);
+                orgs = await UserService.findUserOrganizations(user);
             } else {
                 orgs = await OrganizationDao.get();
             }
@@ -57,7 +59,7 @@ class OrganizationsController{
             var organizationId = req.params.id;
             var userEmails = req.body.userEmails;
 
-            var mails = await OrganizationDao.inviteUsers(organizationId, userEmails);
+            var mails = await OrganizationService.inviteUsers(organizationId, userEmails);
 
             sendSuccessResponse(res, mails);
 
@@ -70,7 +72,7 @@ class OrganizationsController{
         var token = req.body.token;
 
         try{
-            await OrganizationDao.acceptUserInvitation(token);
+            await OrganizationService.acceptUserInvitation(token);
             sendEmptySuccessResponse(res);
         } catch (err){
             sendErrorResponse(res, err);
@@ -82,7 +84,7 @@ class OrganizationsController{
         var organizationId = req.params.id;
 
         try{
-            await OrganizationDao.removeUser(userId, organizationId);
+            await OrganizationService.removeUser(userId, organizationId);
             logger.info(`User ${userId} abandoned organization ${organizationId}`);
             sendEmptySuccessResponse(res);
         } catch (err){

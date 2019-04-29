@@ -1,9 +1,11 @@
 var logger = require('logops');
 var UserDao = require('../daos/UserDao');
-var OrganizationDao = require('../daos/OrganizationDao');
+var OrganizationService = require('../services/OrganizationService');
 var { sendSuccessResponse, sendErrorResponse, sendEmptySuccessResponse } = require('../helpers/ResponseHelper');
 var { InvalidLocationError } = require('../helpers/Errors');
 var Token = require('../helpers/Token');
+const UserService = require ('../services/UserService');
+
 
 class UsersController{
 
@@ -26,7 +28,7 @@ class UsersController{
             var user = await UserDao.create(data);
             logger.info("User created: " + user.id);
             sendSuccessResponse(res, user);
-            
+
         } catch (err){
             sendErrorResponse(res, err);
         }
@@ -58,15 +60,26 @@ class UsersController{
         var token = req.query.userToken;
 
         try{
-            var invitations = await UserDao.findUserInvitations(token);
+            var invitations = await UserService.findUserInvitations(token);
             var result = invitations.map(invitation => {
                 return {token: invitation.organizationUserInvitation.token,
                         organization: invitation,
                         invitedAt: invitation.organizationUserInvitation.createdAt
                        };
             });
-            
+
             sendSuccessResponse(res, result);
+        } catch (err){
+            sendErrorResponse(res, err);
+        }
+    }
+
+    async getStatistics(req, res) {
+        const userToken = req.query.userToken;
+
+        try{
+            var stats = await UserService.getStatistics(userToken);
+            sendSuccessResponse(res, stats);
         } catch (err){
             sendErrorResponse(res, err);
         }
@@ -76,7 +89,7 @@ class UsersController{
         var token = req.params.token;
 
         try{
-            await UserDao.deleteUserInvitation(token);
+            await UserService.deleteUserInvitation(token);
             sendEmptySuccessResponse(res);
         } catch (err){
             sendErrorResponse(res, err);
@@ -87,13 +100,13 @@ class UsersController{
         var organizationId = req.query.organizationId;
 
         try{
-            var users = await OrganizationDao.findOrganizationUsers(organizationId);
+            var users = await OrganizationService.findOrganizationUsers(organizationId);
             sendSuccessResponse(res, users);
         } catch (err){
             sendErrorResponse(res, err);
         }
     }
-    
+
     async updateProfile(req, res) {
         var data = {
             name: req.body.name,
@@ -127,7 +140,7 @@ class UsersController{
             await UserDao.update(data, token);
             logger.info("Location from user " + token + " updated");
             sendEmptySuccessResponse(res);
-            
+
         } catch (err){
             sendErrorResponse(res, err);
         }
