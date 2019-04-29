@@ -35,8 +35,10 @@ class MessageNotificationsService {
             }
         }
 
-        await this._notifyMentionedUsers(message, mentionedUsers);
-        await this._addNewUsers(message, mentionedUsers);
+        await Promise.all([
+                    this._notifyMentionedUsers(message, mentionedUsers),
+                    this._addNewUsers(message, mentionedUsers)
+                ]);
     }
 
     async _notifyMentionedUsers(message, mentionedUsers){

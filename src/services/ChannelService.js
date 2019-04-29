@@ -44,8 +44,10 @@ class ChannelService {
     }
 
     async removeUser(userId, channelId){
-        var channel = await ChannelDao.findById(channelId);
-        var user = await UserDao.findById(userId);
+        var [channel, user] = await Promise.all([
+                    ChannelDao.findById(channelId),
+                    UserDao.findById(userId)
+                ]);
 
         if (!(await channel.hasUser(user))){
             throw new UserNotBelongsToChannelError(channelId, userId);
@@ -71,8 +73,10 @@ class ChannelService {
     }
 
     async getForUser(organizationId, userToken, userIsMember){
-        var user = await UserDao.findByToken(userToken);
-        var orgChannels = await this.get(organizationId);
+        var [user, orgChannels] = await Promise.all([
+                    UserDao.findByToken(userToken),
+                    this.get(organizationId)
+                ]);
 
         var userChannels = await filter(orgChannels, async (channel) => {
             if (userIsMember){

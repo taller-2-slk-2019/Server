@@ -48,17 +48,21 @@ class ConversationDao{
         var conversations = await organization.getConversations(this._getIncludeUsers(user1.id));
 
         var result = await filter(conversations, async (conversation) => {
-            var hasUser1 = await conversation.hasUser(user1);
-            var hasUser2 = await conversation.hasUser(user2);
-            return hasUser1 && hasUser2;
+            var results = await Promise.all([
+                    conversation.hasUser(user1),
+                    conversation.hasUser(user2)
+                ]);
+            return results.every(r => r);
         });
 
         return result.length > 0 ? result[0] : null;
     }
 
     async get(userToken, organizationId){
-        var org = await OrganizationDao.findById(organizationId);
-        var user = await UserDao.findByToken(userToken);
+        var [org, user] = await Promise.all([
+                OrganizationDao.findById(organizationId),
+                UserDao.findByToken(userToken)
+            ]);
 
         var orgConversations = await org.getConversations(this._getIncludeUsers(user.id));
 

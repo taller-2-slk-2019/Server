@@ -22,15 +22,14 @@ class BotDao{
             throw new BotAlreadyExistsError(botData.name, org.id);
         }
         
-        return Bot.create(botData);
+        return await Bot.create(botData);
     }
 
     async findByName(name, organizationId){
-        var org = await OrganizationDao.findById(organizationId);
-
-        var bots = await org.getBots({where: {name: name}});
-
-        return bots.length > 0 ? bots[0] : null;
+        return await Bot.findOne({
+            where: {organizationId: organizationId,
+                    name: name }
+        });
     }
 
     async delete(id){

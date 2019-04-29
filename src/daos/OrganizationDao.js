@@ -31,6 +31,7 @@ class OrganizationDao{
     async delete(organizationId){
         var organization = await this.findById(organizationId);
         var channels = await organization.getChannels();
+        
         await forEach(channels, async (channel) => {
             await channel.destroy();
         });

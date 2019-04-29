@@ -61,18 +61,24 @@ class OrganizationService {
             throw new InvalidOrganizationInvitationTokenError(token);
         }
 
-        var org = await OrganizationDao.findById(invitation.organizationId);
-        var user = await UserDao.findById(invitation.userId);
+        var [org, user] = await Promise.all([
+                    OrganizationDao.findById(invitation.organizationId),
+                    UserDao.findById(invitation.userId)
+                ]);
 
-        await org.addUser(user, { through: {role: (new UserRoleMember()).name } });
-        await invitation.destroy();
+        await Promise.all([
+            org.addUser(user, { through: {role: (new UserRoleMember()).name } }),
+            invitation.destroy()
+        ]);
 
         logger.info(`User ${user.id} accepted invitation to organization ${org.id}`);
     }
 
     async removeUser(userId, organizationId){
-        var organization = await OrganizationDao.findById(organizationId);
-        var user = await UserDao.findById(userId);
+        var [organization, user] = await Promise.all([
+                    OrganizationDao.findById(organizationId),
+                    UserDao.findById(userId)
+                ]);
 
         if (!(await organization.hasUser(user))){
             throw new UserNotBelongsToOrganizationError(organizationId, userId);

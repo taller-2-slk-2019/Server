@@ -9,11 +9,11 @@ class UserService {
     async getStatistics(userToken) {
         var user = await UserDao.findByToken(userToken);
 
-        var results = await Promise.all([
+        var [orgs, messageCount] = await Promise.all([
                           user.getOrganizations().map(org => org.name),
                           MessageStatisticsDao.getMessagesCountByUser(user.id),
                         ]);
-        return new UserStatistics(results[0], results[1]);
+        return new UserStatistics(orgs, messageCount);
     }
 
     async findUserOrganizations(userToken){
