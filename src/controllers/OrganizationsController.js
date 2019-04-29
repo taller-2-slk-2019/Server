@@ -1,6 +1,7 @@
 var logger = require('logops');
 var OrganizationDao = require('../daos/OrganizationDao');
 var OrganizationService = require('../services/OrganizationService');
+var UserService = require('../services/UserService');
 var { sendSuccessResponse, sendEmptySuccessResponse, sendErrorResponse } = require('../helpers/ResponseHelper');
 var { checkIsAdmin } = require('../helpers/RequestHelper');
 
@@ -22,7 +23,7 @@ class OrganizationsController{
         try {
             var orgs = [];
             if (user){
-                orgs = await OrganizationDao.findForUser(user);
+                orgs = await UserService.findUserOrganizations(user);
             } else {
                 orgs = await OrganizationDao.get();
             }

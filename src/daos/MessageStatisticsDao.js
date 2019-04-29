@@ -10,6 +10,14 @@ class MessageStatisticsDao {
             }
         });
     }
+
+    async getMessagesCountByUser(userId) {
+        return await Message.count({
+            where: {
+                senderId: userId
+            }
+        });
+    }
 }
 
 module.exports = new MessageStatisticsDao();

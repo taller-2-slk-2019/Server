@@ -268,17 +268,6 @@ describe('"ChannelService Tests"', () => {
         var stats;
         var mock;
 
-        /*before(async () => {
-            user = await TestDatabaseHelper.createUser();
-            organization = await TestDatabaseHelper.createOrganization([user]);
-            channel = await TestDatabaseHelper.createChannel(user, organization);
-            for (i = 0; i < 5; i++){
-                await TestDatabaseHelper.createChannelMessage("hola", channel, user);
-            }
-
-            stats = await ChannelDao.getStatistics(channel.id);
-        });*/
-
         before(async () => {
             mock = stub(MessageStatisticsDao, 'getMessagesCountByChannel').returns(10);
             channel = await TestDatabaseHelper.createChannel(user, organization);

@@ -24,13 +24,6 @@ class OrganizationDao{
         return org;
     }
 
-
-    async findForUser(userToken){
-        var user = await UserDao.findByToken(userToken);
-
-        return await user.getOrganizations();
-    }
-
     async get(){
         return await Organization.findAll();
     }

@@ -86,14 +86,6 @@ class MessageDao{
         return await this._get({ conversationId: conversation.id }, offset);
     }
 
-    async getMessagesCountByUser(userId) {
-        return await Message.count({
-            where: {
-                senderId: userId
-            }
-        });
-    }
-
     async _get(where, offset){
         var limit = Config.messagesPerPage;
 

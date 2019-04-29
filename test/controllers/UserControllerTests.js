@@ -27,6 +27,7 @@ describe('"UsersController Tests"', () => {
         var mock5;
         var mock6;
         var mock7;
+        var mock8;
 
         before(async () => {
             mock1 = stub(UserDao, 'create').resolves(userProfileMock);
@@ -34,8 +35,8 @@ describe('"UsersController Tests"', () => {
             mock3 = stub(UserDao, 'findById').resolves(userProfileMock);
             mock4 = stub(OrganizationService, 'findOrganizationUsers').resolves([userForOrganizationMock, userForOrganizationMock]);
             mock5 = stub(UserDao, 'findByToken').resolves(userProfileMock);
-            mock6 = stub(UserDao, 'findUserInvitations').resolves([userOrganizationInvitationMock, userOrganizationInvitationMock]);
-            mock7 = stub(UserDao, 'deleteUserInvitation').resolves();
+            mock6 = stub(UserService, 'findUserInvitations').resolves([userOrganizationInvitationMock, userOrganizationInvitationMock]);
+            mock7 = stub(UserService, 'deleteUserInvitation').resolves();
             mock8 = stub(UserService, 'getStatistics').resolves(new UserStatistics(['org1'], 2));
         });
 
@@ -47,6 +48,7 @@ describe('"UsersController Tests"', () => {
             mock5.restore();
             mock6.restore();
             mock7.restore();
+            mock8.restore();
         });
 
         describe('Register User', () => {
@@ -321,7 +323,7 @@ describe('"UsersController Tests"', () => {
                 expect(res.status).to.have.been.calledWith(200);
             });
 
-            it('response body must be null', async () => {
+            it('response must have correct stats', async () => {
                 var response = res.send.args[0][0];
                 expect(response.messagesSent).to.eq(2);
             });
@@ -336,6 +338,7 @@ describe('"UsersController Tests"', () => {
         var mock5;
         var mock6;
         var mock7;
+        var mock8;
 
         before(async () => {
             mock1 = stub(UserDao, 'create').rejects();
@@ -343,8 +346,9 @@ describe('"UsersController Tests"', () => {
             mock3 = stub(UserDao, 'findById').rejects();
             mock4 = stub(OrganizationService, 'findOrganizationUsers').rejects();
             mock5 = stub(UserDao, 'findByToken').rejects();
-            mock6 = stub(UserDao, 'findUserInvitations').rejects();
-            mock7 = stub(UserDao, 'deleteUserInvitation').rejects();
+            mock6 = stub(UserService, 'findUserInvitations').rejects();
+            mock7 = stub(UserService, 'deleteUserInvitation').rejects();
+            mock8 = stub(UserService, 'getStatistics').rejects();
         });
 
         after(async () => {
@@ -355,6 +359,7 @@ describe('"UsersController Tests"', () => {
             mock5.restore();
             mock6.restore();
             mock7.restore();
+            mock8.restore();
         });
 
 
@@ -593,6 +598,26 @@ describe('"UsersController Tests"', () => {
             beforeEach(async () => {
                 res = mockResponse();
                 await UserController.deleteInvitation(req, res);
+            });
+
+            it('response status must be 400', async () => { 
+                expect(res.status).to.have.been.calledWith(400);
+            });
+            
+            it('response must have an error', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('error');
+            });
+        });
+
+        describe('Get statistics', () => {
+
+            var req = mockRequest();
+            var res;
+            
+            beforeEach(async () => {
+                res = mockResponse();
+                await UserController.getStatistics(req, res);
             });
 
             it('response status must be 400', async () => { 

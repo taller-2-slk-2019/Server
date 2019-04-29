@@ -6,8 +6,9 @@ var { BotAlreadyExistsError } = require('../helpers/Errors');
 class BotDao{
 
     async get(organizationId){
-        var org = await OrganizationDao.findById(organizationId);
-        return await org.getBots();
+        return await Bot.findAll({
+            where: {organizationId: organizationId}
+        });
     }
 
     async create(botData){

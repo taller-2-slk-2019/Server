@@ -60,7 +60,7 @@ class UsersController{
         var token = req.query.userToken;
 
         try{
-            var invitations = await UserDao.findUserInvitations(token);
+            var invitations = await UserService.findUserInvitations(token);
             var result = invitations.map(invitation => {
                 return {token: invitation.organizationUserInvitation.token,
                         organization: invitation,
@@ -89,7 +89,7 @@ class UsersController{
         var token = req.params.token;
 
         try{
-            await UserDao.deleteUserInvitation(token);
+            await UserService.deleteUserInvitation(token);
             sendEmptySuccessResponse(res);
         } catch (err){
             sendErrorResponse(res, err);

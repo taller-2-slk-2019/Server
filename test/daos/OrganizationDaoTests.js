@@ -122,34 +122,6 @@ describe('"OrganizationDao Tests"', () => {
         });
     });
 
-    describe('Find for user', () => {
-        var organization1;
-        var organization2;
-        var user;
-        var organizations;
-
-        before(async () => {
-            user = await TestDatabaseHelper.createUser();
-            organization1 = await TestDatabaseHelper.createOrganization([user]);
-            organization2 = await TestDatabaseHelper.createOrganization([user]);
-            
-            organizations = await OrganizationDao.findForUser(user.token);
-        });
-
-        it('must return 2 organizations', async () => {
-            expect(organizations.length).to.eq(2);
-        });
-        
-        it('organizations must have correct id', async () => {
-            expect(organizations[0]).to.have.property('id', organization1.id);
-        });
-
-        it('organization must have user', async () => {
-            var belongs = await organizations[0].hasUser(user);
-            expect(belongs).to.be.true;
-        });
-    });
-
     describe('Get', () => {
         var organization1;
         var organization2;
