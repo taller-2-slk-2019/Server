@@ -10,7 +10,6 @@ var SequelizeValidationError = require('../../src/database/sequelize').Sequelize
 
 var ChannelDao = require('../../src/daos/ChannelDao');
 var TitoBotService = require('../../src/services/TitoBotService');
-var FirebaseService = require('../../src/firebase/FirebaseService');
 
 var models = require('../../src/database/sequelize');
 var Channel = models.channel;
@@ -21,17 +20,14 @@ var { UserNotFoundError, OrganizationNotFoundError, ChannelNotFoundError, UserAl
 var { channelCreateData } = require('../data/channelData');
 
 describe('"ChannelDao Tests"', () => {
-    var titoMock, titoMock2;
-    var firebaseMock;
+    var titoMock;
 
     var user;
     var organization;
     var channelData = Object.create(channelCreateData);
 
     before(async () => {
-        titoMock = stub(TitoBotService, 'userAddedToChannel').resolves();
-        titoMock2 = stub(TitoBotService, 'channelCreated').resolves();
-        firebaseMock = stub(FirebaseService, 'sendChannelInvitationNotification').resolves();
+        titoMock = stub(TitoBotService, 'channelCreated').resolves();
 
         user = await TestDatabaseHelper.createUser();
         organization = await TestDatabaseHelper.createOrganization([user]);
@@ -41,8 +37,6 @@ describe('"ChannelDao Tests"', () => {
 
     after(async () => {
         titoMock.restore();
-        titoMock2.restore();
-        firebaseMock.restore();
     });
 
 
@@ -50,7 +44,7 @@ describe('"ChannelDao Tests"', () => {
         var channel;
 
         beforeEach(async () => {
-            titoMock2.resetHistory();
+            titoMock.resetHistory();
             channel = await ChannelDao.create(channelData);
         });
 
@@ -83,7 +77,7 @@ describe('"ChannelDao Tests"', () => {
         });
 
         it('should inform tito', async () => {
-            assert.calledOnce(titoMock2);
+            assert.calledOnce(titoMock);
         });
     });
 
@@ -150,254 +144,6 @@ describe('"ChannelDao Tests"', () => {
             await expect(ChannelDao.findById(-1)).to.eventually.be.rejectedWith(ChannelNotFoundError);
         });
 
-    });
-
-    describe('Add user', () => {
-        var channel;
-        var usr;
-
-        before(async () => {
-            channel = await Channel.create(channelData);
-            usr = await TestDatabaseHelper.createUser();
-            await organization.addUser(usr, { through: {role: 'role'}});
-        });
-
-        beforeEach(async () => {
-            titoMock.resetHistory();
-            firebaseMock.resetHistory();
-            await channel.setUsers([]);
-            await ChannelDao.addUser(channel.id, usr.id);
-        });
-
-        it('channel must have 1 user', async () => {
-            var users = await channel.getUsers();
-            expect(users.length).to.eq(1);
-        });
-
-        it('user must be added to channel', async () => {
-            var users = await channel.getUsers();
-            expect(users[0].id).to.eq(usr.id);
-        });
-
-        it('should inform tito', async () => {
-            assert.calledOnce(titoMock);
-        });
-
-        it('should inform firebase', async () => {
-            assert.calledOnce(firebaseMock);
-        });
-
-        it('can not add user again to channel', async () => {
-            await expect(ChannelDao.addUser(channel.id, usr.id)).to.eventually.be.rejectedWith(UserAlreadyInChannelError);
-        });
-
-        it('can not add user that does not belong to channel organization', async () => {
-            var user2 = await TestDatabaseHelper.createUser();
-            await expect(ChannelDao.addUser(channel.id, user2.id)).to.eventually.be.rejectedWith(UserNotBelongsToOrganizationError);
-        });
-    });
-
-    describe('Add username', () => {
-        var channel;
-        var usr;
-
-        before(async () => {
-            channel = await Channel.create(channelData);
-            usr = await TestDatabaseHelper.createUser();
-            await organization.addUser(usr, { through: {role: 'role'}});
-        });
-
-        beforeEach(async () => {
-            titoMock.resetHistory();
-            firebaseMock.resetHistory();
-            await channel.setUsers([]);
-            await ChannelDao.addUsername(channel.id, usr.username);
-        });
-
-        it('channel must have 1 user', async () => {
-            var users = await channel.getUsers();
-            expect(users.length).to.eq(1);
-        });
-
-        it('user must be added to channel', async () => {
-            var users = await channel.getUsers();
-            expect(users[0].id).to.eq(usr.id);
-        });
-
-        it('should inform tito', async () => {
-            assert.calledOnce(titoMock);
-        });
-
-        it('should inform firebase', async () => {
-            assert.calledOnce(firebaseMock);
-        });
-
-        it('can not add user again to channel', async () => {
-            await expect(ChannelDao.addUsername(channel.id, usr.username)).to.eventually.be.rejectedWith(UserAlreadyInChannelError);
-        });
-
-        it('can not add user that does not belong to channel organization', async () => {
-            var user2 = await TestDatabaseHelper.createUser();
-            await expect(ChannelDao.addUsername(channel.id, user2.username)).to.eventually.be.rejectedWith(UserNotBelongsToOrganizationError);
-        });
-
-    });
-
-    describe('Remove user', () => {
-        var channel;
-        var usr;
-
-        before(async () => {
-            channel = await Channel.create(channelData);
-            usr = await TestDatabaseHelper.createUser();
-        });
-
-        beforeEach(async () => {
-            await channel.setUsers([usr]);
-            await ChannelDao.removeUser(usr.id, channel.id);
-        });
-
-        it('channel must have 0 user', async () => {
-            var users = await channel.getUsers();
-            expect(users.length).to.eq(0);
-        });
-
-        it('can not remove user that does no belong to channel', async () => {
-            await channel.setUsers([]);
-            await expect(ChannelDao.removeUser(user.id, channel.id)).to.eventually.be.rejectedWith(UserNotBelongsToChannelError);
-        });
-    });
-
-    describe('Get channels for user', () => {
-        var channel;
-        var channel2;
-        var org;
-        var usr;
-
-        before(async () => {
-            org = await TestDatabaseHelper.createOrganization([user]);
-            channel = await TestDatabaseHelper.createChannel(user, org);
-            channel2 = await TestDatabaseHelper.createChannel(user, org);
-            usr = await TestDatabaseHelper.createUser();
-        });
-
-        it('get for user and organization must return 2 channels', async () => {
-            var channels = await ChannelDao.get(user.token, org.id, true);
-            expect(channels.length).to.eq(2);
-        });
-
-        it('get for other user and organization must return 0 channels', async () => {
-            var channels = await ChannelDao.get(usr.token, org.id, true);
-            expect(channels.length).to.eq(0);
-        });
-
-        it('user must belong to returned channels', async () => {
-            var channels = await ChannelDao.get(user.token, org.id, true);
-            var hasUser = await channels[0].hasUser(user);
-            expect(hasUser).to.be.true;
-        });
-    });
-
-    describe('Get channels that user not belongs to', () => {
-        var channel;
-        var channel2;
-        var org;
-        var usr;
-
-        before(async () => {
-            org = await TestDatabaseHelper.createOrganization([user]);
-            channel = await TestDatabaseHelper.createChannel(user, org);
-            channel2 = await TestDatabaseHelper.createChannel(user, org, false);
-            usr = await TestDatabaseHelper.createUser();
-        });
-
-        it('get for user and organization must return 1 channel', async () => {
-            var channels = await ChannelDao.get(usr.token, org.id, false);
-            expect(channels.length).to.eq(1);
-        });
-
-        it('get for other user and organization must return 0 channels', async () => {
-            var channels = await ChannelDao.get(user.token, org.id, false);
-            expect(channels.length).to.eq(0);
-        });
-
-        it('user must belong to returned channels', async () => {
-            var channels = await ChannelDao.get(usr.token, org.id, false);
-            var hasUser = await channels[0].hasUser(usr);
-            expect(hasUser).to.be.false;
-        });
-    });
-
-    describe('Get channels', () => {
-        var channel;
-        var channel2;
-        var org;
-        var usr;
-
-        before(async () => {
-            org = await TestDatabaseHelper.createOrganization([user]);
-            channel = await TestDatabaseHelper.createChannel(user, org);
-            channel2 = await TestDatabaseHelper.createChannel(user, org);
-            usr = await TestDatabaseHelper.createUser();
-        });
-
-        it('get for user and organization must return 2 channels', async () => {
-            var channels = await ChannelDao.get(null, org.id);
-            var orgChannels = await org.getChannels();
-            expect(channels.length).to.eq(orgChannels.length);
-        });
-    });
-
-    describe('Find Channel Users', () => {
-        var channel
-        var organization;
-        var user;
-        var user2;
-        var users;
-
-        before(async () => {
-            user = await TestDatabaseHelper.createUser();
-            user2 = await TestDatabaseHelper.createUser();
-            organization = await TestDatabaseHelper.createOrganization([user, user2]);
-            channel = await TestDatabaseHelper.createChannel(user, organization);
-            await channel.addUser(user2);
-            users = await ChannelDao.getChannelUsers(channel.id);
-        });
-
-        it('must return 2 users', async () => {
-            expect(users.length).to.eq(2);
-        });
-        
-        it('users must have correct id', async () => {
-            expect([user.id, user2.id]).to.include(users[0].id);
-        });
-
-        it('users must belong to channel', async () => {
-            var belongs = await channel.hasUser(users[0]);
-            expect(belongs).to.be.true;
-        });
-    });
-
-    describe('Get statistics', () => {
-        var channel
-        var organization;
-        var user;
-        var stats;
-
-        before(async () => {
-            user = await TestDatabaseHelper.createUser();
-            organization = await TestDatabaseHelper.createOrganization([user]);
-            channel = await TestDatabaseHelper.createChannel(user, organization);
-            for (i = 0; i < 5; i++){
-                await TestDatabaseHelper.createChannelMessage("hola", channel, user);
-            }
-
-            stats = await ChannelDao.getStatistics(channel.id);
-        });
-
-        it('message count must be 5', async () => {
-            expect(stats.messageCount).to.eq(5);
-        });
     });
 
     describe('Delete', () => {

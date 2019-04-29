@@ -10,7 +10,7 @@ var MessageNotificationsService = require('../../src/services/MessageNotificatio
 var FirebaseService = require('../../src/firebase/FirebaseService');
 var TitoBotService = require('../../src/services/TitoBotService');
 var BotsController = require('../../src/controllers/BotsController');
-var ChannelDao = require('../../src/daos/ChannelDao');
+var ChannelService = require('../../src/services/ChannelService');
 
 var TestDatabaseHelper = require('../TestDatabaseHelper');
 var messageMock = require('../mocks/messageMock');
@@ -26,7 +26,7 @@ describe('"MessageNotificationsService Tests"', () => {
         firebaseMock = stub(FirebaseService, 'sendMessage').resolves();
         mock = stub(FirebaseService, 'sendChannelMessageNotification').resolves();
         mock2 = stub(TitoBotService, 'sendMessage').resolves();
-        mock3 = stub(ChannelDao, 'addUsername').resolves();
+        mock3 = stub(ChannelService, 'addUsername').resolves();
         mock4 = stub(BotsController, 'sendMessageToBot').resolves();
 
         user1 = await TestDatabaseHelper.createUser();

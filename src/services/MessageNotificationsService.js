@@ -1,7 +1,7 @@
 var logger = require('logops');
 var MessageParser = require('../helpers/MessageParser');
 var FirebaseService = require('../firebase/FirebaseService');
-var ChannelDao = require('../daos/ChannelDao');
+var ChannelService = require('../services/ChannelService');
 var BotDao = require('../daos/BotDao');
 var BotsController = require('../controllers/BotsController');
 var TitoBot = require('../services/TitoBotService');
@@ -64,7 +64,7 @@ class MessageNotificationsService {
 
         logger.info(`Adding to channel ${message.channelId} mentioned users ` + newUsers);
         newUsers.forEach(username => {
-            ChannelDao.addUsername(message.channelId, username).catch(err => {
+            ChannelService.addUsername(message.channelId, username).catch(err => {
                 logger.error(`Could not add user ${username} to channel ${message.channelId}`);
                 logger.error(err);
             });

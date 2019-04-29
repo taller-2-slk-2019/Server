@@ -13,24 +13,26 @@ const { channelCreateData } = require('../data/channelData');
 
 var ChannelsController = require('../../src/controllers/ChannelsController');
 var ChannelDao = require('../../src/daos/ChannelDao');
+var ChannelService = require('../../src/services/ChannelService');
 var AdminDao = require('../../src/daos/AdminUserDao');
 const adminMock = require('../mocks/adminMock');
 
 describe('"ChannelsController Tests"', () => {
 
     describe('Methods without errors', () => {
-        var mock1, mock2, mock3, mock4, mock5, mock6, mock7, mock8, mock9;
+        var mock1, mock2, mock3, mock4, mock5, mock6, mock7, mock8, mock9, mock10;
 
         before(async () => {
             mock1 = stub(ChannelDao, 'create').resolves(channelDataMock);
-            mock2 = stub(ChannelDao, 'addUser').resolves();
-            mock3 = stub(ChannelDao, 'removeUser').resolves();
-            mock4 = stub(ChannelDao, 'get').resolves([channelDataMock, channelDataMock, channelDataMock]);
-            mock5 = stub(ChannelDao, 'findById').resolves(channelDataMock);
-            mock6 = stub(ChannelDao, 'getChannelUsers').resolves([userDataMock, userDataMock, userDataMock]);
-            mock7 = stub(ChannelDao, 'getStatistics').resolves(channelStatisticsMock);
-            mock8 = stub(ChannelDao, 'delete').resolves();
-            mock9 = stub(AdminDao, 'findByToken').resolves(adminMock);
+            mock2 = stub(ChannelService, 'addUser').resolves();
+            mock3 = stub(ChannelService, 'removeUser').resolves();
+            mock4 = stub(ChannelService, 'get').resolves([channelDataMock, channelDataMock, channelDataMock]);
+            mock5 = stub(ChannelService, 'getForUser').resolves([channelDataMock, channelDataMock, channelDataMock]);
+            mock6 = stub(ChannelDao, 'findById').resolves(channelDataMock);
+            mock7 = stub(ChannelService, 'getChannelUsers').resolves([userDataMock, userDataMock, userDataMock]);
+            mock8 = stub(ChannelService, 'getStatistics').resolves(channelStatisticsMock);
+            mock9 = stub(ChannelDao, 'delete').resolves();
+            mock10 = stub(AdminDao, 'findByToken').resolves(adminMock);
         });
 
         after(async () => {
@@ -43,6 +45,7 @@ describe('"ChannelsController Tests"', () => {
             mock7.restore();
             mock8.restore();
             mock9.restore();
+            mock10.restore();
         });
 
         describe('Create channel', () => {
@@ -155,12 +158,13 @@ describe('"ChannelsController Tests"', () => {
             });
         });
 
-        describe('Get channels', () => {
+        describe('Get channels for user', () => {
             var req = mockRequest();
+            req.query.userToken = "token";
             var res;
 
             beforeEach(async () => {
-                mock4.resetHistory();
+                mock5.resetHistory();
                 res = mockResponse();
                 await ChannelsController.get(req, res);
             });
@@ -180,7 +184,7 @@ describe('"ChannelsController Tests"', () => {
             });
 
             it('Get should be called with userIsMember=true', async () => {
-                var call = mock4.getCall(0).args[2];
+                var call = mock5.getCall(0).args[2];
                 expect(call).to.be.true;
             });
         });
@@ -188,10 +192,11 @@ describe('"ChannelsController Tests"', () => {
         describe('Get public channels', () => {
             var req = mockRequest();
             req.query.userIsMember = false;
+            req.query.userToken = "token";
             var res;
 
             beforeEach(async () => {
-                mock4.resetHistory();
+                mock5.resetHistory();
                 res = mockResponse();
                 await ChannelsController.get(req, res);
             });
@@ -211,7 +216,7 @@ describe('"ChannelsController Tests"', () => {
             });
 
             it('Get should be called with userIsMember=false', async () => {
-                var call = mock4.getCall(0).args[2];
+                var call = mock5.getCall(0).args[2];
                 expect(call).to.be.false;
             });
         });
@@ -266,18 +271,19 @@ describe('"ChannelsController Tests"', () => {
     });
 
     describe('Methods with errors', () => {
-        var mock1, mock2, mock3, mock4, mock5, mock6, mock7, mock8, mock9;
+        var mock1, mock2, mock3, mock4, mock5, mock6, mock7, mock8, mock9, mock10;;
 
         before(async () => {
             mock1 = stub(ChannelDao, 'create').rejects();
-            mock2 = stub(ChannelDao, 'addUser').rejects();
-            mock3 = stub(ChannelDao, 'removeUser').rejects();
-            mock4 = stub(ChannelDao, 'get').rejects();
-            mock5 = stub(ChannelDao, 'findById').rejects();
-            mock6 = stub(ChannelDao, 'getChannelUsers').rejects();
-            mock7 = stub(ChannelDao, 'getStatistics').rejects();
-            mock8 = stub(ChannelDao, 'delete').rejects();
-            mock9 = stub(AdminDao, 'findByToken').resolves(adminMock);
+            mock2 = stub(ChannelService, 'addUser').rejects();
+            mock3 = stub(ChannelService, 'removeUser').rejects();
+            mock4 = stub(ChannelService, 'get').rejects();
+            mock5 = stub(ChannelService, 'getForUser').rejects();
+            mock6 = stub(ChannelDao, 'findById').rejects();
+            mock7 = stub(ChannelService, 'getChannelUsers').rejects();
+            mock8 = stub(ChannelService, 'getStatistics').rejects();
+            mock9 = stub(ChannelDao, 'delete').rejects();
+            mock10 = stub(AdminDao, 'findByToken').resolves(adminMock);
         });
 
         after(async () => {
@@ -290,6 +296,7 @@ describe('"ChannelsController Tests"', () => {
             mock7.restore();
             mock8.restore();
             mock9.restore();
+            mock10.restore();
         });
 
 
