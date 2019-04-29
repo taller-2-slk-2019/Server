@@ -405,24 +405,4 @@ describe('"MessageDao Tests"', () => {
             await expect(MessageDao.findById(-1)).to.eventually.be.rejectedWith(MessageNotFoundError);
         });
     });
-
-    describe('get messages count by user', () => {
-        var expected;
-        var message;
-
-        before(async () => {
-            expected = await Message.create(messageData);
-
-        });
-
-        it('should return 25 for user id 1', async () => {
-            message = await MessageDao.getMessagesCountByUser(user.id);
-            expect(message).to.be.equal(25);
-        });
-
-        it('count must be zero for a unknown user', async () => {
-            message = await MessageDao.getMessagesCountByUser(200);
-            expect(message).to.be.equal(0);
-        });
-    });
 });
