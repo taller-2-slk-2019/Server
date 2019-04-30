@@ -1,5 +1,6 @@
 var models = require('../database/sequelize');
 var Message = models.message;
+var Op = models.Sequelize.Op;
 
 class MessageStatisticsDao {
 
@@ -16,6 +17,21 @@ class MessageStatisticsDao {
             where: {
                 senderId: userId
             }
+        });
+    }
+
+    async getMessagesCountByOrganization(organization) {
+        var [channels, conversations] = await Promise.all([
+                organization.getChannels().map(channel => channel.id),
+                organization.getConversations().map(conversation => conversation.id)
+            ]);
+
+        return await Message.count({
+            attributes: ['type'],
+            where: {
+                [Op.or]: [{channelId: channels}, {conversationId: conversations}]
+            },
+            group: ['type']
         });
     }
 }

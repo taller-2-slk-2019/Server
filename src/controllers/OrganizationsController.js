@@ -106,6 +106,17 @@ class OrganizationsController{
         }
     }
 
+    async getStatistics(req, res){
+        var organizationId = req.params.id;
+
+        try{      
+            var stats = await OrganizationService.getStatistics(organizationId);
+            sendSuccessResponse(res, stats);
+        } catch (err){
+            sendErrorResponse(res, err);
+        }
+    }
+
 }
 
 module.exports = new OrganizationsController();
