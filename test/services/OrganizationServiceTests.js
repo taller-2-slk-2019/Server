@@ -12,6 +12,8 @@ var FirebaseService = require('../../src/firebase/FirebaseService');
 var models = require('../../src/database/sequelize');
 var Organization = models.organization;
 var Channel = models.channel;
+var MessageStatisticsDao = require('../../src/daos/MessageStatisticsDao');
+var UserRoleDao = require('../../src/daos/UserRoleDao');
 var TestDatabaseHelper = require('../TestDatabaseHelper');
 
 var { InvalidOrganizationInvitationTokenError, UserNotBelongsToOrganizationError,
@@ -19,6 +21,8 @@ var { InvalidOrganizationInvitationTokenError, UserNotBelongsToOrganizationError
 
 var CreatorRole = require('../../src/models/userRoles/UserRoleCreator');
 var MemberRole = require('../../src/models/userRoles/UserRoleMember');
+var organizationMessageCountMock = require('../mocks/messageCountByOrganizationMock');
+var organizationUserCountMock = require('../mocks/userRolesCountByOrganizationMock');
 
 describe('"OrganizationService Tests"', () => {
     var user;
@@ -215,6 +219,31 @@ describe('"OrganizationService Tests"', () => {
         it('user must be removed from organization channels', async () => {
             var users = await channel.getUsers();
             expect(users.length).to.eq(0);
+        });
+    });
+
+    describe('Get statistics', () => {
+        var mock1, mock2;
+        var stats;
+
+        before(async () => {
+            mock1 = stub(MessageStatisticsDao, 'getMessagesCountByOrganization').resolves(organizationMessageCountMock);
+            mock2 = stub(UserRoleDao, 'getCountForOrganization').resolves(organizationUserCountMock);
+
+            stats = await OrganizationService.getStatistics(1);
+        });
+
+        after(async () => {
+            mock1.restore();
+            mock2.restore();
+        });
+
+        it('stats must have user count', async () => {
+            expect(stats).to.have.property('usersCount', organizationUserCountMock);
+        });
+
+        it('stats must have messages count', async () => {
+            expect(stats).to.have.property('messagesCount', organizationMessageCountMock);
         });
     });
 });
