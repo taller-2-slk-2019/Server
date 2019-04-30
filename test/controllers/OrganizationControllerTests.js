@@ -16,11 +16,14 @@ var OrganizationService = require('../../src/services/OrganizationService');
 var UserService = require('../../src/services/UserService');
 var AdminDao = require('../../src/daos/AdminUserDao');
 const adminMock = require('../mocks/adminMock');
+var organizationMessageCountMock = require('../mocks/messageCountByOrganizationMock');
+var organizationUserCountMock = require('../mocks/userRolesCountByOrganizationMock');
+var OrganizationStatistics = require('../../src/models/statistics/OrganizationStatistics');
 
 describe('"OrganizationsController Tests"', () => {
 
     describe('Methods without errors', () => {
-        var mock1, mock2, mock3, mock4, mock5, mock6, mock7, mock8, mock9;
+        var mock1, mock2, mock3, mock4, mock5, mock6, mock7, mock8, mock9, mock10;
 
         before(async () => {
             mock1 = stub(OrganizationDao, 'findById').resolves(organizationDataMock);
@@ -32,6 +35,8 @@ describe('"OrganizationsController Tests"', () => {
             mock7 = stub(OrganizationDao, 'get').resolves([organizationDataMock, organizationDataMock]);
             mock8 = stub(OrganizationDao, 'delete').resolves();
             mock9 = stub(AdminDao, 'findByToken').resolves(adminMock);
+            mock10 = stub(OrganizationService, 'getStatistics').resolves(
+                new OrganizationStatistics(organizationUserCountMock, organizationMessageCountMock));
         });
 
         after(async () => {
@@ -44,6 +49,7 @@ describe('"OrganizationsController Tests"', () => {
             mock7.restore();
             mock8.restore();
             mock9.restore();
+            mock10.restore();
         });
 
         describe('Get Profile Method', () => {
@@ -234,10 +240,34 @@ describe('"OrganizationsController Tests"', () => {
                 expect(response).to.be.undefined;
             });
         });
+
+        describe('Get statistics Method', () => {
+            var req = mockRequest();
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await OrganizationsController.getStatistics(req, res);
+            });
+
+            it('response status must be 200', async () => {
+                expect(res.status).to.have.been.calledWith(200);
+            });
+
+            it('response body must have users count', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('usersCount', organizationUserCountMock);
+            });
+
+            it('response body must have messages count', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('messagesCount', organizationMessageCountMock);
+            });
+        });
     });
 
     describe('Methods with errors', () => {
-        var mock1, mock2, mock3, mock4, mock5, mock6, mock7, mock8, mock9;
+        var mock1, mock2, mock3, mock4, mock5, mock6, mock7, mock8, mock9, mock10;
 
         before(async () => {
             mock1 = stub(OrganizationDao, 'findById').rejects();
@@ -249,6 +279,7 @@ describe('"OrganizationsController Tests"', () => {
             mock7 = stub(OrganizationDao, 'get').rejects();
             mock8 = stub(OrganizationDao, 'delete').rejects();
             mock9 = stub(AdminDao, 'findByToken').resolves(adminMock);
+            mock10 = stub(OrganizationService, 'getStatistics').rejects();
         });
 
         after(async () => {
@@ -261,6 +292,7 @@ describe('"OrganizationsController Tests"', () => {
             mock7.restore();
             mock8.restore();
             mock9.restore();
+            mock10.restore();
         });
 
 
@@ -411,6 +443,25 @@ describe('"OrganizationsController Tests"', () => {
                 req.params.id = -1;
                 res = mockResponse();
                 await OrganizationsController.delete(req, res);
+            });
+
+            it('response status must be 400', async () => {
+                expect(res.status).to.have.been.calledWith(400);
+            });
+
+            it('response must have an error', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('error');
+            });
+        });
+
+        describe('Get statistics with error', () => {
+            var req = mockRequest();
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await OrganizationsController.getStatistics(req, res);
             });
 
             it('response status must be 400', async () => {

@@ -59,19 +59,21 @@ class TestDatabaseHelper {
         return conversation;
     }
 
-    async createChannelMessage(msg, channel, user) {
+    async createChannelMessage(msg, channel, user, type = 'text') {
         var data = Object.create(messageCreateData);
         data.senderId = user.id;
         data.channelId = channel.id;
         data.data = msg;
+        data.type = type;
         return await Message.create(data);
     }
 
-    async createConversationMessage(msg, conversation, user) {
+    async createConversationMessage(msg, conversation, user, type = 'text') {
         var data = Object.create(messageCreateData);
         data.senderId = user.id;
         data.conversationId = conversation.id;
         data.data = msg;
+        data.type = type;
         return await Message.create(data);
     }
 

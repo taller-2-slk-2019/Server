@@ -4,11 +4,14 @@ var { forEach } = require('p-iteration');
 var logger = require('logops');
 var UserDao = require('../daos/UserDao');
 var OrganizationDao = require('../daos/OrganizationDao');
+var UserRoleDao = require('../daos/UserRoleDao');
+var MessageStatisticsDao = require('../daos/MessageStatisticsDao');
 var models = require('../database/sequelize');
 var OrganizationUserInvitation = models.organizationUserInvitation;
 var { UserNotBelongsToOrganizationError,
              InvalidOrganizationInvitationTokenError } = require('../helpers/Errors');
 var UserRoleMember = require('../models/userRoles/UserRoleMember');
+var OrganizationStatistics = require('../models/statistics/OrganizationStatistics');
 
 class OrganizationService {
     async findOrganizationUsers(organizationId){
@@ -89,6 +92,16 @@ class OrganizationService {
             await channel.removeUser(user);
         });
         await organization.removeUser(user);
+    }
+
+    async getStatistics(organizationId) {
+        var organization = await OrganizationDao.findById(organizationId);
+
+        var [usersCount, messagesCount] = await Promise.all([
+                          UserRoleDao.getCountForOrganization(organization.id),
+                          MessageStatisticsDao.getMessagesCountByOrganization(organization),
+                        ]);
+        return new OrganizationStatistics(usersCount, messagesCount);
     }
 }
 
