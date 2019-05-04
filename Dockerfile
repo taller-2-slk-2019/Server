@@ -7,6 +7,8 @@ WORKDIR /home/app
 
 COPY . /home/app
 
+RUN apt-get -q update && apt-get -qy install netcat
+
 RUN npm install
 
 CMD [ "node", "./src/app.js" ]

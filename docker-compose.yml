@@ -11,7 +11,7 @@ services:
       - postgres
     ports:
       - "3000:3000"
-    command: bash -c "sleep 20; npx sequelize db:create; npx sequelize db:migrate; node src/app.js"
+    command: bash -c "./wait-for postgres:5432; npx sequelize db:create; npx sequelize db:migrate; node src/app.js"
     environment:
         DOCKER: 1
     
