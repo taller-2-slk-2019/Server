@@ -36,6 +36,13 @@ class ChannelNotFoundError extends Error {
     }
 }
 
+class ChannelAlreadyExistsError extends Error {
+    constructor(channelName, orgId) {
+        super(`Channel ${channelName} already exists in organization ${orgId}`);
+        this.name = this.constructor.name;
+    }
+}
+
 class MessageNotFoundError extends Error {
     constructor(msgId) {
         super("Message not found: " + msgId);
@@ -169,5 +176,6 @@ module.exports = {
     BotAlreadyExistsError,
     InvalidUserRoleError,
     InvalidForbiddenWordError,
-    InvalidBotError
+    InvalidBotError,
+    ChannelAlreadyExistsError
 };
