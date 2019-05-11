@@ -9,14 +9,20 @@ class ChannelDao{
 
     async create(channel){
         //TODO channel name does not exist in org
-        var user = await UserDao.findByToken(channel.creatorToken);
-
-        var organization = await OrganizationDao.findById(channel.organizationId);
-        if (!(await organization.hasUser(user))){
-            throw new UserNotBelongsToOrganizationError(organization.id, user.id);
+        var user;
+        if (channel.creatorToken) {
+            user = await UserDao.findByToken(channel.creatorToken);
         }
 
-        channel.creatorId = user.id;
+        var organization = await OrganizationDao.findById(channel.organizationId);
+        if (user){
+            if (!(await organization.hasUser(user))){
+                throw new UserNotBelongsToOrganizationError(organization.id, user.id);
+            }
+
+            channel.creatorId = user.id;
+        }
+        
         channel.organizationId = organization.id;
 
         var channelModel = await Channel.create(channel);

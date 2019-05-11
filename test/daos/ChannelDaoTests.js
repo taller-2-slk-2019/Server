@@ -81,6 +81,44 @@ describe('"ChannelDao Tests"', () => {
         });
     });
 
+    describe('Create channel for admin', () => {
+        var channel;
+        var data = Object.create(channelCreateData);
+
+        beforeEach(async () => {
+            titoMock.resetHistory();
+            data.organizationId = organization.id;
+            channel = await ChannelDao.create(data);
+        });
+
+        it('channel must be created', async () => {
+            expect(channel).to.not.be.null;
+        });
+
+        it('channel must have an id', async () => {
+            expect(channel).to.have.property('id');
+        });
+
+        it('channel organization must be correct', async () => {
+            var org = await channel.getOrganization();
+            expect(org.id).to.eq(organization.id);
+        });
+
+        it('channel creator must be null', async () => {
+            var creator = await channel.getCreator();
+            expect(creator).to.be.null;
+        });
+
+        it('channel must not have an user', async () => {
+            var users = await channel.getUsers();
+            expect(users.length).to.eq(0);
+        });
+
+        it('should inform tito', async () => {
+            assert.calledOnce(titoMock);
+        });
+    });
+
     describe('Create channel with error', () => {
         var channel;
         var data;

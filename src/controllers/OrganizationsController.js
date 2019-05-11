@@ -49,7 +49,7 @@ class OrganizationsController{
 
         try{
             if (!data.creatorToken){
-                await checkIsAdmin();
+                await checkIsAdmin(req);
             }
 
             var org = await OrganizationDao.create(data);

@@ -17,6 +17,10 @@ class ChannelsController{
         };
 
         try{
+            if (!data.creatorToken){
+                await checkIsAdmin(req);
+            }
+            
             var channel  = await ChannelDao.create(data);
             logger.info(`Channel created (${channel.id}) in organization ${data.organizationId} by user ${data.creatorToken}`);
             sendSuccessResponse(res, channel);
