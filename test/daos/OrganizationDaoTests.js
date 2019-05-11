@@ -70,6 +70,28 @@ describe('"OrganizationDao Tests"', () => {
         });
     });
 
+    describe('Create Organization by admin', () => {
+        var organization;
+        var data = Object.create(organizationCreateData);
+
+        beforeEach(async () => {
+            organization = await OrganizationDao.create(data);
+        });
+
+        it('organization must be created', async () => {
+            expect(organization).to.not.be.null;
+        });
+
+        it('organization must have an id', async () => {
+            expect(organization).to.have.property('id');
+        });
+
+        it('organization must not have an user', async () => {
+            var users = await organization.getUsers();
+            expect(users.length).to.eq(0);
+        });
+    });
+
     describe('Create organization with errors', () => {
         var organization;
         var data;

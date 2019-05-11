@@ -48,6 +48,10 @@ class OrganizationsController{
         };
 
         try{
+            if (!data.creatorToken){
+                await checkIsAdmin();
+            }
+
             var org = await OrganizationDao.create(data);
             logger.info("Organization created: " + org.id);
             sendSuccessResponse(res, org);

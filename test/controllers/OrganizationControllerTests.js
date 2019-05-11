@@ -145,6 +145,7 @@ describe('"OrganizationsController Tests"', () => {
 
         describe('Create Method', () => {
             var req = mockRequest({body: organizationCreateData});
+            req.query.userToken = "token";
             var res;
 
             beforeEach(async () => {
@@ -409,6 +410,7 @@ describe('"OrganizationsController Tests"', () => {
 
         describe('Create Method', () => {
             var req = mockRequest({body: organizationCreateData});
+            req.query.userToken = "token";
             var res;
 
             beforeEach(async () => {
@@ -624,6 +626,26 @@ describe('"OrganizationsController Tests"', () => {
                 req.params.id = -1;
                 res = mockResponse();
                 await OrganizationsController.updateUser(req, res);
+            });
+
+            it('response status must be 400', async () => {
+                expect(res.status).to.have.been.calledWith(400);
+            });
+
+            it('response must have an error', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('error');
+            });
+        });
+
+        describe('Create Method with admin error', () => {
+            var req = mockRequest({body: organizationCreateData});
+            req.query.userToken = null;
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await OrganizationsController.create(req, res);
             });
 
             it('response status must be 400', async () => {
