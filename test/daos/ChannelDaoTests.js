@@ -81,6 +81,44 @@ describe('"ChannelDao Tests"', () => {
         });
     });
 
+    describe('Create channel for admin', () => {
+        var channel;
+        var data = Object.create(channelCreateData);
+
+        beforeEach(async () => {
+            titoMock.resetHistory();
+            data.organizationId = organization.id;
+            channel = await ChannelDao.create(data);
+        });
+
+        it('channel must be created', async () => {
+            expect(channel).to.not.be.null;
+        });
+
+        it('channel must have an id', async () => {
+            expect(channel).to.have.property('id');
+        });
+
+        it('channel organization must be correct', async () => {
+            var org = await channel.getOrganization();
+            expect(org.id).to.eq(organization.id);
+        });
+
+        it('channel creator must be null', async () => {
+            var creator = await channel.getCreator();
+            expect(creator).to.be.null;
+        });
+
+        it('channel must not have an user', async () => {
+            var users = await channel.getUsers();
+            expect(users.length).to.eq(0);
+        });
+
+        it('should inform tito', async () => {
+            assert.calledOnce(titoMock);
+        });
+    });
+
     describe('Create channel with error', () => {
         var channel;
         var data;
@@ -108,6 +146,46 @@ describe('"ChannelDao Tests"', () => {
             await organization.setUsers([]);
             await expect(ChannelDao.create(channelData)).to.eventually.be.rejectedWith(UserNotBelongsToOrganizationError);
             await organization.addUser(user, {through: {role: 'role'}});
+        });
+    });
+
+    describe('Update', () => {
+        var edited = {name: "My channel edited"};
+        var original;
+        var channel, organization, user;
+
+        before(async () => {
+            user = await TestDatabaseHelper.createUser();
+            organization = await TestDatabaseHelper.createOrganization([user]);
+            original = await TestDatabaseHelper.createChannel(user, organization);
+            await ChannelDao.update(edited, original.id);
+            channel = await Channel.findByPk(original.id);
+        });
+
+        it('channel must not be null', async () => {
+            expect(channel).to.not.be.null;
+        });
+        
+        it('channel must have correct id', async () => {
+            expect(channel).to.have.property('id', original.id);
+        });
+        
+        it('channel name must be updated', async () => {
+            expect(channel).to.have.property('name', edited.name);
+        });
+
+        it('channel description must not change', async () => {
+            expect(channel).to.have.property('description', original.description);
+        });
+
+        it('throws exception if id does not exist', async () => {
+            await expect(ChannelDao.update(edited, 0)).to.eventually.be.rejectedWith(ChannelNotFoundError);
+        });
+
+        it('throws if name is null', async () => {
+            newEdited = Object.create(edited);
+            newEdited.name = null;
+            await expect(ChannelDao.update(newEdited, original.id)).to.eventually.be.rejectedWith(SequelizeValidationError);
         });
     });
 

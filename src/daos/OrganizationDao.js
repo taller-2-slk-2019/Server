@@ -8,12 +8,23 @@ var UserRoleCreator = require('../models/userRoles/UserRoleCreator');
 class OrganizationDao{
 
     async create(organization){
-        var user = await UserDao.findByToken(organization.creatorToken);
+        var user;
+        if (organization.creatorToken){
+            user = await UserDao.findByToken(organization.creatorToken);
+        }
 
         var org = await Organization.create(organization);
-        await org.addUser(user, { through: {role: (new UserRoleCreator()).name } });
+
+        if (user){
+            await org.addUser(user, { through: {role: (new UserRoleCreator()).name } });
+        }
 
         return org;
+    }
+
+    async update(organization, id){
+        await this.findById(id);
+        await Organization.update(organization, {where: {id: id}});
     }
 
     async findById(id){

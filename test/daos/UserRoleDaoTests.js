@@ -60,4 +60,26 @@ describe('"UserRoleDao Tests"', () => {
         });
     });
 
+    describe('Update user role', () => {
+        var org, usr;
+
+        beforeEach(async () => {
+            usr = await TestDatabaseHelper.createUser();
+            org = await TestDatabaseHelper.createOrganization();
+
+            await org.addUser(usr, {through: {role:'original role'}});
+        });
+
+        it('user role must be updated', async () => {
+            await UserRoleDao.updateUserRole(org.id, usr.id, 'new role');
+            var result = await org.getUsers();
+            expect(result[0].userOrganizations).to.have.property('role', 'new role');
+        });
+
+        it('update user role must not affect others', async () => {
+            await UserRoleDao.updateUserRole(org.id, 0, 'new role');
+            var result = await org.getUsers();
+            expect(result[0].userOrganizations).to.have.property('role', 'original role');
+        });
+    });
 });

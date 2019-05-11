@@ -1,9 +1,12 @@
 var logger = require('logops');
 var OrganizationDao = require('../daos/OrganizationDao');
+var UserRoleDao = require('../daos/UserRoleDao');
 var OrganizationService = require('../services/OrganizationService');
 var UserService = require('../services/UserService');
+var UserRoleFactory = require('../factories/UserRoleFactory');
 var { sendSuccessResponse, sendEmptySuccessResponse, sendErrorResponse } = require('../helpers/ResponseHelper');
 var { checkIsAdmin } = require('../helpers/RequestHelper');
+var { InvalidUserRoleError } = require('../helpers/Errors');
 
 class OrganizationsController{
 
@@ -45,6 +48,10 @@ class OrganizationsController{
         };
 
         try{
+            if (!data.creatorToken){
+                await checkIsAdmin(req);
+            }
+
             var org = await OrganizationDao.create(data);
             logger.info("Organization created: " + org.id);
             sendSuccessResponse(res, org);
@@ -54,7 +61,31 @@ class OrganizationsController{
         }
     }
 
+    async updateProfile(req, res) {
+        var data = {
+            name: req.body.name,
+            picture: req.body.picture,
+            latitude: req.body.latitude,
+            longitude: req.body.longitude,
+            description: req.body.description,
+            welcome: req.body.welcome
+        };
+
+        //TODO check roles
+
+        try{
+            var org = req.params.id;
+            await OrganizationDao.update(data, org);
+            logger.info("Organization " + org + " updated");
+            sendEmptySuccessResponse(res);
+
+        } catch (err){
+            sendErrorResponse(res, err);
+        }
+    }
+
     async inviteUsers(req, res){
+        //TODO check roles
         try{
             var organizationId = req.params.id;
             var userEmails = req.body.userEmails;
@@ -80,6 +111,7 @@ class OrganizationsController{
     }
 
     async removeUser(req, res){
+        //TODO check roles
         var userId = req.params.userId;
         var organizationId = req.params.id;
 
@@ -97,9 +129,30 @@ class OrganizationsController{
 
         try{
             await checkIsAdmin(req);
+            //TODO check roles
             
             await OrganizationDao.delete(organizationId);
             logger.info(`Organization ${organizationId} deleted`);
+            sendEmptySuccessResponse(res);
+        } catch (err){
+            sendErrorResponse(res, err);
+        }
+    }
+
+    async updateUser(req, res){
+        var organizationId = req.params.id;
+        var userId = req.params.userId;
+        var role = req.body.role;
+
+        try{
+            await checkIsAdmin(req);
+
+            if (!UserRoleFactory.roles.includes(role)){
+                throw new InvalidUserRoleError();
+            }
+            
+            await UserRoleDao.updateUserRole(organizationId, userId, role);
+            logger.info(`User ${userId} role updated to '${role}' in organization ${organizationId} `);
             sendEmptySuccessResponse(res);
         } catch (err){
             sendErrorResponse(res, err);

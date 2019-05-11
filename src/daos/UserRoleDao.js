@@ -1,7 +1,19 @@
 var models = require('../database/sequelize');
 var UserRole = models.userOrganizations;
 
-class UserRoleDao{
+class UserRoleDao {
+
+    async updateUserRole(organizationId, userId, role){
+        await UserRole.update(
+            { role: role },
+            { where: 
+                { 
+                    organizationId: organizationId,
+                    userId: userId
+                }
+            }
+        );
+    }
 
     async getCountForOrganization(organizationId){
         return await UserRole.count({

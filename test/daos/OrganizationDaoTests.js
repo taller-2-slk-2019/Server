@@ -70,6 +70,28 @@ describe('"OrganizationDao Tests"', () => {
         });
     });
 
+    describe('Create Organization by admin', () => {
+        var organization;
+        var data = Object.create(organizationCreateData);
+
+        beforeEach(async () => {
+            organization = await OrganizationDao.create(data);
+        });
+
+        it('organization must be created', async () => {
+            expect(organization).to.not.be.null;
+        });
+
+        it('organization must have an id', async () => {
+            expect(organization).to.have.property('id');
+        });
+
+        it('organization must not have an user', async () => {
+            var users = await organization.getUsers();
+            expect(users.length).to.eq(0);
+        });
+    });
+
     describe('Create organization with errors', () => {
         var organization;
         var data;
@@ -85,6 +107,45 @@ describe('"OrganizationDao Tests"', () => {
 
         it('organization must not be created with empty data', async () => {
             await expect(OrganizationDao.create({})).to.eventually.be.rejectedWith(SequelizeValidationError);
+        });
+    });
+
+    describe('Update', () => {
+        var edited = {name: "My organization edited"};
+        var original;
+        var organization, user;
+
+        before(async () => {
+            user = await TestDatabaseHelper.createUser();
+            original = await TestDatabaseHelper.createOrganization([user]);
+            await OrganizationDao.update(edited, original.id);
+            organization = await Organization.findByPk(original.id);
+        });
+
+        it('organization must not be null', async () => {
+            expect(organization).to.not.be.null;
+        });
+        
+        it('organization must have correct id', async () => {
+            expect(organization).to.have.property('id', original.id);
+        });
+        
+        it('organization name must be updated', async () => {
+            expect(organization).to.have.property('name', edited.name);
+        });
+
+        it('organization description must not change', async () => {
+            expect(organization).to.have.property('description', original.description);
+        });
+
+        it('throws exception if id does not exist', async () => {
+            await expect(OrganizationDao.update(edited, 0)).to.eventually.be.rejectedWith(OrganizationNotFoundError);
+        });
+
+        it('throws if name is null', async () => {
+            newEdited = Object.create(edited);
+            newEdited.name = null;
+            await expect(OrganizationDao.update(newEdited, original.id)).to.eventually.be.rejectedWith(SequelizeValidationError);
         });
     });
 

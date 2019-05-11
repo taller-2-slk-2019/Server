@@ -20,7 +20,8 @@ const adminMock = require('../mocks/adminMock');
 describe('"ChannelsController Tests"', () => {
 
     describe('Methods without errors', () => {
-        var mock1, mock2, mock3, mock4, mock5, mock6, mock7, mock8, mock9, mock10;
+        var mock1, mock2, mock3, mock4, mock5, mock6, mock7, mock8, 
+            mock9, mock10, mock11;
 
         before(async () => {
             mock1 = stub(ChannelDao, 'create').resolves(channelDataMock);
@@ -33,6 +34,7 @@ describe('"ChannelsController Tests"', () => {
             mock8 = stub(ChannelService, 'getStatistics').resolves(channelStatisticsMock);
             mock9 = stub(ChannelDao, 'delete').resolves();
             mock10 = stub(AdminDao, 'findByToken').resolves(adminMock);
+            mock11 = stub(ChannelDao, 'update').resolves();
         });
 
         after(async () => {
@@ -46,10 +48,12 @@ describe('"ChannelsController Tests"', () => {
             mock8.restore();
             mock9.restore();
             mock10.restore();
+            mock11.restore();
         });
 
         describe('Create channel', () => {
             var req = mockRequest({ body: channelCreateData });
+            req.query.userToken = "token";
             var res;
 
             beforeEach(async () => {
@@ -69,6 +73,25 @@ describe('"ChannelsController Tests"', () => {
             it('returned channel must have an id', async () => {
                 var response = res.send.args[0][0];
                 expect(response).to.have.property('id', channelDataMock.id);
+            });
+        });
+
+        describe('Update Method', () => {
+            var req = mockRequest({body: channelCreateData});
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await ChannelsController.updateChannel(req, res);
+            });
+
+            it('response status must be 204', async () => {
+                expect(res.status).to.have.been.calledWith(204);
+            });
+
+            it('response body must be null', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.be.undefined;
             });
         });
 
@@ -271,7 +294,8 @@ describe('"ChannelsController Tests"', () => {
     });
 
     describe('Methods with errors', () => {
-        var mock1, mock2, mock3, mock4, mock5, mock6, mock7, mock8, mock9, mock10;;
+        var mock1, mock2, mock3, mock4, mock5, mock6, mock7, mock8, 
+            mock9, mock10, mock11;
 
         before(async () => {
             mock1 = stub(ChannelDao, 'create').rejects();
@@ -284,6 +308,7 @@ describe('"ChannelsController Tests"', () => {
             mock8 = stub(ChannelService, 'getStatistics').rejects();
             mock9 = stub(ChannelDao, 'delete').rejects();
             mock10 = stub(AdminDao, 'findByToken').resolves(adminMock);
+            mock11 = stub(ChannelDao, 'update').rejects();
         });
 
         after(async () => {
@@ -297,16 +322,37 @@ describe('"ChannelsController Tests"', () => {
             mock8.restore();
             mock9.restore();
             mock10.restore();
+            mock11.restore();
         });
 
 
         describe('Create channel with error', () => {
             var req = mockRequest({ body: channelCreateData });
+            req.query.userToken = "token";
             var res;
 
             beforeEach(async () => {
                 res = mockResponse();
                 await ChannelsController.create(req, res);
+            });
+
+            it('response status must be 400', async () => {
+                expect(res.status).to.have.been.calledWith(400);
+            });
+
+            it('response must have an error', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('error');
+            });
+        });
+
+        describe('Update channel with error', () => {
+            var req = mockRequest({ body: channelCreateData });
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await ChannelsController.updateChannel(req, res);
             });
 
             it('response status must be 400', async () => {
@@ -473,6 +519,26 @@ describe('"ChannelsController Tests"', () => {
             beforeEach(async () => {
                 res = mockResponse();
                 await ChannelsController.delete(req, res);
+            });
+
+            it('response status must be 400', async () => {
+                expect(res.status).to.have.been.calledWith(400);
+            });
+
+            it('response must have an error', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('error');
+            });
+        });
+
+        describe('Create channel with admin error', () => {
+            var req = mockRequest({ body: channelCreateData });
+            req.query.userToken = null;
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await ChannelsController.create(req, res);
             });
 
             it('response status must be 400', async () => {

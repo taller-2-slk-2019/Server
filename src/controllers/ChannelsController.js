@@ -17,10 +17,35 @@ class ChannelsController{
         };
 
         try{
+            if (!data.creatorToken){
+                await checkIsAdmin(req);
+            }
+            
             var channel  = await ChannelDao.create(data);
             logger.info(`Channel created (${channel.id}) in organization ${data.organizationId} by user ${data.creatorToken}`);
             sendSuccessResponse(res, channel);
             
+        } catch (err){
+            sendErrorResponse(res, err);
+        }
+    }
+
+    async updateChannel(req, res) {
+        var data = {
+            name: req.body.name,
+            isPublic: req.body.isPublic,
+            description: req.body.description,
+            welcome: req.body.welcome,
+        };
+
+        //TODO check roles
+
+        try{
+            var channel = req.params.id;
+            await ChannelDao.update(data, channel);
+            logger.info("Channel " + channel + " updated");
+            sendEmptySuccessResponse(res);
+
         } catch (err){
             sendErrorResponse(res, err);
         }
