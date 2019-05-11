@@ -12,6 +12,7 @@ var FirebaseService = require('../../src/firebase/FirebaseService');
 var models = require('../../src/database/sequelize');
 var Organization = models.organization;
 var Channel = models.channel;
+var Conversation = models.conversation;
 var MessageStatisticsDao = require('../../src/daos/MessageStatisticsDao');
 var UserRoleDao = require('../../src/daos/UserRoleDao');
 var TestDatabaseHelper = require('../TestDatabaseHelper');
@@ -191,7 +192,7 @@ describe('"OrganizationService Tests"', () => {
     describe('Remove user', () => {
         var organization;
         var usr;
-        var channel;
+        var channel, conversation, other_conversation;
 
         before(async () => {
             organization = await TestDatabaseHelper.createOrganization();;
@@ -202,6 +203,10 @@ describe('"OrganizationService Tests"', () => {
             await organization.setUsers([]);
             await organization.addUser(usr, { through: {role:'role'}});
             channel = await TestDatabaseHelper.createChannel(usr, organization);
+            var user2 = await TestDatabaseHelper.createUser();
+            var user3 = await TestDatabaseHelper.createUser();
+            conversation = await TestDatabaseHelper.createConversation(usr, user2, organization);
+            other_conversation = await TestDatabaseHelper.createConversation(user3, user2, organization);
 
             await OrganizationService.removeUser(usr.id, organization.id);
         });
@@ -219,6 +224,16 @@ describe('"OrganizationService Tests"', () => {
         it('user must be removed from organization channels', async () => {
             var users = await channel.getUsers();
             expect(users.length).to.eq(0);
+        });
+
+        it('user conversations must be deleted', async () => {
+            var c = await Conversation.findByPk(conversation.id);
+            expect(c).to.be.null;
+        });
+
+        it('other users conversations must not be deleted', async () => {
+            var c = await Conversation.findByPk(other_conversation.id);
+            expect(c).to.not.be.null;
         });
     });
 

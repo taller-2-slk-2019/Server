@@ -87,10 +87,22 @@ class OrganizationService {
             throw new UserNotBelongsToOrganizationError(organizationId, userId);
         }
 
-        var channels = await organization.getChannels();
-        await forEach(channels, async (channel) => {
-            await channel.removeUser(user);
-        });
+        var [channels, conversations] = await Promise.all([
+            organization.getChannels(),
+            organization.getConversations()
+        ]);
+        
+        await Promise.all([
+            forEach(channels, async (channel) => {
+                await channel.removeUser(user);
+            }),
+            forEach(conversations, async (conversation) => {
+                if (await conversation.hasUser(user)){
+                    await conversation.destroy();
+                }
+            })
+        ]);
+
         await organization.removeUser(user);
     }
 
