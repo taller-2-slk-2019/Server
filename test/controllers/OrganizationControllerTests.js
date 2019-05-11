@@ -24,7 +24,8 @@ var OrganizationStatistics = require('../../src/models/statistics/OrganizationSt
 describe('"OrganizationsController Tests"', () => {
 
     describe('Methods without errors', () => {
-        var mock1, mock2, mock3, mock4, mock5, mock6, mock7, mock8, mock9, mock10, mock11;
+        var mock1, mock2, mock3, mock4, mock5, mock6, mock7, mock8, 
+            mock9, mock10, mock11, mock12;
 
         before(async () => {
             mock1 = stub(OrganizationDao, 'findById').resolves(organizationDataMock);
@@ -39,6 +40,7 @@ describe('"OrganizationsController Tests"', () => {
             mock10 = stub(OrganizationService, 'getStatistics').resolves(
                 new OrganizationStatistics(organizationUserCountMock, organizationMessageCountMock));
             mock11 = stub(UserRoleDao, 'updateUserRole').resolves();
+            mock12 = stub(OrganizationDao, 'update').resolves();
         });
 
         after(async () => {
@@ -53,6 +55,7 @@ describe('"OrganizationsController Tests"', () => {
             mock9.restore();
             mock10.restore();
             mock11.restore();
+            mock12.restore();
         });
 
         describe('Get Profile Method', () => {
@@ -161,6 +164,25 @@ describe('"OrganizationsController Tests"', () => {
             it('returned organization must have an id', async () => {
                 var response = res.send.args[0][0];
                 expect(response).to.have.property('id');
+            });
+        });
+
+        describe('Update Method', () => {
+            var req = mockRequest({body: organizationCreateData});
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await OrganizationsController.updateProfile(req, res);
+            });
+
+            it('response status must be 204', async () => {
+                expect(res.status).to.have.been.calledWith(204);
+            });
+
+            it('response body must be null', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.be.undefined;
             });
         });
 
@@ -289,7 +311,8 @@ describe('"OrganizationsController Tests"', () => {
     });
 
     describe('Methods with errors', () => {
-        var mock1, mock2, mock3, mock4, mock5, mock6, mock7, mock8, mock9, mock10, mock11;
+        var mock1, mock2, mock3, mock4, mock5, mock6, mock7, mock8, mock9, 
+            mock10, mock11, mock12;
 
         before(async () => {
             mock1 = stub(OrganizationDao, 'findById').rejects();
@@ -303,6 +326,7 @@ describe('"OrganizationsController Tests"', () => {
             mock9 = stub(AdminDao, 'findByToken').resolves(adminMock);
             mock10 = stub(OrganizationService, 'getStatistics').rejects();
             mock11 = stub(UserRoleDao, 'updateUserRole').rejects();
+            mock12 = stub(OrganizationDao, 'update').rejects();
         });
 
         after(async () => {
@@ -317,6 +341,7 @@ describe('"OrganizationsController Tests"', () => {
             mock9.restore();
             mock10.restore();
             mock11.restore();
+            mock12.restore();
         });
 
 
@@ -389,6 +414,25 @@ describe('"OrganizationsController Tests"', () => {
             beforeEach(async () => {
                 res = mockResponse();
                 await OrganizationsController.create(req, res);
+            });
+
+            it('response status must be 400', async () => {
+                expect(res.status).to.have.been.calledWith(400);
+            });
+
+            it('response must have an error', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('error');
+            });
+        });
+
+        describe('Update Method', () => {
+            var req = mockRequest({body: organizationCreateData});
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await OrganizationsController.updateProfile(req, res);
             });
 
             it('response status must be 400', async () => {

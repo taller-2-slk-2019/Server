@@ -88,6 +88,46 @@ describe('"OrganizationDao Tests"', () => {
         });
     });
 
+    describe('Update', () => {
+        var edited = {name: "My organization edited"};
+        var original;
+        var organization, user;
+
+        before(async () => {
+            user = await TestDatabaseHelper.createUser();
+            original = await TestDatabaseHelper.createOrganization([user]);
+            await OrganizationDao.update(edited, original.id);
+            organization = await Organization.findByPk(original.id);
+        });
+
+        it('organization must not be null', async () => {
+            expect(organization).to.not.be.null;
+        });
+        
+        it('organization must have correct id', async () => {
+            expect(organization).to.have.property('id', original.id);
+        });
+        
+        it('organization name must be updated', async () => {
+            expect(organization).to.have.property('name', edited.name);
+        });
+
+        it('organization description must not change', async () => {
+            expect(organization).to.have.property('description', original.description);
+        });
+
+        it('throws exception if id does not exist', async () => {
+            await expect(OrganizationDao.update(edited, 0)).to.eventually.be.rejectedWith(OrganizationNotFoundError);
+        });
+
+        it('throws if name is null', async () => {
+            newEdited = Object.create(edited);
+            newEdited.name = null;
+            await expect(OrganizationDao.update(newEdited, original.id)).to.eventually.be.rejectedWith(SequelizeValidationError);
+        });
+
+    });
+
     describe('Find by id', () => {
         var expected;
         var organization;

@@ -17,6 +17,8 @@ router.delete('/:id/users/:userId', organizationsController.removeUser);
 
 router.get('/:id', organizationsController.getProfile);
 
+router.put('/:id', organizationsController.updateProfile);
+
 router.get('/:id/statistics', organizationsController.getStatistics);
 
 router.delete('/:id', organizationsController.delete);

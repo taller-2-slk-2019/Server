@@ -16,6 +16,11 @@ class OrganizationDao{
         return org;
     }
 
+    async update(organization, id){
+        await this.findById(id);
+        await Organization.update(organization, {where: {id: id}});
+    }
+
     async findById(id){
         var org = await Organization.findByPk(id);
         if (!org){

@@ -55,7 +55,31 @@ class OrganizationsController{
         }
     }
 
+    async updateProfile(req, res) {
+        var data = {
+            name: req.body.name,
+            picture: req.body.picture,
+            latitude: req.body.latitude,
+            longitude: req.body.longitude,
+            description: req.body.description,
+            welcome: req.body.welcome
+        };
+
+        //TODO check roles
+
+        try{
+            var org = req.params.id;
+            await OrganizationDao.update(data, org);
+            logger.info("Organization " + org + " updated");
+            sendEmptySuccessResponse(res);
+
+        } catch (err){
+            sendErrorResponse(res, err);
+        }
+    }
+
     async inviteUsers(req, res){
+        //TODO check roles
         try{
             var organizationId = req.params.id;
             var userEmails = req.body.userEmails;
@@ -81,6 +105,7 @@ class OrganizationsController{
     }
 
     async removeUser(req, res){
+        //TODO check roles
         var userId = req.params.userId;
         var organizationId = req.params.id;
 
@@ -98,6 +123,7 @@ class OrganizationsController{
 
         try{
             await checkIsAdmin(req);
+            //TODO check roles
             
             await OrganizationDao.delete(organizationId);
             logger.info(`Organization ${organizationId} deleted`);
