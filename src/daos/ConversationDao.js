@@ -1,5 +1,6 @@
 var { filter } = require('p-iteration');
 var TitoBotService = require('../services/TitoBotService');
+var FirebaseService = require('../firebase/FirebaseService');
 var UserDao = require('./UserDao');
 var OrganizationDao = require('./OrganizationDao');
 var models = require('../database/sequelize');
@@ -33,6 +34,7 @@ class ConversationDao{
         var conversationModel = await Conversation.create({organizationId: organizationId});
         await conversationModel.addUsers([user1, user2]);
         TitoBotService.conversationCreated(conversationModel, user1);
+        FirebaseService.sendConversationInvitationNotification(user2, user1, conversationModel);
         return await Conversation.findByPk(conversationModel.id, this._getIncludeUsers(user1.id));
     }
 
