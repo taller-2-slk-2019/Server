@@ -15,6 +15,7 @@ const TYPE_NEW_MESSAGE = 'new_message';
 const TYPE_MENTION = 'mention';
 const TYPE_INVITATION = 'invitation';
 const TYPE_CHANNEL_INVITATION = 'channel_invitation';
+const TYPE_CONVERSATION_INVITATION = 'conversation_invitation';
 
 class FirebaseService{
     async sendMessage(message){
@@ -86,6 +87,23 @@ class FirebaseService{
             data: {
                 channel: JSON.stringify(channel),
                 type: TYPE_CHANNEL_INVITATION
+            }
+        };
+
+        this._sendToFirebaseDevices(data, tokens);
+    }
+
+    async sendConversationInvitationNotification(user, other_user, conversation){
+        var tokens = await FirebaseTokensDao.getForUsers(user.username);
+        if (tokens.length == 0){
+            return;
+        }
+
+        var data = {
+            data: {
+                conversation: JSON.stringify(conversation),
+                user: JSON.stringify(other_user),
+                type: TYPE_CONVERSATION_INVITATION
             }
         };
 
