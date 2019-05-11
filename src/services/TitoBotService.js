@@ -1,6 +1,6 @@
 var logger = require('logops');
 const axios = require('axios');
-var BotsController = require('../controllers/BotsController');
+var BotService = require('./BotService');
 
 class TitoBotService {
 
@@ -13,7 +13,7 @@ class TitoBotService {
             url: this.titoBotBaseUrl + 'bot'
         };
 
-        BotsController.sendMessageToBot(bot, message);
+        BotService.sendMessageToBot(bot, message);
     }
 
     async userAddedToChannel(channel, user){

@@ -3,7 +3,7 @@ var MessageParser = require('../helpers/MessageParser');
 var FirebaseService = require('../firebase/FirebaseService');
 var ChannelService = require('../services/ChannelService');
 var BotDao = require('../daos/BotDao');
-var BotsController = require('../controllers/BotsController');
+var BotService = require('../services/BotService');
 var TitoBot = require('../services/TitoBotService');
 var Config = require('../helpers/Config');
 
@@ -30,7 +30,7 @@ class MessageNotificationsService {
             // check if first mentioned user is a bot
             var bot = await BotDao.findByName(mentionedUsers[0], channel.organizationId);
             if (bot){
-                BotsController.sendMessageToBot(bot, message);
+                BotService.sendMessageToBot(bot, message);
                 return;
             }
         }

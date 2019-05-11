@@ -134,6 +134,13 @@ class BotAlreadyExistsError extends Error {
     }
 }
 
+class InvalidBotError extends Error {
+    constructor(bot) {
+        super(`Bot name '${bot}' is invalid`);
+        this.name = this.constructor.name;
+    }
+}
+
 class InvalidUserRoleError extends Error {
     constructor() {
         super("User role is invalid. Must be one of " + UserRoleFactory.roles);
@@ -161,5 +168,6 @@ module.exports = {
     MessageNotFoundError,
     BotAlreadyExistsError,
     InvalidUserRoleError,
-    InvalidForbiddenWordError
+    InvalidForbiddenWordError,
+    InvalidBotError
 };
