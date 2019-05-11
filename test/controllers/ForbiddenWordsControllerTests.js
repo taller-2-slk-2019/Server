@@ -37,6 +37,7 @@ describe('"ForbiddenWordsController Tests"', () => {
 
         describe('Add word', () => {
             var req = mockRequest();
+            req.body.word = "word";
             var res;
 
             beforeEach(async () => {
@@ -130,6 +131,7 @@ describe('"ForbiddenWordsController Tests"', () => {
             var res;
 
             beforeEach(async () => {
+                req.body.word = "word";
                 res = mockResponse();
                 await ForbiddenWordsController.add(req, res);
             });
@@ -141,6 +143,23 @@ describe('"ForbiddenWordsController Tests"', () => {
             it('response must have an error', async () => {
                 var response = res.send.args[0][0];
                 expect(response).to.have.property('error');
+            });
+
+            describe('Add invalid word', () => {
+                beforeEach(async () => {
+                    req.body.word = "word with spaces";
+                    res = mockResponse();
+                    await ForbiddenWordsController.add(req, res);
+                });
+
+                it('response status must be 400', async () => {
+                    expect(res.status).to.have.been.calledWith(400);
+                });
+
+                it('response must have an error', async () => {
+                    var response = res.send.args[0][0];
+                    expect(response).to.have.property('error');
+                });
             });
         });
 
