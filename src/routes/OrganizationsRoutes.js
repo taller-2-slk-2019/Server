@@ -11,6 +11,8 @@ router.post('/:id/invitations', organizationsController.inviteUsers);
 
 router.post('/users', organizationsController.addUser);
 
+router.put('/:id/users/:userId', organizationsController.updateUser);
+
 router.delete('/:id/users/:userId', organizationsController.removeUser);
 
 router.get('/:id', organizationsController.getProfile);

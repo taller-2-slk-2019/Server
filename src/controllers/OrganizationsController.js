@@ -1,5 +1,6 @@
 var logger = require('logops');
 var OrganizationDao = require('../daos/OrganizationDao');
+var UserRoleDao = require('../daos/UserRoleDao');
 var OrganizationService = require('../services/OrganizationService');
 var UserService = require('../services/UserService');
 var { sendSuccessResponse, sendEmptySuccessResponse, sendErrorResponse } = require('../helpers/ResponseHelper');
@@ -100,6 +101,22 @@ class OrganizationsController{
             
             await OrganizationDao.delete(organizationId);
             logger.info(`Organization ${organizationId} deleted`);
+            sendEmptySuccessResponse(res);
+        } catch (err){
+            sendErrorResponse(res, err);
+        }
+    }
+
+    async updateUser(req, res){
+        var organizationId = req.params.id;
+        var userId = req.params.userId;
+        var role = req.body.role;
+
+        try{
+            await checkIsAdmin(req);
+            
+            await UserRoleDao.updateUserRole(organizationId, userId, role);
+            logger.info(`User ${userId} role updated to '${role}' in organization ${organizationId} `);
             sendEmptySuccessResponse(res);
         } catch (err){
             sendErrorResponse(res, err);
