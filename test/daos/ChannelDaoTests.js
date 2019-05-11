@@ -111,6 +111,46 @@ describe('"ChannelDao Tests"', () => {
         });
     });
 
+    describe('Update', () => {
+        var edited = {name: "My channel edited"};
+        var original;
+        var channel, organization, user;
+
+        before(async () => {
+            user = await TestDatabaseHelper.createUser();
+            organization = await TestDatabaseHelper.createOrganization([user]);
+            original = await TestDatabaseHelper.createChannel(user, organization);
+            await ChannelDao.update(edited, original.id);
+            channel = await Channel.findByPk(original.id);
+        });
+
+        it('channel must not be null', async () => {
+            expect(channel).to.not.be.null;
+        });
+        
+        it('channel must have correct id', async () => {
+            expect(channel).to.have.property('id', original.id);
+        });
+        
+        it('channel name must be updated', async () => {
+            expect(channel).to.have.property('name', edited.name);
+        });
+
+        it('channel description must not change', async () => {
+            expect(channel).to.have.property('description', original.description);
+        });
+
+        it('throws exception if id does not exist', async () => {
+            await expect(ChannelDao.update(edited, 0)).to.eventually.be.rejectedWith(ChannelNotFoundError);
+        });
+
+        it('throws if name is null', async () => {
+            newEdited = Object.create(edited);
+            newEdited.name = null;
+            await expect(ChannelDao.update(newEdited, original.id)).to.eventually.be.rejectedWith(SequelizeValidationError);
+        });
+    });
+
     describe('Find by id', () => {
         var expected;
         var channel;

@@ -125,7 +125,6 @@ describe('"OrganizationDao Tests"', () => {
             newEdited.name = null;
             await expect(OrganizationDao.update(newEdited, original.id)).to.eventually.be.rejectedWith(SequelizeValidationError);
         });
-
     });
 
     describe('Find by id', () => {

@@ -26,6 +26,27 @@ class ChannelsController{
         }
     }
 
+    async updateChannel(req, res) {
+        var data = {
+            name: req.body.name,
+            isPublic: req.body.isPublic,
+            description: req.body.description,
+            welcome: req.body.welcome,
+        };
+
+        //TODO check roles
+
+        try{
+            var channel = req.params.id;
+            await ChannelDao.update(data, channel);
+            logger.info("Channel " + channel + " updated");
+            sendEmptySuccessResponse(res);
+
+        } catch (err){
+            sendErrorResponse(res, err);
+        }
+    }
+
     async get(req, res){
         var userToken = req.query.userToken;
         var organizationId = req.query.organizationId;

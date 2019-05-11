@@ -9,6 +9,8 @@ router.post('/', channelsController.create);
 
 router.get('/:id', channelsController.getChannel);
 
+router.put('/:id', channelsController.updateChannel);
+
 router.delete('/:id', channelsController.delete);
 
 router.get('/:id/users', channelsController.getChannelUsers);

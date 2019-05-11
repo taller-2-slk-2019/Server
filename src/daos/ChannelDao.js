@@ -8,7 +8,7 @@ var { ChannelNotFoundError, UserNotBelongsToOrganizationError } = require('../he
 class ChannelDao{
 
     async create(channel){
-        //TODO check user  role, channel name does not exist in org
+        //TODO channel name does not exist in org
         var user = await UserDao.findByToken(channel.creatorToken);
 
         var organization = await OrganizationDao.findById(channel.organizationId);
@@ -24,6 +24,11 @@ class ChannelDao{
 
         TitoBotService.channelCreated(channelModel);
         return channelModel;
+    }
+
+    async update(channel, id){
+        await this.findById(id);
+        await Channel.update(channel, {where: {id: id}});
     }
 
     async findById(id){
