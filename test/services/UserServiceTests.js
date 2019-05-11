@@ -128,7 +128,7 @@ describe('"UserService Tests"', () => {
             expect(invitations.length).to.eq(1);
         });
 
-        it('must delete correct invitation', async () => {
+        it('must not delete incorrect invitation', async () => {
             await user.addOrganizationInvitation(org, {through: {token: "token123"}});
             await user.addOrganizationInvitation(org, {through: {token: "token124"}});
             await UserService.deleteUserInvitation('token123');

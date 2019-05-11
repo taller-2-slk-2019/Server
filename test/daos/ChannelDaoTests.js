@@ -7,6 +7,7 @@ const sinonChai = require('sinon-chai');
 chai.use(sinonChai);
 
 var SequelizeValidationError = require('../../src/database/sequelize').Sequelize.SequelizeValidationError;
+var randtoken = require('rand-token');
 
 var ChannelDao = require('../../src/daos/ChannelDao');
 var TitoBotService = require('../../src/services/TitoBotService');
@@ -16,7 +17,7 @@ var Channel = models.channel;
 var TestDatabaseHelper = require('../TestDatabaseHelper');
 
 var { UserNotFoundError, OrganizationNotFoundError, ChannelNotFoundError, UserAlreadyInChannelError, 
-            UserNotBelongsToOrganizationError, UserNotBelongsToChannelError } = require('../../src/helpers/Errors');
+            UserNotBelongsToOrganizationError, UserNotBelongsToChannelError, ChannelAlreadyExistsError } = require('../../src/helpers/Errors');
 var { channelCreateData } = require('../data/channelData');
 
 describe('"ChannelDao Tests"', () => {
@@ -24,7 +25,7 @@ describe('"ChannelDao Tests"', () => {
 
     var user;
     var organization;
-    var channelData = Object.create(channelCreateData);
+    var channelData = Object.create(channelCreateData());
 
     before(async () => {
         titoMock = stub(TitoBotService, 'channelCreated').resolves();
@@ -45,7 +46,9 @@ describe('"ChannelDao Tests"', () => {
 
         beforeEach(async () => {
             titoMock.resetHistory();
-            channel = await ChannelDao.create(channelData);
+            var data = Object.create(channelData);
+            data.name += randtoken.generate(20);
+            channel = await ChannelDao.create(data);
         });
 
         it('channel must be created', async () => {
@@ -83,10 +86,11 @@ describe('"ChannelDao Tests"', () => {
 
     describe('Create channel for admin', () => {
         var channel;
-        var data = Object.create(channelCreateData);
 
         beforeEach(async () => {
             titoMock.resetHistory();
+            var data = Object.create(channelCreateData());
+            data.name += randtoken.generate(20);
             data.organizationId = organization.id;
             channel = await ChannelDao.create(data);
         });
@@ -125,6 +129,7 @@ describe('"ChannelDao Tests"', () => {
 
         beforeEach(async () => {
             data = Object.create(channelData);
+            data.name += randtoken.generate(20);
         });
 
         it('channel must not be created without creator', async () => {
@@ -136,6 +141,13 @@ describe('"ChannelDao Tests"', () => {
             data.organizationId = -2;
             data.creatorToken = user.token;
             await expect(ChannelDao.create(data)).to.eventually.be.rejectedWith(OrganizationNotFoundError);
+        });
+
+        it('channel must not be created without organization', async () => {
+            data.organizationId = organization.id;
+            data.creatorToken = user.token;
+            await ChannelDao.create(data);
+            await expect(ChannelDao.create(data)).to.eventually.be.rejectedWith(ChannelAlreadyExistsError);
         });
 
         it('channel must not be created with empty data', async () => {
@@ -186,6 +198,13 @@ describe('"ChannelDao Tests"', () => {
             newEdited = Object.create(edited);
             newEdited.name = null;
             await expect(ChannelDao.update(newEdited, original.id)).to.eventually.be.rejectedWith(SequelizeValidationError);
+        });
+
+        it('throws if name is repeated', async () => {
+            var newChannel = await TestDatabaseHelper.createChannel(user, organization);
+            newEdited = Object.create(edited);
+            newEdited.name = newChannel.name;
+            await expect(ChannelDao.update(newEdited, original.id)).to.eventually.be.rejectedWith(ChannelAlreadyExistsError);
         });
     });
 

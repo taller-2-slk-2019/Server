@@ -14,12 +14,13 @@ var models = require('../../src/database/sequelize');
 var Conversation = models.conversation;
 var TestDatabaseHelper = require('../TestDatabaseHelper');
 var TitoBotService = require('../../src/services/TitoBotService');
+var FirebaseService = require('../../src/firebase/FirebaseService');
 
 var { ConversationNotFoundError, UserNotBelongsToOrganizationError, InvalidConversationError } = require('../../src/helpers/Errors');
 var { conversationCreateData } = require('../data/conversationData');
 
 describe('"ConversationDao Tests"', () => {
-    var titoMock;
+    var titoMock, firebaseMock;
     var user;
     var user2;
     var organization;
@@ -27,6 +28,7 @@ describe('"ConversationDao Tests"', () => {
 
     before(async () => {
         titoMock = stub(TitoBotService, 'conversationCreated').resolves();
+        firebaseMock = stub(FirebaseService, 'sendConversationInvitationNotification').resolves();
 
         user = await TestDatabaseHelper.createUser();
         user2 = await TestDatabaseHelper.createUser();
@@ -36,6 +38,7 @@ describe('"ConversationDao Tests"', () => {
 
     after(async () => {
         titoMock.restore();
+        firebaseMock.restore();
     });
 
     describe('Create conversation', () => {
@@ -43,6 +46,7 @@ describe('"ConversationDao Tests"', () => {
 
         before(async () => {
             titoMock.resetHistory();
+            firebaseMock.resetHistory();
             conversation = await ConversationDao.create(organization.id, user2.id, user.token);
         });
 
@@ -76,6 +80,10 @@ describe('"ConversationDao Tests"', () => {
 
         it('should inform tito', async () => {
             assert.calledOnce(titoMock);
+        });
+
+        it('should inform firebase', async () => {
+            assert.calledOnce(firebaseMock);
         });
     });
 

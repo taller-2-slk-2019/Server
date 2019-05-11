@@ -6,50 +6,14 @@ const { stub, assert } = require('sinon');
 const sinonChai = require('sinon-chai');
 chai.use(sinonChai);
 const { mockRequest, mockResponse } = require('mock-req-res');
-var axios = require('axios');
-var AxiosMock = require('axios-mock-adapter');
 
 var BotsController = require('../../src/controllers/BotsController');
 var BotDao = require('../../src/daos/BotDao');
 var AdminDao = require('../../src/daos/AdminUserDao');
-var messageMock = require('../mocks/messageMock');
 const adminMock = require('../mocks/adminMock');
 const botMock = require('../mocks/botMock');
 
 describe('"BotsController Tests"', () => {
-    describe('Send Message To bot', () => {
-        var mock;
-        var bot;
-
-        before(async () => {
-            bot = {
-                name: 'pepe',
-                url: 'pepe.com'
-            }
-
-            messageMock.data = "@pepe hello"
-
-            mock = new AxiosMock(axios);
-            mock.onPost('pepe.com').reply(200, {});
-        });
-
-        beforeEach(async () => {
-            mock.reset();
-            await BotsController.sendMessageToBot(bot, messageMock);
-        });
-
-        after(async () => {
-            mock.restore();
-        });
-
-        it('should send message to bot', async () => {
-            expect(mock.history.post.length).to.eq(1);
-        });
-
-        it('should send message to bot without bot mention', async () => {
-            expect(JSON.parse(mock.history.post[0].data).message).to.not.include('pepe');
-        });
-    });
 
     describe('Methods without errors', () => {
         var mock1, mock2, mock3, mock4;
@@ -70,6 +34,7 @@ describe('"BotsController Tests"', () => {
 
         describe('Add bot', () => {
             var req = mockRequest();
+            req.body.name = "bot";
             var res;
 
             beforeEach(async () => {
@@ -160,6 +125,7 @@ describe('"BotsController Tests"', () => {
             var res;
 
             beforeEach(async () => {
+                req.body.name = "bot";
                 res = mockResponse();
                 await BotsController.create(req, res);
             });
@@ -171,6 +137,46 @@ describe('"BotsController Tests"', () => {
             it('response must have an error', async () => {
                 var response = res.send.args[0][0];
                 expect(response).to.have.property('error');
+            });
+
+            describe('Add bot with spaces in name', () => {
+                var req = mockRequest();
+                var res;
+
+                beforeEach(async () => {
+                    req.body.name = "bot with spaces";
+                    res = mockResponse();
+                    await BotsController.create(req, res);
+                });
+
+                it('response status must be 400', async () => {
+                    expect(res.status).to.have.been.calledWith(400);
+                });
+
+                it('response must have an error', async () => {
+                    var response = res.send.args[0][0];
+                    expect(response).to.have.property('error');
+                });
+            });
+
+            describe('Add bot with tito name', () => {
+                var req = mockRequest();
+                var res;
+
+                beforeEach(async () => {
+                    req.body.name = "tito";
+                    res = mockResponse();
+                    await BotsController.create(req, res);
+                });
+
+                it('response status must be 400', async () => {
+                    expect(res.status).to.have.been.calledWith(400);
+                });
+
+                it('response must have an error', async () => {
+                    var response = res.send.args[0][0];
+                    expect(response).to.have.property('error');
+                });
             });
         });
 

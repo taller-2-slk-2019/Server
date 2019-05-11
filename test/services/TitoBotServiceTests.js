@@ -9,7 +9,7 @@ var axios = require('axios');
 var AxiosMock = require('axios-mock-adapter');
 
 var TitoBotService = require('../../src/services/TitoBotService');
-var BotsController = require('../../src/controllers/BotsController');
+var BotService = require('../../src/services/BotService');
 var TestDatabaseHelper = require('../TestDatabaseHelper');
 
 var messageMock = require('../mocks/messageMock');
@@ -18,7 +18,7 @@ describe('"TitoBotService Tests"', () => {
     var mock, mock2;
 
     before(async () => {
-        mock = stub(BotsController, 'sendMessageToBot').resolves();
+        mock = stub(BotService, 'sendMessageToBot').resolves();
         mock2 = new AxiosMock(axios);
         mock2.onPost(TitoBotService.titoBotBaseUrl + 'welcome').reply(200, {});
         mock2.onPost(TitoBotService.titoBotBaseUrl + 'channel').reply(200, {});

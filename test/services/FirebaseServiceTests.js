@@ -197,8 +197,56 @@ describe('"FirebaseService Tests"', () => {
         });
 
         it('should do nothing if no tokens are provided', async () => {
-            await FirebaseService.sendOrganizationInvitationNotification(user, channel);
+            await FirebaseService.sendChannelInvitationNotification(user, channel);
             assert.notCalled(mockUsers);
+        });
+
+        it('should send correct channel', async () => {
+            await FirebaseService.sendChannelInvitationNotification(user2, channel);
+            var args = JSON.parse(mockUsers.getCall(0).args[0].data.channel);
+            expect(args).to.have.property('id', channel.id);
+        });
+    });
+
+    describe('Send conversation invitation notification', () => {
+        var user, user2;
+        var organization;
+        var conversation;
+
+        before(async () => {
+            user = await TestDatabaseHelper.createUser();
+            user2 = await TestDatabaseHelper.createUser();
+            organization = await TestDatabaseHelper.createOrganization([user]);
+            conversation = await TestDatabaseHelper.createConversation(user, user2, organization);
+
+            await FirebaseToken.create({userId: user2.id, token: 'token0000'});
+        });
+
+        beforeEach(async () => {
+            mockUsers.resetHistory();
+        });
+
+        it('should send message to firebase', async () => {
+            await FirebaseService.sendConversationInvitationNotification(user2, user, conversation);
+            assert.calledOnce(mockUsers);
+        });
+
+        it('should send message to correct user tokens', async () => {
+            await FirebaseService.sendConversationInvitationNotification(user2, user, conversation);
+            var args = mockUsers.getCall(0).args[1];
+            expect(args).to.include('token0000');
+        });
+
+        it('should send correct conversation', async () => {
+            await FirebaseService.sendConversationInvitationNotification(user2, user, conversation);
+            var args = JSON.parse(mockUsers.getCall(0).args[0].data.conversation);
+            expect(args).to.have.property('id', conversation.id);
+        });
+
+        it('should send correct user', async () => {
+            await FirebaseService.sendConversationInvitationNotification(user2, user, conversation);
+            var args = JSON.parse(mockUsers.getCall(0).args[0].data.user);
+            expect(args).to.have.property('id', user.id);
         });
     });
 });

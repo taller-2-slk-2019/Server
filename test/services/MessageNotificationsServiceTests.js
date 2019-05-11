@@ -9,7 +9,7 @@ chai.use(sinonChai);
 var MessageNotificationsService = require('../../src/services/MessageNotificationsService');
 var FirebaseService = require('../../src/firebase/FirebaseService');
 var TitoBotService = require('../../src/services/TitoBotService');
-var BotsController = require('../../src/controllers/BotsController');
+var BotService = require('../../src/services/BotService');
 var ChannelService = require('../../src/services/ChannelService');
 
 var TestDatabaseHelper = require('../TestDatabaseHelper');
@@ -27,7 +27,7 @@ describe('"MessageNotificationsService Tests"', () => {
         mock = stub(FirebaseService, 'sendChannelMessageNotification').resolves();
         mock2 = stub(TitoBotService, 'sendMessage').resolves();
         mock3 = stub(ChannelService, 'addUsername').resolves();
-        mock4 = stub(BotsController, 'sendMessageToBot').resolves();
+        mock4 = stub(BotService, 'sendMessageToBot').resolves();
 
         user1 = await TestDatabaseHelper.createUser();
         user2 = await TestDatabaseHelper.createUser();

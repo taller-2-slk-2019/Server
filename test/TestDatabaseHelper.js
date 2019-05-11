@@ -42,7 +42,7 @@ class TestDatabaseHelper {
     }
 
     async createChannel(user, organization, isPublic = true) {
-        var channelData = Object.create(channelCreateData);
+        var channelData = Object.create(channelCreateData());
         channelData.creatorId = user.id;
         channelData.organizationId = organization.id;
         channelData.isPublic = isPublic;

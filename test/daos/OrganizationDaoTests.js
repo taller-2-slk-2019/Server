@@ -12,6 +12,7 @@ var FirebaseService = require('../../src/firebase/FirebaseService');
 var models = require('../../src/database/sequelize');
 var Organization = models.organization;
 var Channel = models.channel;
+var Conversation = models.conversation;
 var TestDatabaseHelper = require('../TestDatabaseHelper');
 
 var { UserNotFoundError, OrganizationNotFoundError,
@@ -211,14 +212,16 @@ describe('"OrganizationDao Tests"', () => {
     });
 
     describe('Delete', () => {
-        var channel
+        var channel, conversation;
         var organization;
         var user;
 
         before(async () => {
             user = await TestDatabaseHelper.createUser();
-            organization = await TestDatabaseHelper.createOrganization([user]);
+            var user2 = await TestDatabaseHelper.createUser();
+            organization = await TestDatabaseHelper.createOrganization([user, user2]);
             channel = await TestDatabaseHelper.createChannel(user, organization);
+            conversation = await TestDatabaseHelper.createConversation(user, user2, organization);
             await OrganizationDao.delete(organization.id);
         });
 
@@ -233,6 +236,11 @@ describe('"OrganizationDao Tests"', () => {
 
         it('organization channels must be deleted', async () => {
             var c = await Channel.findByPk(channel.id);
+            expect(c).to.be.null;
+        });
+
+        it('organization conversations must be deleted', async () => {
+            var c = await Conversation.findByPk(conversation.id);
             expect(c).to.be.null;
         });
     });

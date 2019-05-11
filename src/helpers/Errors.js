@@ -36,6 +36,13 @@ class ChannelNotFoundError extends Error {
     }
 }
 
+class ChannelAlreadyExistsError extends Error {
+    constructor(channelName, orgId) {
+        super(`Channel ${channelName} already exists in organization ${orgId}`);
+        this.name = this.constructor.name;
+    }
+}
+
 class MessageNotFoundError extends Error {
     constructor(msgId) {
         super("Message not found: " + msgId);
@@ -120,9 +127,23 @@ class ForbiddenWordAlreadyExistsError extends Error {
     }
 }
 
+class InvalidForbiddenWordError extends Error {
+    constructor(word) {
+        super(`Forbidden word '${word}' is invalid`);
+        this.name = this.constructor.name;
+    }
+}
+
 class BotAlreadyExistsError extends Error {
     constructor(bot, organizationId) {
         super(`Bot '${bot}' already exists in organization ${organizationId}`);
+        this.name = this.constructor.name;
+    }
+}
+
+class InvalidBotError extends Error {
+    constructor(bot) {
+        super(`Bot name '${bot}' is invalid`);
         this.name = this.constructor.name;
     }
 }
@@ -153,5 +174,8 @@ module.exports = {
     InvalidQueryError,
     MessageNotFoundError,
     BotAlreadyExistsError,
-    InvalidUserRoleError
+    InvalidUserRoleError,
+    InvalidForbiddenWordError,
+    InvalidBotError,
+    ChannelAlreadyExistsError
 };
