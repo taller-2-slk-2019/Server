@@ -248,7 +248,7 @@ describe('"OrganizationsController Tests"', () => {
         });
 
         describe('Update User', () => {
-            var req = mockRequest();
+            var req = mockRequest({body: {role: 'member'}});
             var res;
 
             beforeEach(async () => {
@@ -504,7 +504,7 @@ describe('"OrganizationsController Tests"', () => {
         });
 
         describe('Remove user', () => {
-            var req = mockRequest();
+            var req = mockRequest({body: {role: 'member'}});
             var res;
 
             beforeEach(async () => {
@@ -519,6 +519,25 @@ describe('"OrganizationsController Tests"', () => {
             it('response must have an error', async () => {
                 var response = res.send.args[0][0];
                 expect(response).to.have.property('error');
+            });
+
+            describe('Invalid role', () => {
+                var req = mockRequest({body: {role: 'invalid'}});
+                var res;
+
+                beforeEach(async () => {
+                    res = mockResponse();
+                    await OrganizationsController.updateUser(req, res);
+                });
+
+                it('response status must be 400', async () => {
+                    expect(res.status).to.have.been.calledWith(400);
+                });
+
+                it('response must have an error', async () => {
+                    var response = res.send.args[0][0];
+                    expect(response).to.have.property('error');
+                });
             });
         });
 
@@ -598,7 +617,7 @@ describe('"OrganizationsController Tests"', () => {
         });
 
         describe('Update user Method with admin error', () => {
-            var req = mockRequest();
+            var req = mockRequest({body: {role: 'member'}});
             var res;
 
             beforeEach(async () => {

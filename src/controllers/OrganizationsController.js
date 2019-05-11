@@ -3,8 +3,10 @@ var OrganizationDao = require('../daos/OrganizationDao');
 var UserRoleDao = require('../daos/UserRoleDao');
 var OrganizationService = require('../services/OrganizationService');
 var UserService = require('../services/UserService');
+var UserRoleFactory = require('../factories/UserRoleFactory');
 var { sendSuccessResponse, sendEmptySuccessResponse, sendErrorResponse } = require('../helpers/ResponseHelper');
 var { checkIsAdmin } = require('../helpers/RequestHelper');
+var { InvalidUserRoleError } = require('../helpers/Errors');
 
 class OrganizationsController{
 
@@ -140,6 +142,10 @@ class OrganizationsController{
 
         try{
             await checkIsAdmin(req);
+
+            if (!UserRoleFactory.roles.includes(role)){
+                throw new InvalidUserRoleError();
+            }
             
             await UserRoleDao.updateUserRole(organizationId, userId, role);
             logger.info(`User ${userId} role updated to '${role}' in organization ${organizationId} `);

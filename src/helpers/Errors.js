@@ -1,4 +1,5 @@
 var Config = require('./Config');
+var UserRoleFactory = require('../factories/UserRoleFactory');
 
 class InvalidQueryError extends Error {
     constructor() {
@@ -126,6 +127,13 @@ class BotAlreadyExistsError extends Error {
     }
 }
 
+class InvalidUserRoleError extends Error {
+    constructor() {
+        super("User role is invalid. Must be one of " + UserRoleFactory.roles);
+        this.name = this.constructor.name;
+    }
+}
+
 module.exports = {
     UserNotFoundError,
     AdminUserNotFoundError,
@@ -144,5 +152,6 @@ module.exports = {
     UserNotBelongsToConversationError,
     InvalidQueryError,
     MessageNotFoundError,
-    BotAlreadyExistsError
+    BotAlreadyExistsError,
+    InvalidUserRoleError
 };
