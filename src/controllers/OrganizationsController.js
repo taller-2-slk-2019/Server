@@ -5,7 +5,7 @@ var OrganizationService = require('../services/OrganizationService');
 var UserService = require('../services/UserService');
 var UserRoleFactory = require('../factories/UserRoleFactory');
 var { sendSuccessResponse, sendEmptySuccessResponse, sendErrorResponse } = require('../helpers/ResponseHelper');
-var { checkIsAdmin } = require('../helpers/RequestHelper');
+var RequestRolePermissions = require('../helpers/RequestRolePermissions');
 var { InvalidUserRoleError } = require('../helpers/Errors');
 
 class OrganizationsController{
@@ -49,7 +49,7 @@ class OrganizationsController{
 
         try{
             if (!data.creatorToken){
-                await checkIsAdmin(req);
+                await RequestRolePermissions.checkAdminPermissions(req);
             }
 
             var org = await OrganizationDao.create(data);
@@ -128,7 +128,7 @@ class OrganizationsController{
         var organizationId = req.params.id;
 
         try{
-            await checkIsAdmin(req);
+            await RequestRolePermissions.checkAdminPermissions(req);
             //TODO check roles
             
             await OrganizationDao.delete(organizationId);
@@ -145,7 +145,7 @@ class OrganizationsController{
         var role = req.body.role;
 
         try{
-            await checkIsAdmin(req);
+            await RequestRolePermissions.checkAdminPermissions(req);
 
             if (!UserRoleFactory.roles.includes(role)){
                 throw new InvalidUserRoleError();

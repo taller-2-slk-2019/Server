@@ -11,7 +11,7 @@ const adminMock = require('../mocks/adminMock');
 
 var ForbiddenWordsController = require('../../src/controllers/ForbiddenWordsController');
 var ForbiddenWordDao = require('../../src/daos/ForbiddenWordDao');
-var AdminDao = require('../../src/daos/AdminUserDao');
+var TestPermissionsMock = require('../TestPermissionsMock');
 
 describe('"ForbiddenWordsController Tests"', () => {
 
@@ -19,20 +19,19 @@ describe('"ForbiddenWordsController Tests"', () => {
         var mock1;
         var mock2;
         var mock3;
-        var mock4;
 
         before(async () => {
+            TestPermissionsMock.allowPermissions();
             mock1 = stub(ForbiddenWordDao, 'get').resolves([forbiddenWordMock, forbiddenWordMock, forbiddenWordMock]);
             mock2 = stub(ForbiddenWordDao, 'create').resolves(forbiddenWordMock);
             mock3 = stub(ForbiddenWordDao, 'delete').resolves();
-            mock4 = stub(AdminDao, 'findByToken').resolves(adminMock);
         });
 
         after(async () => {
+            TestPermissionsMock.restore();
             mock1.restore();
             mock2.restore();
             mock3.restore();
-            mock4.restore();
         });
 
         describe('Add word', () => {
@@ -109,20 +108,19 @@ describe('"ForbiddenWordsController Tests"', () => {
         var mock1;
         var mock2;
         var mock3;
-        var mock4;
 
         before(async () => {
+            TestPermissionsMock.allowPermissions();
             mock1 = stub(ForbiddenWordDao, 'get').rejects();
             mock2 = stub(ForbiddenWordDao, 'create').rejects();
             mock3 = stub(ForbiddenWordDao, 'delete').rejects();
-            mock4 = stub(AdminDao, 'findByToken').resolves(adminMock);
         });
 
         after(async () => {
+            TestPermissionsMock.restore();
             mock1.restore();
             mock2.restore();
             mock3.restore();
-            mock4.restore();
         });
 
 
@@ -206,20 +204,19 @@ describe('"ForbiddenWordsController Tests"', () => {
         var mock1;
         var mock2;
         var mock3;
-        var mock4;
 
         before(async () => {
-            mock1 = stub(ForbiddenWordDao, 'get').rejects();
-            mock2 = stub(ForbiddenWordDao, 'create').rejects();
-            mock3 = stub(ForbiddenWordDao, 'delete').rejects();
-            mock4 = stub(AdminDao, 'findByToken').rejects();
+            TestPermissionsMock.rejectPermissions();
+            mock1 = stub(ForbiddenWordDao, 'get').resolves();
+            mock2 = stub(ForbiddenWordDao, 'create').resolves();
+            mock3 = stub(ForbiddenWordDao, 'delete').resolves();
         });
 
         after(async () => {
+            TestPermissionsMock.restore();
             mock1.restore();
             mock2.restore();
             mock3.restore();
-            mock4.restore();
         });
 
 

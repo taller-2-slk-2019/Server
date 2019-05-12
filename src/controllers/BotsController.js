@@ -1,7 +1,7 @@
 var logger = require('logops');
 var BotDao = require('../daos/BotDao');
 var TitoBot = require('../services/TitoBotService');
-var { checkIsAdmin } = require('../helpers/RequestHelper');
+var RequestRolePermissions = require('../helpers/RequestRolePermissions');
 var { sendSuccessResponse, sendErrorResponse, sendEmptySuccessResponse } = require('../helpers/ResponseHelper');
 var { InvalidBotError } = require('../helpers/Errors');
 
@@ -27,7 +27,7 @@ class BotsController {
         };
         
         try{
-            await checkIsAdmin(req);
+            await RequestRolePermissions.checkAdminPermissions(req);
 
             if (data.name.includes(' ') || data.name == TitoBot.titoBotName){
                 throw new InvalidBotError(data.name);
@@ -46,7 +46,7 @@ class BotsController {
         var botId = req.params.id;
 
         try{
-            await checkIsAdmin(req);
+            await RequestRolePermissions.checkAdminPermissions(req);
             
             await BotDao.delete(botId);
             logger.info(`Bot '${botId}' deleted`);
