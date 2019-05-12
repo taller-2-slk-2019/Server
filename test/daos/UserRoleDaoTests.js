@@ -82,4 +82,19 @@ describe('"UserRoleDao Tests"', () => {
             expect(result[0].userOrganizations).to.have.property('role', 'original role');
         });
     });
+
+    describe('Get user role', () => {
+        it('user role must be correct', async () => {
+            var role = await UserRoleDao.getUserRole(organization.id, user.id);
+            expect(role).to.eq('creator');
+        });
+
+        it('get unexistant user role must throw', async () => {
+            await expect(UserRoleDao.getUserRole(organization.id, 0)).to.eventually.be.rejected;
+        });
+
+        it('get unexistant organization user role must throw', async () => {
+            await expect(UserRoleDao.getUserRole(0, user.id)).to.eventually.be.rejected;
+        });
+    });
 });
