@@ -1,9 +1,9 @@
 const chai = require('chai');
 const expect = chai.expect;
 
-var UserRoleCreator = require('../src/models/userRoles/UserRoleCreator');
-var UserRoleModerator = require('../src/models/userRoles/UserRoleModerator');
-var UserRoleMember = require('../src/models/userRoles/UserRoleMember');
+var UserRoleCreator = require('../../src/models/userRoles/UserRoleCreator');
+var UserRoleModerator = require('../../src/models/userRoles/UserRoleModerator');
+var UserRoleMember = require('../../src/models/userRoles/UserRoleMember');
 
 describe('"User Roles Tests"', () => {
 
