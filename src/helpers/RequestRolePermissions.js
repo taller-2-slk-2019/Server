@@ -24,6 +24,60 @@ class RequestRolePermissions {
         }
     }
 
+    async checkOrganizationPermissions(req, organizationId){
+        try {
+            await this.checkAdminPermissions(req);
+            return;
+        } catch (err) {
+            // do nothing
+        }
+
+        try {
+            var role = await this._getUserRole(req.query.userToken, organizationId);
+            if (!role.hasOrganizationPermissions()){
+                throw new UnauthorizedUserError();
+            }
+        } catch (err) {
+            throw new UnauthorizedUserError();
+        }
+    }
+
+    async checkChannelPermissions(req, organizationId){
+        try {
+            await this.checkAdminPermissions(req);
+            return;
+        } catch (err) {
+            // do nothing
+        }
+
+        try {
+            var role = await this._getUserRole(req.query.userToken, organizationId);
+            if (!role.hasChannelsPermissions()){
+                throw new UnauthorizedUserError();
+            }
+        } catch (err) {
+            throw new UnauthorizedUserError();
+        }
+    }
+
+    async checkUserPermissions(req, organizationId){
+        try {
+            await this.checkAdminPermissions(req);
+            return;
+        } catch (err) {
+            // do nothing
+        }
+
+        try {
+            var role = await this._getUserRole(req.query.userToken, organizationId);
+            if (!role.hasUserPermissions()){
+                throw new UnauthorizedUserError();
+            }
+        } catch (err) {
+            throw new UnauthorizedUserError();
+        }
+    }
+
 }
 
 module.exports = new RequestRolePermissions();

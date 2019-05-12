@@ -17,10 +17,6 @@ class UserRoleCreator extends UserRole {
     hasUserPermissions(){
         return true;
     }
-
-    hasRolePermissions(){
-        return true;
-    }
 }
 
 module.exports = UserRoleCreator;

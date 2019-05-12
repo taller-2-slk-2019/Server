@@ -22,10 +22,6 @@ describe('"User Roles Tests"', () => {
         it('must have user permissions', async () => {
             expect(role.hasUserPermissions()).to.be.true;
         });
-
-        it('must have roles permissions', async () => {
-            expect(role.hasRolePermissions()).to.be.true;
-        });
     });
 
     describe('Role Moderator', () => {
@@ -43,10 +39,6 @@ describe('"User Roles Tests"', () => {
         it('must have user permissions', async () => {
             expect(role.hasUserPermissions()).to.be.true;
         });
-
-        it('must not have roles permissions', async () => {
-            expect(role.hasRolePermissions()).to.be.false;
-        });
     });
 
     describe('Role Member', () => {
@@ -63,10 +55,6 @@ describe('"User Roles Tests"', () => {
 
         it('must not have user permissions', async () => {
             expect(role.hasUserPermissions()).to.be.false;
-        });
-
-        it('must not have roles permissions', async () => {
-            expect(role.hasRolePermissions()).to.be.false;
         });
     });
 });

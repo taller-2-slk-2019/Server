@@ -9,11 +9,17 @@ class TestPermissionsMock {
     allowPermissions(){
         this.restore();
         this.mocks.push(stub(RequestRolePermissions, 'checkAdminPermissions').resolves());
+        this.mocks.push(stub(RequestRolePermissions, 'checkOrganizationPermissions').resolves());
+        this.mocks.push(stub(RequestRolePermissions, 'checkChannelPermissions').resolves());
+        this.mocks.push(stub(RequestRolePermissions, 'checkUserPermissions').resolves());
     }
 
     rejectPermissions(){
         this.restore();
         this.mocks.push(stub(RequestRolePermissions, 'checkAdminPermissions').rejects());
+        this.mocks.push(stub(RequestRolePermissions, 'checkOrganizationPermissions').rejects());
+        this.mocks.push(stub(RequestRolePermissions, 'checkChannelPermissions').rejects());
+        this.mocks.push(stub(RequestRolePermissions, 'checkUserPermissions').rejects());
     }
 
     restore(){

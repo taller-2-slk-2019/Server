@@ -12,6 +12,7 @@ var { UnauthorizedUserError } = require('../../src/helpers/Errors');
 var AdminDao = require('../../src/daos/AdminUserDao');
 var UserDao = require('../../src/daos/UserDao');
 var UserRoleDao = require('../../src/daos/UserRoleDao');
+var userMock = require('../mocks/userProfileMock');
 
 describe('"RequestRolePermissions Tests"', () => {
     var mockAdmin, mockUser, mockRole;
@@ -21,14 +22,18 @@ describe('"RequestRolePermissions Tests"', () => {
         mockAdmin.withArgs("token").resolves();
         
         mockUser = stub(UserDao, 'findByToken').rejects();
-        mockUser.withArgs("token").resolves();
-       // mockRole = stub(UserRoleDao, 'getUserRole').resolves();
+        mockUser.withArgs("token").resolves(userMock);
+
+        mockRole = stub(UserRoleDao, 'getUserRole').rejects();
+        mockRole.withArgs('creator').resolves('creator');
+        mockRole.withArgs('moderator').resolves('moderator');
+        mockRole.withArgs('member').resolves('member');
     });
 
     after(async () => {
         mockAdmin.restore();
         mockUser.restore();
-        //mockRole.restore();
+        mockRole.restore();
     });
 
     describe('Admin permissions', () => {
@@ -38,8 +43,74 @@ describe('"RequestRolePermissions Tests"', () => {
         });
 
         it('should reject if admin not exists', async () => {
-            var req = mockRequest({ query: {adminToken: "invalid token"} })
+            var req = mockRequest({ query: {adminToken: "invalid token"} });
             await expect(RequestRolePermissions.checkAdminPermissions(req)).to.eventually.be.rejectedWith(UnauthorizedUserError);
+        });
+    });
+
+    describe('Organization permissions', () => {
+        it('should resolve if admin exists', async () => {
+            var req = mockRequest({ query: {adminToken: "token"} });
+            await expect(RequestRolePermissions.checkOrganizationPermissions(req)).to.eventually.be.fulfilled;
+        });
+
+        it('should resolve if user role has permission', async () => {
+            var req = mockRequest({ query: {userToken: "token"} });
+            await expect(RequestRolePermissions.checkOrganizationPermissions(req, "creator")).to.eventually.be.fulfilled;
+        });
+
+        it('should reject if user role does not have permission', async () => {
+            var req = mockRequest({ query: {userToken: "token"} });
+            await expect(RequestRolePermissions.checkOrganizationPermissions(req, "member")).to.eventually.be.rejectedWith(UnauthorizedUserError);
+        });
+
+        it('should reject if user does not exist', async () => {
+            var req = mockRequest({ query: {userToken: " invalidtoken"} });
+            await expect(RequestRolePermissions.checkOrganizationPermissions(req)).to.eventually.be.rejectedWith(UnauthorizedUserError);
+        });
+    });
+
+    describe('Channel permissions', () => {
+        it('should resolve if admin exists', async () => {
+            var req = mockRequest({ query: {adminToken: "token"} });
+            await expect(RequestRolePermissions.checkChannelPermissions(req)).to.eventually.be.fulfilled;
+        });
+
+        it('should resolve if user role has permission', async () => {
+            var req = mockRequest({ query: {userToken: "token"} });
+            await expect(RequestRolePermissions.checkChannelPermissions(req, "creator")).to.eventually.be.fulfilled;
+        });
+
+        it('should reject if user role does not have permission', async () => {
+            var req = mockRequest({ query: {userToken: "token"} });
+            await expect(RequestRolePermissions.checkChannelPermissions(req, "member")).to.eventually.be.rejectedWith(UnauthorizedUserError);
+        });
+
+        it('should reject if user does not exist', async () => {
+            var req = mockRequest({ query: {userToken: " invalidtoken"} });
+            await expect(RequestRolePermissions.checkChannelPermissions(req)).to.eventually.be.rejectedWith(UnauthorizedUserError);
+        });
+    });
+
+    describe('User permissions', () => {
+        it('should resolve if admin exists', async () => {
+            var req = mockRequest({ query: {adminToken: "token"} });
+            await expect(RequestRolePermissions.checkUserPermissions(req)).to.eventually.be.fulfilled;
+        });
+
+        it('should resolve if user role has permission', async () => {
+            var req = mockRequest({ query: {userToken: "token"} });
+            await expect(RequestRolePermissions.checkUserPermissions(req, "creator")).to.eventually.be.fulfilled;
+        });
+
+        it('should reject if user role does not have permission', async () => {
+            var req = mockRequest({ query: {userToken: "token"} });
+            await expect(RequestRolePermissions.checkUserPermissions(req, "member")).to.eventually.be.rejectedWith(UnauthorizedUserError);
+        });
+
+        it('should reject if user does not exist', async () => {
+            var req = mockRequest({ query: {userToken: " invalidtoken"} });
+            await expect(RequestRolePermissions.checkUserPermissions(req)).to.eventually.be.rejectedWith(UnauthorizedUserError);
         });
     });
 });
