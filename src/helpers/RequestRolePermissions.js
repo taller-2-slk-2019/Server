@@ -16,6 +16,24 @@ class RequestRolePermissions {
         return UserRoleFactory.getRole(role);
     }
 
+    async _checkUserRolePermissions(req, organizationId, roleCheck){
+        try {
+            await this.checkAdminPermissions(req);
+            return;
+        } catch (err) {
+            // do nothing
+        }
+
+        try {
+            var role = await this._getUserRole(req.query.userToken, organizationId);
+            if (!roleCheck(role)){
+                throw new UnauthorizedUserError();
+            }
+        } catch (err) {
+            throw new UnauthorizedUserError();
+        }
+    }
+
     async checkAdminPermissions(req){
         try {
             await this._checkAdmin(req.query.adminToken);
@@ -25,57 +43,18 @@ class RequestRolePermissions {
     }
 
     async checkOrganizationPermissions(req, organizationId){
-        try {
-            await this.checkAdminPermissions(req);
-            return;
-        } catch (err) {
-            // do nothing
-        }
-
-        try {
-            var role = await this._getUserRole(req.query.userToken, organizationId);
-            if (!role.hasOrganizationPermissions()){
-                throw new UnauthorizedUserError();
-            }
-        } catch (err) {
-            throw new UnauthorizedUserError();
-        }
+        var roleCheck = (role) => { return role.hasOrganizationPermissions(); };
+        await this._checkUserRolePermissions(req, organizationId, roleCheck);
     }
 
     async checkChannelPermissions(req, organizationId){
-        try {
-            await this.checkAdminPermissions(req);
-            return;
-        } catch (err) {
-            // do nothing
-        }
-
-        try {
-            var role = await this._getUserRole(req.query.userToken, organizationId);
-            if (!role.hasChannelsPermissions()){
-                throw new UnauthorizedUserError();
-            }
-        } catch (err) {
-            throw new UnauthorizedUserError();
-        }
+        var roleCheck = (role) => { return role.hasChannelsPermissions(); };
+        await this._checkUserRolePermissions(req, organizationId, roleCheck);
     }
 
     async checkUserPermissions(req, organizationId){
-        try {
-            await this.checkAdminPermissions(req);
-            return;
-        } catch (err) {
-            // do nothing
-        }
-
-        try {
-            var role = await this._getUserRole(req.query.userToken, organizationId);
-            if (!role.hasUserPermissions()){
-                throw new UnauthorizedUserError();
-            }
-        } catch (err) {
-            throw new UnauthorizedUserError();
-        }
+        var roleCheck = (role) => { return role.hasUserPermissions(); };
+        await this._checkUserRolePermissions(req, organizationId, roleCheck);
     }
 
 }
