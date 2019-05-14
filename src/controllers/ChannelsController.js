@@ -38,10 +38,10 @@ class ChannelsController{
             welcome: req.body.welcome,
         };
 
-        //TODO check roles
-
         try{
             var channel = req.params.id;
+            await RequestRolePermissions.checkChannelPermissions(req, channel);
+
             await ChannelDao.update(data, channel);
             logger.info("Channel " + channel + " updated");
             sendEmptySuccessResponse(res);
@@ -100,9 +100,17 @@ class ChannelsController{
     async addUser(req, res){
         var channelId = req.params.id;
         var userId = req.body.userId;
+        var userToken = req.query.userToken;
         try{
-            await ChannelService.addUser(channelId, userId);
-            logger.info(`User ${userId} added to channel ${channelId}`);
+            if (userId){
+                await RequestRolePermissions.checkChannelPermissions(req, channelId);
+                await ChannelService.addUser(channelId, userId);
+                logger.info(`User ${userId} added to channel ${channelId}`);
+            } else {
+                await ChannelService.joinUser(channelId, userToken);
+                logger.info(`User ${userToken} joined channel ${channelId}`);
+            }
+
             sendEmptySuccessResponse(res);
 
         } catch (err){
@@ -113,10 +121,18 @@ class ChannelsController{
     async removeUser(req, res){
         var userId = req.params.userId;
         var channelId = req.params.id;
+        var userToken = req.query.userToken;
 
         try{
-            await ChannelService.removeUser(userId, channelId);
-            logger.info(`User ${userId} abandoned channel ${channelId}`);
+            if (userId){
+                await RequestRolePermissions.checkChannelPermissions(req, channelId);
+                await ChannelService.removeUser(userId, channelId);
+                logger.info(`User ${userId} removed from channel ${channelId}`);
+            } else {
+                await ChannelService.abandonUser(userToken, channelId);
+                logger.info(`User ${userToken} abandoned channel ${channelId}`);
+            }
+
             sendEmptySuccessResponse(res);
         } catch (err){
             sendErrorResponse(res, err);
@@ -138,7 +154,7 @@ class ChannelsController{
         var channelId = req.params.id;
 
         try{
-            await RequestRolePermissions.checkAdminPermissions(req);
+            await RequestRolePermissions.checkChannelPermissions(req, channelId);
             
             await ChannelDao.delete(channelId);
             logger.info(`Channel ${channelId} deleted`);

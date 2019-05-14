@@ -25,7 +25,7 @@ describe('"OrganizationsController Tests"', () => {
 
     describe('Methods without errors', () => {
         var mock1, mock2, mock3, mock4, mock5, mock6, mock7, mock8, 
-            mock9, mock10, mock11;
+            mock9, mock10, mock11, mock12;
 
         before(async () => {
             TestPermissionsMock.allowPermissions();
@@ -41,6 +41,7 @@ describe('"OrganizationsController Tests"', () => {
                 new OrganizationStatistics(organizationUserCountMock, organizationMessageCountMock));
             mock10 = stub(UserRoleDao, 'updateUserRole').resolves();
             mock11 = stub(OrganizationDao, 'update').resolves();
+            mock12 = stub(OrganizationService, 'abandonUser').resolves();
         });
 
         after(async () => {
@@ -56,6 +57,7 @@ describe('"OrganizationsController Tests"', () => {
             mock9.restore();
             mock10.restore();
             mock11.restore();
+            mock12.restore();
         });
 
         describe('Get Profile Method', () => {
@@ -231,6 +233,27 @@ describe('"OrganizationsController Tests"', () => {
 
         describe('Remove User', () => {
             var req = mockRequest();
+            req.params.userId = 1;
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await OrganizationsController.removeUser(req, res);
+            });
+
+            it('response status must be 204', async () => {
+                expect(res.status).to.have.been.calledWith(204);
+            });
+
+            it('response body must be null', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.be.undefined;
+            });
+        });
+
+        describe('Abandon User', () => {
+            var req = mockRequest();
+            req.params.userId = null;
             var res;
 
             beforeEach(async () => {
@@ -583,22 +606,17 @@ describe('"OrganizationsController Tests"', () => {
         });
     });
 
-    describe('Methods with admin errors', () => {
-        var mock1, mock2;
+    describe('Methods with permission errors', () => {
 
         before(async () => {
             TestPermissionsMock.rejectPermissions();
-            mock1 = stub(OrganizationDao, 'delete').resolves();
-            mock2 = stub(UserRoleDao, 'updateUserRole').resolves();
         });
 
         after(async () => {
             TestPermissionsMock.restore();
-            mock1.restore();
-            mock2.restore();
         });
 
-        describe('Delete Method with admin error', () => {
+        describe('Delete Method with permission error', () => {
             var req = mockRequest();
             var res;
 
@@ -618,7 +636,27 @@ describe('"OrganizationsController Tests"', () => {
             });
         });
 
-        describe('Update user Method with admin error', () => {
+        describe('Remove user with permission error', () => {
+            var req = mockRequest();
+            var res;
+
+            beforeEach(async () => {
+                req.params.id = -1;
+                res = mockResponse();
+                await OrganizationsController.removeUser(req, res);
+            });
+
+            it('response status must be 400', async () => {
+                expect(res.status).to.have.been.calledWith(400);
+            });
+
+            it('response must have an error', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('error');
+            });
+        });
+
+        describe('Update user Method with permission error', () => {
             var req = mockRequest({body: {role: 'member'}});
             var res;
 
@@ -638,7 +676,26 @@ describe('"OrganizationsController Tests"', () => {
             });
         });
 
-        describe('Create Method with admin error', () => {
+        describe('Update profile with permission error', () => {
+            var req = mockRequest();
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await OrganizationsController.updateProfile(req, res);
+            });
+
+            it('response status must be 400', async () => {
+                expect(res.status).to.have.been.calledWith(400);
+            });
+
+            it('response must have an error', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('error');
+            });
+        });
+
+        describe('Create Method with permission error', () => {
             var req = mockRequest({body: organizationCreateData});
             req.query.userToken = null;
             var res;
@@ -646,6 +703,25 @@ describe('"OrganizationsController Tests"', () => {
             beforeEach(async () => {
                 res = mockResponse();
                 await OrganizationsController.create(req, res);
+            });
+
+            it('response status must be 400', async () => {
+                expect(res.status).to.have.been.calledWith(400);
+            });
+
+            it('response must have an error', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('error');
+            });
+        });
+
+        describe('Invite users with permission error', () => {
+            var req = mockRequest();
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await OrganizationsController.inviteUsers(req, res);
             });
 
             it('response status must be 400', async () => {

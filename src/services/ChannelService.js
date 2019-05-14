@@ -7,7 +7,7 @@ var ChannelDao = require('../daos/ChannelDao');
 var MessageStatisticsDao = require('../daos/MessageStatisticsDao');
 var ChannelStatistics = require('../models/statistics/ChannelStatistics');
 var { UserAlreadyInChannelError, UserNotBelongsToOrganizationError, 
-            UserNotBelongsToChannelError } = require('../helpers/Errors');
+            UserNotBelongsToChannelError, UnauthorizedUserError } = require('../helpers/Errors');
 
 class ChannelService {
     async getChannelUsers(id){
@@ -20,13 +20,21 @@ class ChannelService {
         await this._addUserToChannel(channelId, user);
     }
 
+    async joinUser(channelId, userToken){
+        var user = await UserDao.findByToken(userToken);
+        await this._addUserToChannel(channelId, user, true);
+    }
+
     async addUsername(channelId, username){
         var user = await UserDao.findByUsername(username);
         await this._addUserToChannel(channelId, user);
     }
 
-    async _addUserToChannel(channelId, user){
+    async _addUserToChannel(channelId, user, isSelf = false){
         var channel = await ChannelDao.findById(channelId);
+        if (isSelf && !channel.isPublic){
+            throw new UnauthorizedUserError(user.id);
+        }
 
         var organization = await channel.getOrganization();
 
@@ -40,17 +48,26 @@ class ChannelService {
 
         await channel.addUser(user);
         TitoBotService.userAddedToChannel(channel, user);
-        FirebaseService.sendChannelInvitationNotification(user, channel);
+        if (!isSelf){
+            FirebaseService.sendChannelInvitationNotification(user, channel);
+        }
     }
 
     async removeUser(userId, channelId){
-        var [channel, user] = await Promise.all([
-                    ChannelDao.findById(channelId),
-                    UserDao.findById(userId)
-                ]);
+        var user = await UserDao.findById(userId);
+        await this._removeUserFromChannel(user, channelId);
+    }
+
+    async abandonUser(userToken, channelId){
+        var user = await UserDao.findByToken(userToken);
+        await this._removeUserFromChannel(user, channelId);
+    }
+
+    async _removeUserFromChannel(user, channelId){
+        var channel = await ChannelDao.findById(channelId);
 
         if (!(await channel.hasUser(user))){
-            throw new UserNotBelongsToChannelError(channelId, userId);
+            throw new UserNotBelongsToChannelError(channelId, user.id);
         }
 
         await channel.removeUser(user);

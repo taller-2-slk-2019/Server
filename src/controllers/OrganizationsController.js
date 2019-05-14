@@ -71,10 +71,10 @@ class OrganizationsController{
             welcome: req.body.welcome
         };
 
-        //TODO check roles
-
         try{
             var org = req.params.id;
+            await RequestRolePermissions.checkOrganizationPermissions(req, org);
+
             await OrganizationDao.update(data, org);
             logger.info("Organization " + org + " updated");
             sendEmptySuccessResponse(res);
@@ -85,10 +85,11 @@ class OrganizationsController{
     }
 
     async inviteUsers(req, res){
-        //TODO check roles
         try{
             var organizationId = req.params.id;
             var userEmails = req.body.userEmails;
+
+            await RequestRolePermissions.checkUserPermissions(req, organizationId);
 
             var mails = await OrganizationService.inviteUsers(organizationId, userEmails);
 
@@ -111,13 +112,20 @@ class OrganizationsController{
     }
 
     async removeUser(req, res){
-        //TODO check roles
         var userId = req.params.userId;
         var organizationId = req.params.id;
+        var userToken = req.query.userToken;
 
         try{
-            await OrganizationService.removeUser(userId, organizationId);
-            logger.info(`User ${userId} abandoned organization ${organizationId}`);
+            if (userId){
+                await RequestRolePermissions.checkUserPermissions(req, organizationId);
+                await OrganizationService.removeUser(userId, organizationId);
+                logger.info(`User ${userId} removed from organization ${organizationId}`);
+            } else {
+                await OrganizationService.abandonUser(userToken, organizationId);
+                logger.info(`User ${userId} abandoned organization ${organizationId}`);
+            }
+            
             sendEmptySuccessResponse(res);
         } catch (err){
             sendErrorResponse(res, err);
@@ -128,8 +136,7 @@ class OrganizationsController{
         var organizationId = req.params.id;
 
         try{
-            await RequestRolePermissions.checkAdminPermissions(req);
-            //TODO check roles
+            await RequestRolePermissions.checkOrganizationPermissions(req, organizationId);
             
             await OrganizationDao.delete(organizationId);
             logger.info(`Organization ${organizationId} deleted`);
@@ -145,7 +152,7 @@ class OrganizationsController{
         var role = req.body.role;
 
         try{
-            await RequestRolePermissions.checkAdminPermissions(req);
+            await RequestRolePermissions.checkOrganizationPermissions(req, organizationId);
 
             if (!UserRoleFactory.roles.includes(role)){
                 throw new InvalidUserRoleError();

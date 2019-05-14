@@ -20,7 +20,7 @@ describe('"ChannelsController Tests"', () => {
 
     describe('Methods without errors', () => {
         var mock1, mock2, mock3, mock4, mock5, mock6, mock7, mock8, 
-            mock9, mock10;
+            mock9, mock10, mock11, mock12;
 
         before(async () => {
             TestPermissionsMock.allowPermissions();
@@ -34,6 +34,8 @@ describe('"ChannelsController Tests"', () => {
             mock8 = stub(ChannelService, 'getStatistics').resolves(channelStatisticsMock);
             mock9 = stub(ChannelDao, 'delete').resolves();
             mock10 = stub(ChannelDao, 'update').resolves();
+            mock11 = stub(ChannelService, 'joinUser').resolves();
+            mock12 = stub(ChannelService, 'abandonUser').resolves();
         });
 
         after(async () => {
@@ -48,6 +50,8 @@ describe('"ChannelsController Tests"', () => {
             mock8.restore();
             mock9.restore();
             mock10.restore();
+            mock11.restore();
+            mock12.restore();
         });
 
         describe('Create channel', () => {
@@ -125,6 +129,27 @@ describe('"ChannelsController Tests"', () => {
 
         describe('Add user', () => {
             var req = mockRequest();
+            req.body.userId = 1;
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await ChannelsController.addUser(req, res);
+            });
+
+            it('response status must be 204', async () => {
+                expect(res.status).to.have.been.calledWith(204);
+            });
+
+            it('response body must be null', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.be.undefined;
+            });
+        });
+
+        describe('Add self to channel', () => {
+            var req = mockRequest();
+            req.body.userId = null;
             var res;
 
             beforeEach(async () => {
@@ -144,6 +169,27 @@ describe('"ChannelsController Tests"', () => {
 
         describe('Remove user', () => {
             var req = mockRequest();
+            req.params.userId = 1;
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await ChannelsController.removeUser(req, res);
+            });
+
+            it('response status must be 204', async () => {
+                expect(res.status).to.have.been.calledWith(204);
+            });
+
+            it('response body must be null', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.be.undefined;
+            });
+        });
+
+        describe('Abandon user', () => {
+            var req = mockRequest();
+            req.params.userId = null;
             var res;
 
             beforeEach(async () => {
@@ -294,7 +340,7 @@ describe('"ChannelsController Tests"', () => {
 
     describe('Methods with errors', () => {
         var mock1, mock2, mock3, mock4, mock5, mock6, mock7, mock8, 
-            mock9, mock10;
+            mock9, mock10, mock11, mock12;
 
         before(async () => {
             TestPermissionsMock.allowPermissions();
@@ -308,6 +354,8 @@ describe('"ChannelsController Tests"', () => {
             mock8 = stub(ChannelService, 'getStatistics').rejects();
             mock9 = stub(ChannelDao, 'delete').rejects();
             mock10 = stub(ChannelDao, 'update').rejects();
+            mock11 = stub(ChannelService, 'joinUser').rejects();
+            mock12 = stub(ChannelService, 'abandonUser').rejects();
         });
 
         after(async () => {
@@ -322,6 +370,8 @@ describe('"ChannelsController Tests"', () => {
             mock8.restore();
             mock9.restore();
             mock10.restore();
+            mock11.restore();
+            mock12.restore();
         });
 
 
@@ -498,20 +548,17 @@ describe('"ChannelsController Tests"', () => {
         });
     });    
 
-    describe('Methods with admin errors', () => {
-        var mock1, mock2;
+    describe('Methods with permissions errors', () => {
 
         before(async () => {
             TestPermissionsMock.rejectPermissions();
-            mock1 = stub(ChannelDao, 'delete').resolves();
         });
 
         after(async () => {
             TestPermissionsMock.restore();
-            mock1.restore();
         });
 
-        describe('Delete channel with error', () => {
+        describe('Delete channel with permissions error', () => {
             var req = mockRequest();
             var res;
 
@@ -530,7 +577,7 @@ describe('"ChannelsController Tests"', () => {
             });
         });
 
-        describe('Create channel with admin error', () => {
+        describe('Create channel with permissions error', () => {
             var req = mockRequest({ body: channelCreateData });
             req.query.userToken = null;
             var res;
@@ -538,6 +585,65 @@ describe('"ChannelsController Tests"', () => {
             beforeEach(async () => {
                 res = mockResponse();
                 await ChannelsController.create(req, res);
+            });
+
+            it('response status must be 400', async () => {
+                expect(res.status).to.have.been.calledWith(400);
+            });
+
+            it('response must have an error', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('error');
+            });
+        });
+
+        describe('Update channel with permissions error', () => {
+            var req = mockRequest({ body: channelCreateData });
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await ChannelsController.updateChannel(req, res);
+            });
+
+            it('response status must be 400', async () => {
+                expect(res.status).to.have.been.calledWith(400);
+            });
+
+            it('response must have an error', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('error');
+            });
+        });
+
+        describe('Add user with permissions error', () => {
+            var req = mockRequest();
+            req.body.userId = 1;
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await ChannelsController.addUser(req, res);
+            });
+
+            it('response status must be 400', async () => {
+                expect(res.status).to.have.been.calledWith(400);
+            });
+
+            it('response must have an error', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('error');
+            });
+        });
+
+        describe('Remove user with permissions error', () => {
+            var req = mockRequest();
+            req.params.userId = 1;
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await ChannelsController.removeUser(req, res);
             });
 
             it('response status must be 400', async () => {
