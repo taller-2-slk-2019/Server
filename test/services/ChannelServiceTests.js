@@ -16,7 +16,7 @@ var Channel = models.channel;
 var TestDatabaseHelper = require('../TestDatabaseHelper');
 
 var { UserNotFoundError, OrganizationNotFoundError, ChannelNotFoundError, UserAlreadyInChannelError, 
-            UserNotBelongsToOrganizationError, UserNotBelongsToChannelError } = require('../../src/helpers/Errors');
+            UserNotBelongsToOrganizationError, UserNotBelongsToChannelError, UnauthorizedUserError } = require('../../src/helpers/Errors');
 
 describe('"ChannelService Tests"', () => {
     var titoMock;
@@ -110,6 +110,56 @@ describe('"ChannelService Tests"', () => {
         it('can not add user that does not belong to channel organization', async () => {
             var user2 = await TestDatabaseHelper.createUser();
             await expect(ChannelService.addUser(channel.id, user2.id)).to.eventually.be.rejectedWith(UserNotBelongsToOrganizationError);
+        });
+    });
+
+    describe('Join user', () => {
+        var channel;
+        var usr;
+
+        before(async () => {
+            channel = await TestDatabaseHelper.createChannel(user, organization);
+            usr = await TestDatabaseHelper.createUser();
+            await organization.addUser(usr, { through: {role: 'role'}});
+        });
+
+        beforeEach(async () => {
+            titoMock.resetHistory();
+            firebaseMock.resetHistory();
+            await channel.setUsers([]);
+            await ChannelService.joinUser(channel.id, usr.token);
+        });
+
+        it('channel must have 1 user', async () => {
+            var users = await channel.getUsers();
+            expect(users.length).to.eq(1);
+        });
+
+        it('user must be added to channel', async () => {
+            var users = await channel.getUsers();
+            expect(users[0].id).to.eq(usr.id);
+        });
+
+        it('should inform tito', async () => {
+            assert.calledOnce(titoMock);
+        });
+
+        it('should not inform firebase', async () => {
+            assert.notCalled(firebaseMock);
+        });
+
+        it('can not add user again to channel', async () => {
+            await expect(ChannelService.joinUser(channel.id, usr.token)).to.eventually.be.rejectedWith(UserAlreadyInChannelError);
+        });
+
+        it('can not add user that does not belong to channel organization', async () => {
+            var user2 = await TestDatabaseHelper.createUser();
+            await expect(ChannelService.joinUser(channel.id, user2.token)).to.eventually.be.rejectedWith(UserNotBelongsToOrganizationError);
+        });
+
+        it('can not add user to private channel', async () => {
+            private = await TestDatabaseHelper.createChannel(user, organization, false);
+            await expect(ChannelService.joinUser(private.id, usr.token)).to.eventually.be.rejectedWith(UnauthorizedUserError);
         });
     });
 

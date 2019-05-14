@@ -100,10 +100,15 @@ class ChannelsController{
     async addUser(req, res){
         var channelId = req.params.id;
         var userId = req.body.userId;
+        var userToken = req.query.userToken;
         try{
-            await RequestRolePermissions.checkChannelPermissions(req, channelId);
+            if (userId){
+                await RequestRolePermissions.checkChannelPermissions(req, channelId);
+                await ChannelService.addUser(channelId, userId);
+            } else {
+                await ChannelService.joinUser(channelId, userToken);
+            }
 
-            await ChannelService.addUser(channelId, userId);
             logger.info(`User ${userId} added to channel ${channelId}`);
             sendEmptySuccessResponse(res);
 
@@ -118,7 +123,7 @@ class ChannelsController{
 
         try{
             await RequestRolePermissions.checkChannelPermissions(req, channelId);
-            
+
             await ChannelService.removeUser(userId, channelId);
             logger.info(`User ${userId} abandoned channel ${channelId}`);
             sendEmptySuccessResponse(res);

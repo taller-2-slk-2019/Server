@@ -20,7 +20,7 @@ describe('"ChannelsController Tests"', () => {
 
     describe('Methods without errors', () => {
         var mock1, mock2, mock3, mock4, mock5, mock6, mock7, mock8, 
-            mock9, mock10;
+            mock9, mock10, mock11;
 
         before(async () => {
             TestPermissionsMock.allowPermissions();
@@ -34,6 +34,7 @@ describe('"ChannelsController Tests"', () => {
             mock8 = stub(ChannelService, 'getStatistics').resolves(channelStatisticsMock);
             mock9 = stub(ChannelDao, 'delete').resolves();
             mock10 = stub(ChannelDao, 'update').resolves();
+            mock11 = stub(ChannelService, 'joinUser').resolves();
         });
 
         after(async () => {
@@ -48,6 +49,7 @@ describe('"ChannelsController Tests"', () => {
             mock8.restore();
             mock9.restore();
             mock10.restore();
+            mock11.restore();
         });
 
         describe('Create channel', () => {
@@ -125,6 +127,27 @@ describe('"ChannelsController Tests"', () => {
 
         describe('Add user', () => {
             var req = mockRequest();
+            req.body.userId = 1;
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await ChannelsController.addUser(req, res);
+            });
+
+            it('response status must be 204', async () => {
+                expect(res.status).to.have.been.calledWith(204);
+            });
+
+            it('response body must be null', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.be.undefined;
+            });
+        });
+
+        describe('Add self to channel', () => {
+            var req = mockRequest();
+            req.body.userId = null;
             var res;
 
             beforeEach(async () => {
@@ -294,7 +317,7 @@ describe('"ChannelsController Tests"', () => {
 
     describe('Methods with errors', () => {
         var mock1, mock2, mock3, mock4, mock5, mock6, mock7, mock8, 
-            mock9, mock10;
+            mock9, mock10, mock11;
 
         before(async () => {
             TestPermissionsMock.allowPermissions();
@@ -308,6 +331,7 @@ describe('"ChannelsController Tests"', () => {
             mock8 = stub(ChannelService, 'getStatistics').rejects();
             mock9 = stub(ChannelDao, 'delete').rejects();
             mock10 = stub(ChannelDao, 'update').rejects();
+            mock11 = stub(ChannelService, 'joinUser').rejects();
         });
 
         after(async () => {
@@ -322,6 +346,7 @@ describe('"ChannelsController Tests"', () => {
             mock8.restore();
             mock9.restore();
             mock10.restore();
+            mock11.restore();
         });
 
 
@@ -568,6 +593,7 @@ describe('"ChannelsController Tests"', () => {
 
         describe('Add user with permissions error', () => {
             var req = mockRequest();
+            req.body.userId = 1;
             var res;
 
             beforeEach(async () => {
