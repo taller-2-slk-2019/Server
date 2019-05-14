@@ -85,10 +85,11 @@ class OrganizationsController{
     }
 
     async inviteUsers(req, res){
-        //TODO check roles
         try{
             var organizationId = req.params.id;
             var userEmails = req.body.userEmails;
+
+            await RequestRolePermissions.checkUserPermissions(req, organizationId);
 
             var mails = await OrganizationService.inviteUsers(organizationId, userEmails);
 
@@ -129,8 +130,7 @@ class OrganizationsController{
         var organizationId = req.params.id;
 
         try{
-            await RequestRolePermissions.checkAdminPermissions(req);
-            //TODO check roles
+            await RequestRolePermissions.checkOrganizationPermissions(req, organizationId);
             
             await OrganizationDao.delete(organizationId);
             logger.info(`Organization ${organizationId} deleted`);
