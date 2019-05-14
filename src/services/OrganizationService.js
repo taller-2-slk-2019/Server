@@ -78,13 +78,20 @@ class OrganizationService {
     }
 
     async removeUser(userId, organizationId){
-        var [organization, user] = await Promise.all([
-                    OrganizationDao.findById(organizationId),
-                    UserDao.findById(userId)
-                ]);
+        var user = await UserDao.findById(userId);
+        await this._removeUserFromOrganization(user, organizationId);
+    }
+
+    async abandonUser(userToken, organizationId){
+        var user = await UserDao.findByToken(userToken);
+        await this._removeUserFromOrganization(user, organizationId);
+    }
+
+    async _removeUserFromOrganization(user, organizationId){
+        var organization = await OrganizationDao.findById(organizationId);
 
         if (!(await organization.hasUser(user))){
-            throw new UserNotBelongsToOrganizationError(organizationId, userId);
+            throw new UserNotBelongsToOrganizationError(organizationId, user.id);
         }
 
         var [channels, conversations] = await Promise.all([

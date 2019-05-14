@@ -114,12 +114,18 @@ class OrganizationsController{
     async removeUser(req, res){
         var userId = req.params.userId;
         var organizationId = req.params.id;
+        var userToken = req.query.userToken;
 
         try{
-            await RequestRolePermissions.checkUserPermissions(req, organizationId);
-
-            await OrganizationService.removeUser(userId, organizationId);
-            logger.info(`User ${userId} abandoned organization ${organizationId}`);
+            if (userId){
+                await RequestRolePermissions.checkUserPermissions(req, organizationId);
+                await OrganizationService.removeUser(userId, organizationId);
+                logger.info(`User ${userId} removed from organization ${organizationId}`);
+            } else {
+                await OrganizationService.abandonUser(userToken, organizationId);
+                logger.info(`User ${userId} abandoned organization ${organizationId}`);
+            }
+            
             sendEmptySuccessResponse(res);
         } catch (err){
             sendErrorResponse(res, err);

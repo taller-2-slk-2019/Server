@@ -237,6 +237,54 @@ describe('"OrganizationService Tests"', () => {
         });
     });
 
+    describe('Abandon user', () => {
+        var organization;
+        var usr;
+        var channel, conversation, other_conversation;
+
+        before(async () => {
+            organization = await TestDatabaseHelper.createOrganization();;
+            usr = await TestDatabaseHelper.createUser();
+        });
+
+        beforeEach(async () => {
+            await organization.setUsers([]);
+            await organization.addUser(usr, { through: {role:'role'}});
+            channel = await TestDatabaseHelper.createChannel(usr, organization);
+            var user2 = await TestDatabaseHelper.createUser();
+            var user3 = await TestDatabaseHelper.createUser();
+            conversation = await TestDatabaseHelper.createConversation(usr, user2, organization);
+            other_conversation = await TestDatabaseHelper.createConversation(user3, user2, organization);
+
+            await OrganizationService.abandonUser(usr.token, organization.id);
+        });
+
+        it('organization must have 0 user', async () => {
+            var users = await organization.getUsers();
+            expect(users.length).to.eq(0);
+        });
+
+        it('can not remove user that does no belong to organization', async () => {
+            await organization.setUsers([]);
+            await expect(OrganizationService.removeUser(user.id, organization.id)).to.eventually.be.rejectedWith(UserNotBelongsToOrganizationError);
+        });
+
+        it('user must be removed from organization channels', async () => {
+            var users = await channel.getUsers();
+            expect(users.length).to.eq(0);
+        });
+
+        it('user conversations must be deleted', async () => {
+            var c = await Conversation.findByPk(conversation.id);
+            expect(c).to.be.null;
+        });
+
+        it('other users conversations must not be deleted', async () => {
+            var c = await Conversation.findByPk(other_conversation.id);
+            expect(c).to.not.be.null;
+        });
+    });
+
     describe('Get statistics', () => {
         var mock1, mock2;
         var stats;
