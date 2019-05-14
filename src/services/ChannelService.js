@@ -54,13 +54,20 @@ class ChannelService {
     }
 
     async removeUser(userId, channelId){
-        var [channel, user] = await Promise.all([
-                    ChannelDao.findById(channelId),
-                    UserDao.findById(userId)
-                ]);
+        var user = await UserDao.findById(userId);
+        await this._removeUserFromChannel(user, channelId);
+    }
+
+    async abandonUser(userToken, channelId){
+        var user = await UserDao.findByToken(userToken);
+        await this._removeUserFromChannel(user, channelId);
+    }
+
+    async _removeUserFromChannel(user, channelId){
+        var channel = await ChannelDao.findById(channelId);
 
         if (!(await channel.hasUser(user))){
-            throw new UserNotBelongsToChannelError(channelId, userId);
+            throw new UserNotBelongsToChannelError(channelId, user.id);
         }
 
         await channel.removeUser(user);

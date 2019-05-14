@@ -233,6 +233,31 @@ describe('"ChannelService Tests"', () => {
         });
     });
 
+    describe('Abandon user', () => {
+        var channel;
+        var usr;
+
+        before(async () => {
+            channel = await TestDatabaseHelper.createChannel(user, organization);
+            usr = await TestDatabaseHelper.createUser();
+        });
+
+        beforeEach(async () => {
+            await channel.setUsers([usr]);
+            await ChannelService.abandonUser(usr.token, channel.id);
+        });
+
+        it('channel must have 0 user', async () => {
+            var users = await channel.getUsers();
+            expect(users.length).to.eq(0);
+        });
+
+        it('can not remove user that does no belong to channel', async () => {
+            await channel.setUsers([]);
+            await expect(ChannelService.abandonUser(user.token, channel.id)).to.eventually.be.rejectedWith(UserNotBelongsToChannelError);
+        });
+    });
+
     describe('Get channels for user', () => {
         var channel;
         var channel2;

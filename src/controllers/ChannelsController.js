@@ -105,11 +105,12 @@ class ChannelsController{
             if (userId){
                 await RequestRolePermissions.checkChannelPermissions(req, channelId);
                 await ChannelService.addUser(channelId, userId);
+                logger.info(`User ${userId} added to channel ${channelId}`);
             } else {
                 await ChannelService.joinUser(channelId, userToken);
+                logger.info(`User ${userToken} joined channel ${channelId}`);
             }
 
-            logger.info(`User ${userId} added to channel ${channelId}`);
             sendEmptySuccessResponse(res);
 
         } catch (err){
@@ -120,12 +121,18 @@ class ChannelsController{
     async removeUser(req, res){
         var userId = req.params.userId;
         var channelId = req.params.id;
+        var userToken = req.query.userToken;
 
         try{
-            await RequestRolePermissions.checkChannelPermissions(req, channelId);
+            if (userId){
+                await RequestRolePermissions.checkChannelPermissions(req, channelId);
+                await ChannelService.removeUser(userId, channelId);
+                logger.info(`User ${userId} removed from channel ${channelId}`);
+            } else {
+                await ChannelService.abandonUser(userToken, channelId);
+                logger.info(`User ${userToken} abandoned channel ${channelId}`);
+            }
 
-            await ChannelService.removeUser(userId, channelId);
-            logger.info(`User ${userId} abandoned channel ${channelId}`);
             sendEmptySuccessResponse(res);
         } catch (err){
             sendErrorResponse(res, err);

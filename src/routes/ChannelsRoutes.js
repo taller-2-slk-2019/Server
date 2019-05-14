@@ -19,6 +19,8 @@ router.post('/:id/users', channelsController.addUser);
 
 router.delete('/:id/users/:userId', channelsController.removeUser);
 
+router.delete('/:id/users', channelsController.removeUser);
+
 router.get('/:id/statistics', channelsController.getStatistics);
 
 module.exports = router;
