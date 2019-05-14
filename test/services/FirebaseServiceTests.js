@@ -248,5 +248,10 @@ describe('"FirebaseService Tests"', () => {
             var args = JSON.parse(mockUsers.getCall(0).args[0].data.user);
             expect(args).to.have.property('id', user.id);
         });
+
+        it('should do nothing if no tokens are provided', async () => {
+            await FirebaseService.sendConversationInvitationNotification(user, user, conversation);
+            assert.notCalled(mockUsers);
+        });
     });
 });

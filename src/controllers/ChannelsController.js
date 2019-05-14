@@ -2,7 +2,7 @@ var logger = require('logops');
 var ChannelDao = require('../daos/ChannelDao');
 var ChannelService = require('../services/ChannelService');
 var { sendSuccessResponse, sendErrorResponse, sendEmptySuccessResponse } = require('../helpers/ResponseHelper');
-var { checkIsAdmin } = require('../helpers/RequestHelper');
+var RequestRolePermissions = require('../helpers/RequestRolePermissions');
 
 class ChannelsController{
 
@@ -18,7 +18,7 @@ class ChannelsController{
 
         try{
             if (!data.creatorToken){
-                await checkIsAdmin(req);
+                await RequestRolePermissions.checkAdminPermissions(req);
             }
             
             var channel  = await ChannelDao.create(data);
@@ -138,7 +138,7 @@ class ChannelsController{
         var channelId = req.params.id;
 
         try{
-            await checkIsAdmin(req);
+            await RequestRolePermissions.checkAdminPermissions(req);
             
             await ChannelDao.delete(channelId);
             logger.info(`Channel ${channelId} deleted`);

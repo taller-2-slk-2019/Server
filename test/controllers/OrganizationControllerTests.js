@@ -6,6 +6,8 @@ const { stub, match } = require('sinon');
 const sinonChai = require('sinon-chai');
 chai.use(sinonChai);
 const { mockRequest, mockResponse } = require('mock-req-res');
+const TestPermissionsMock = require('../TestPermissionsMock');
+
 const organizationDataMock = require('../mocks/organizationDataMock');
 const organizationsForUserMock = require('../mocks/organizationsForUserMock');
 const { organizationCreateData } = require('../data/organizationData');
@@ -15,8 +17,6 @@ var OrganizationDao = require('../../src/daos/OrganizationDao');
 var UserRoleDao = require('../../src/daos/UserRoleDao');
 var OrganizationService = require('../../src/services/OrganizationService');
 var UserService = require('../../src/services/UserService');
-var AdminDao = require('../../src/daos/AdminUserDao');
-const adminMock = require('../mocks/adminMock');
 var organizationMessageCountMock = require('../mocks/messageCountByOrganizationMock');
 var organizationUserCountMock = require('../mocks/userRolesCountByOrganizationMock');
 var OrganizationStatistics = require('../../src/models/statistics/OrganizationStatistics');
@@ -25,9 +25,10 @@ describe('"OrganizationsController Tests"', () => {
 
     describe('Methods without errors', () => {
         var mock1, mock2, mock3, mock4, mock5, mock6, mock7, mock8, 
-            mock9, mock10, mock11, mock12;
+            mock9, mock10, mock11;
 
         before(async () => {
+            TestPermissionsMock.allowPermissions();
             mock1 = stub(OrganizationDao, 'findById').resolves(organizationDataMock);
             mock2 = stub(OrganizationDao, 'create').resolves(organizationDataMock);
             mock3 = stub(OrganizationService, 'inviteUsers').resolves(["mail1", "mail2"]);
@@ -36,14 +37,14 @@ describe('"OrganizationsController Tests"', () => {
             mock6 = stub(OrganizationService, 'removeUser').resolves();
             mock7 = stub(OrganizationDao, 'get').resolves([organizationDataMock, organizationDataMock]);
             mock8 = stub(OrganizationDao, 'delete').resolves();
-            mock9 = stub(AdminDao, 'findByToken').resolves(adminMock);
-            mock10 = stub(OrganizationService, 'getStatistics').resolves(
+            mock9 = stub(OrganizationService, 'getStatistics').resolves(
                 new OrganizationStatistics(organizationUserCountMock, organizationMessageCountMock));
-            mock11 = stub(UserRoleDao, 'updateUserRole').resolves();
-            mock12 = stub(OrganizationDao, 'update').resolves();
+            mock10 = stub(UserRoleDao, 'updateUserRole').resolves();
+            mock11 = stub(OrganizationDao, 'update').resolves();
         });
 
         after(async () => {
+            TestPermissionsMock.restore();
             mock1.restore();
             mock2.restore();
             mock3.restore();
@@ -55,7 +56,6 @@ describe('"OrganizationsController Tests"', () => {
             mock9.restore();
             mock10.restore();
             mock11.restore();
-            mock12.restore();
         });
 
         describe('Get Profile Method', () => {
@@ -313,9 +313,10 @@ describe('"OrganizationsController Tests"', () => {
 
     describe('Methods with errors', () => {
         var mock1, mock2, mock3, mock4, mock5, mock6, mock7, mock8, mock9, 
-            mock10, mock11, mock12;
+            mock10, mock11;
 
         before(async () => {
+            TestPermissionsMock.allowPermissions();
             mock1 = stub(OrganizationDao, 'findById').rejects();
             mock2 = stub(OrganizationDao, 'create').rejects();
             mock3 = stub(OrganizationService, 'inviteUsers').rejects();
@@ -324,13 +325,13 @@ describe('"OrganizationsController Tests"', () => {
             mock6 = stub(OrganizationService, 'removeUser').rejects();
             mock7 = stub(OrganizationDao, 'get').rejects();
             mock8 = stub(OrganizationDao, 'delete').rejects();
-            mock9 = stub(AdminDao, 'findByToken').resolves(adminMock);
-            mock10 = stub(OrganizationService, 'getStatistics').rejects();
-            mock11 = stub(UserRoleDao, 'updateUserRole').rejects();
-            mock12 = stub(OrganizationDao, 'update').rejects();
+            mock9 = stub(OrganizationService, 'getStatistics').rejects();
+            mock10 = stub(UserRoleDao, 'updateUserRole').rejects();
+            mock11 = stub(OrganizationDao, 'update').rejects();
         });
 
         after(async () => {
+            TestPermissionsMock.restore();
             mock1.restore();
             mock2.restore();
             mock3.restore();
@@ -342,7 +343,6 @@ describe('"OrganizationsController Tests"', () => {
             mock9.restore();
             mock10.restore();
             mock11.restore();
-            mock12.restore();
         });
 
 
@@ -584,18 +584,18 @@ describe('"OrganizationsController Tests"', () => {
     });
 
     describe('Methods with admin errors', () => {
-        var mock1, mock2, mock3;
+        var mock1, mock2;
 
         before(async () => {
+            TestPermissionsMock.rejectPermissions();
             mock1 = stub(OrganizationDao, 'delete').resolves();
-            mock2 = stub(AdminDao, 'findByToken').rejects();
-            mock3 = stub(UserRoleDao, 'updateUserRole').resolves();
+            mock2 = stub(UserRoleDao, 'updateUserRole').resolves();
         });
 
         after(async () => {
+            TestPermissionsMock.restore();
             mock1.restore();
             mock2.restore();
-            mock3.restore();
         });
 
         describe('Delete Method with admin error', () => {

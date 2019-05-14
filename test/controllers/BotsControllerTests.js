@@ -9,27 +9,26 @@ const { mockRequest, mockResponse } = require('mock-req-res');
 
 var BotsController = require('../../src/controllers/BotsController');
 var BotDao = require('../../src/daos/BotDao');
-var AdminDao = require('../../src/daos/AdminUserDao');
-const adminMock = require('../mocks/adminMock');
+var TestPermissionsMock = require('../TestPermissionsMock');
 const botMock = require('../mocks/botMock');
 
 describe('"BotsController Tests"', () => {
 
     describe('Methods without errors', () => {
-        var mock1, mock2, mock3, mock4;
+        var mock1, mock2, mock3;
 
         before(async () => {
+            TestPermissionsMock.allowPermissions();
             mock1 = stub(BotDao, 'create').resolves(botMock);
             mock2 = stub(BotDao, 'delete').resolves();
-            mock3 = stub(AdminDao, 'findByToken').resolves(adminMock);
-            mock4 = stub(BotDao, 'get').resolves([botMock, botMock]);
+            mock3 = stub(BotDao, 'get').resolves([botMock, botMock]);
         });
 
         after(async () => {
+            TestPermissionsMock.restore();
             mock1.restore();
             mock2.restore();
             mock3.restore();
-            mock4.restore();
         });
 
         describe('Add bot', () => {
@@ -104,20 +103,20 @@ describe('"BotsController Tests"', () => {
     });
 
     describe('Methods with errors', () => {
-        var mock1, mock2, mock3, mock4;;
+        var mock1, mock2, mock3;
 
         before(async () => {
+            TestPermissionsMock.allowPermissions();
             mock1 = stub(BotDao, 'create').rejects();
             mock2 = stub(BotDao, 'delete').rejects();
-            mock3 = stub(AdminDao, 'findByToken').resolves(adminMock);
-            mock4 = stub(BotDao, 'get').rejects();
+            mock3 = stub(BotDao, 'get').rejects();
         });
 
         after(async () => {
+            TestPermissionsMock.restore();
             mock1.restore();
             mock2.restore();
             mock3.restore();
-            mock4.restore();
         });
 
         describe('Add bot with errors', () => {
@@ -220,18 +219,18 @@ describe('"BotsController Tests"', () => {
     });
 
     describe('Methods with admin errors', () => {
-        var mock1, mock2, mock3;
+        var mock1, mock2;
 
         before(async () => {
-            mock1 = stub(BotDao, 'create').rejects();
-            mock2 = stub(BotDao, 'delete').rejects();
-            mock3 = stub(AdminDao, 'findByToken').rejects();
+            TestPermissionsMock.rejectPermissions();
+            mock1 = stub(BotDao, 'create').resolves();
+            mock2 = stub(BotDao, 'delete').resolves();
         });
 
         after(async () => {
+            TestPermissionsMock.restore();
             mock1.restore();
             mock2.restore();
-            mock3.restore();
         });
 
         describe('Add bot with errors', () => {

@@ -15,10 +15,6 @@ class UserRole {
     hasUserPermissions(){
         return false;
     }
-
-    hasRolePermissions(){
-        return false;
-    }
 }
 
 module.exports = UserRole;

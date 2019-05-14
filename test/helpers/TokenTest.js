@@ -1,7 +1,7 @@
 const chai = require('chai');
 const expect = chai.expect;
 
-var Token = require('../src/helpers/Token');
+var Token = require('../../src/helpers/Token');
 
 describe('"Token Tests"', () => {
 

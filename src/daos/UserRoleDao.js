@@ -15,6 +15,19 @@ class UserRoleDao {
         );
     }
 
+    async getUserRole(organizationId, userId){
+        var data = await UserRole.findOne(
+            { where: 
+                { 
+                    organizationId: organizationId,
+                    userId: userId
+                }
+            }
+        );
+
+        return data.role;
+    }
+
     async getCountForOrganization(organizationId){
         return await UserRole.count({
             attributes: ['role'],

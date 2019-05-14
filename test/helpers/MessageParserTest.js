@@ -1,8 +1,8 @@
 const chai = require('chai');
 const expect = chai.expect;
 
-var messageParser = require('../src/helpers/MessageParser');
-var Config = require('../src/helpers/Config');
+var messageParser = require('../../src/helpers/MessageParser');
+var Config = require('../../src/helpers/Config');
 
 describe('"Message Parser Tests"', () => {
 

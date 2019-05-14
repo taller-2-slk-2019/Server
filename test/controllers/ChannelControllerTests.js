@@ -14,16 +14,16 @@ const { channelCreateData } = require('../data/channelData');
 var ChannelsController = require('../../src/controllers/ChannelsController');
 var ChannelDao = require('../../src/daos/ChannelDao');
 var ChannelService = require('../../src/services/ChannelService');
-var AdminDao = require('../../src/daos/AdminUserDao');
-const adminMock = require('../mocks/adminMock');
+const TestPermissionsMock = require('../TestPermissionsMock');
 
 describe('"ChannelsController Tests"', () => {
 
     describe('Methods without errors', () => {
         var mock1, mock2, mock3, mock4, mock5, mock6, mock7, mock8, 
-            mock9, mock10, mock11;
+            mock9, mock10;
 
         before(async () => {
+            TestPermissionsMock.allowPermissions();
             mock1 = stub(ChannelDao, 'create').resolves(channelDataMock);
             mock2 = stub(ChannelService, 'addUser').resolves();
             mock3 = stub(ChannelService, 'removeUser').resolves();
@@ -33,11 +33,11 @@ describe('"ChannelsController Tests"', () => {
             mock7 = stub(ChannelService, 'getChannelUsers').resolves([userDataMock, userDataMock, userDataMock]);
             mock8 = stub(ChannelService, 'getStatistics').resolves(channelStatisticsMock);
             mock9 = stub(ChannelDao, 'delete').resolves();
-            mock10 = stub(AdminDao, 'findByToken').resolves(adminMock);
-            mock11 = stub(ChannelDao, 'update').resolves();
+            mock10 = stub(ChannelDao, 'update').resolves();
         });
 
         after(async () => {
+            TestPermissionsMock.restore();
             mock1.restore();
             mock2.restore();
             mock3.restore();
@@ -48,7 +48,6 @@ describe('"ChannelsController Tests"', () => {
             mock8.restore();
             mock9.restore();
             mock10.restore();
-            mock11.restore();
         });
 
         describe('Create channel', () => {
@@ -295,9 +294,10 @@ describe('"ChannelsController Tests"', () => {
 
     describe('Methods with errors', () => {
         var mock1, mock2, mock3, mock4, mock5, mock6, mock7, mock8, 
-            mock9, mock10, mock11;
+            mock9, mock10;
 
         before(async () => {
+            TestPermissionsMock.allowPermissions();
             mock1 = stub(ChannelDao, 'create').rejects();
             mock2 = stub(ChannelService, 'addUser').rejects();
             mock3 = stub(ChannelService, 'removeUser').rejects();
@@ -307,11 +307,11 @@ describe('"ChannelsController Tests"', () => {
             mock7 = stub(ChannelService, 'getChannelUsers').rejects();
             mock8 = stub(ChannelService, 'getStatistics').rejects();
             mock9 = stub(ChannelDao, 'delete').rejects();
-            mock10 = stub(AdminDao, 'findByToken').resolves(adminMock);
-            mock11 = stub(ChannelDao, 'update').rejects();
+            mock10 = stub(ChannelDao, 'update').rejects();
         });
 
         after(async () => {
+            TestPermissionsMock.restore();
             mock1.restore();
             mock2.restore();
             mock3.restore();
@@ -322,7 +322,6 @@ describe('"ChannelsController Tests"', () => {
             mock8.restore();
             mock9.restore();
             mock10.restore();
-            mock11.restore();
         });
 
 
@@ -503,13 +502,13 @@ describe('"ChannelsController Tests"', () => {
         var mock1, mock2;
 
         before(async () => {
-            mock1 = stub(ChannelDao, 'delete').rejects();
-            mock2 = stub(AdminDao, 'findByToken').rejects();
+            TestPermissionsMock.rejectPermissions();
+            mock1 = stub(ChannelDao, 'delete').resolves();
         });
 
         after(async () => {
+            TestPermissionsMock.restore();
             mock1.restore();
-            mock2.restore();
         });
 
         describe('Delete channel with error', () => {

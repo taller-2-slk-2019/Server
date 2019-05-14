@@ -1,6 +1,6 @@
 var logger = require('logops');
 var ForbiddenWordDao = require('../daos/ForbiddenWordDao');
-var { checkIsAdmin } = require('../helpers/RequestHelper');
+var RequestRolePermissions = require('../helpers/RequestRolePermissions');
 var { sendSuccessResponse, sendErrorResponse, sendEmptySuccessResponse } = require('../helpers/ResponseHelper');
 var { InvalidForbiddenWordError } = require('../helpers/Errors');
 
@@ -25,7 +25,7 @@ class ForbiddenWordsController{
         };
         
         try{
-            await checkIsAdmin(req);
+            await RequestRolePermissions.checkAdminPermissions(req);
 
             if (data.word.includes(' ')){
                 throw new InvalidForbiddenWordError(data.word);
@@ -44,7 +44,7 @@ class ForbiddenWordsController{
         var wordId = req.params.id;
 
         try{
-            await checkIsAdmin(req);
+            await RequestRolePermissions.checkAdminPermissions(req);
             
             await ForbiddenWordDao.delete(wordId);
             logger.info(`Forbidden word '${wordId}' deleted`);

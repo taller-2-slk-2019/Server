@@ -155,6 +155,13 @@ class InvalidUserRoleError extends Error {
     }
 }
 
+class UnauthorizedUserError extends Error {
+    constructor() {
+        super("User is not authorized");
+        this.name = this.constructor.name;
+    }
+}
+
 module.exports = {
     UserNotFoundError,
     AdminUserNotFoundError,
@@ -177,5 +184,6 @@ module.exports = {
     InvalidUserRoleError,
     InvalidForbiddenWordError,
     InvalidBotError,
-    ChannelAlreadyExistsError
+    ChannelAlreadyExistsError,
+    UnauthorizedUserError
 };
