@@ -12,10 +12,12 @@ var { UnauthorizedUserError } = require('../../src/helpers/Errors');
 var AdminDao = require('../../src/daos/AdminUserDao');
 var UserDao = require('../../src/daos/UserDao');
 var UserRoleDao = require('../../src/daos/UserRoleDao');
+var ChannelDao = require('../../src/daos/ChannelDao');
 var userMock = require('../mocks/userProfileMock');
+var channelMock = Object.create(require('../mocks/channelDataMock'));
 
 describe('"RequestRolePermissions Tests"', () => {
-    var mockAdmin, mockUser, mockRole;
+    var mockAdmin, mockUser, mockRole, mockChannel;
 
     before(async () => {
         mockAdmin = stub(AdminDao, 'findByToken').rejects();
@@ -23,6 +25,8 @@ describe('"RequestRolePermissions Tests"', () => {
         
         mockUser = stub(UserDao, 'findByToken').rejects();
         mockUser.withArgs("token").resolves(userMock);
+
+        mockChannel = stub(ChannelDao, 'findById').resolves(channelMock);
 
         mockRole = stub(UserRoleDao, 'getUserRole').rejects();
         mockRole.withArgs('creator').resolves('creator');
@@ -34,6 +38,7 @@ describe('"RequestRolePermissions Tests"', () => {
         mockAdmin.restore();
         mockUser.restore();
         mockRole.restore();
+        mockChannel.restore();
     });
 
     describe('Admin permissions', () => {
@@ -78,16 +83,19 @@ describe('"RequestRolePermissions Tests"', () => {
 
         it('should resolve if user role has permission', async () => {
             var req = mockRequest({ query: {userToken: "token"} });
+            channelMock.organizationId = "creator";
             await expect(RequestRolePermissions.checkChannelPermissions(req, "creator")).to.eventually.be.fulfilled;
         });
 
         it('should reject if user role does not have permission', async () => {
             var req = mockRequest({ query: {userToken: "token"} });
+            channelMock.organizationId = "member";
             await expect(RequestRolePermissions.checkChannelPermissions(req, "member")).to.eventually.be.rejectedWith(UnauthorizedUserError);
         });
 
         it('should reject if user does not exist', async () => {
             var req = mockRequest({ query: {userToken: " invalidtoken"} });
+            channelMock.organizationId = "creator";
             await expect(RequestRolePermissions.checkChannelPermissions(req)).to.eventually.be.rejectedWith(UnauthorizedUserError);
         });
     });

@@ -38,10 +38,10 @@ class ChannelsController{
             welcome: req.body.welcome,
         };
 
-        //TODO check roles
-
         try{
             var channel = req.params.id;
+            await RequestRolePermissions.checkChannelPermissions(req, channel);
+
             await ChannelDao.update(data, channel);
             logger.info("Channel " + channel + " updated");
             sendEmptySuccessResponse(res);
@@ -101,6 +101,8 @@ class ChannelsController{
         var channelId = req.params.id;
         var userId = req.body.userId;
         try{
+            await RequestRolePermissions.checkChannelPermissions(req, channelId);
+
             await ChannelService.addUser(channelId, userId);
             logger.info(`User ${userId} added to channel ${channelId}`);
             sendEmptySuccessResponse(res);
@@ -115,6 +117,8 @@ class ChannelsController{
         var channelId = req.params.id;
 
         try{
+            await RequestRolePermissions.checkChannelPermissions(req, channelId);
+            
             await ChannelService.removeUser(userId, channelId);
             logger.info(`User ${userId} abandoned channel ${channelId}`);
             sendEmptySuccessResponse(res);
@@ -138,7 +142,7 @@ class ChannelsController{
         var channelId = req.params.id;
 
         try{
-            await RequestRolePermissions.checkAdminPermissions(req);
+            await RequestRolePermissions.checkChannelPermissions(req, channelId);
             
             await ChannelDao.delete(channelId);
             logger.info(`Channel ${channelId} deleted`);

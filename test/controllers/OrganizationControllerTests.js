@@ -583,7 +583,7 @@ describe('"OrganizationsController Tests"', () => {
         });
     });
 
-    describe('Methods with admin errors', () => {
+    describe('Methods with permission errors', () => {
         var mock1, mock2;
 
         before(async () => {
@@ -598,7 +598,7 @@ describe('"OrganizationsController Tests"', () => {
             mock2.restore();
         });
 
-        describe('Delete Method with admin error', () => {
+        describe('Delete Method with permission error', () => {
             var req = mockRequest();
             var res;
 
@@ -618,7 +618,27 @@ describe('"OrganizationsController Tests"', () => {
             });
         });
 
-        describe('Update user Method with admin error', () => {
+        describe('Remove user with permission error', () => {
+            var req = mockRequest();
+            var res;
+
+            beforeEach(async () => {
+                req.params.id = -1;
+                res = mockResponse();
+                await OrganizationsController.removeUser(req, res);
+            });
+
+            it('response status must be 400', async () => {
+                expect(res.status).to.have.been.calledWith(400);
+            });
+
+            it('response must have an error', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('error');
+            });
+        });
+
+        describe('Update user Method with permission error', () => {
             var req = mockRequest({body: {role: 'member'}});
             var res;
 
@@ -638,7 +658,26 @@ describe('"OrganizationsController Tests"', () => {
             });
         });
 
-        describe('Create Method with admin error', () => {
+        describe('Update profile with permission error', () => {
+            var req = mockRequest();
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await OrganizationsController.updateProfile(req, res);
+            });
+
+            it('response status must be 400', async () => {
+                expect(res.status).to.have.been.calledWith(400);
+            });
+
+            it('response must have an error', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('error');
+            });
+        });
+
+        describe('Create Method with permission error', () => {
             var req = mockRequest({body: organizationCreateData});
             req.query.userToken = null;
             var res;

@@ -2,6 +2,7 @@ var UserRoleFactory = require('../factories/UserRoleFactory');
 var AdminDao = require('../daos/AdminUserDao');
 var UserDao = require('../daos/UserDao');
 var UserRoleDao = require('../daos/UserRoleDao');
+var ChannelDao = require('../daos/ChannelDao');
 var { UnauthorizedUserError } = require('../helpers/Errors');
 
 class RequestRolePermissions {
@@ -47,9 +48,10 @@ class RequestRolePermissions {
         await this._checkUserRolePermissions(req, organizationId, roleCheck);
     }
 
-    async checkChannelPermissions(req, organizationId){
+    async checkChannelPermissions(req, channelId){
         var roleCheck = (role) => { return role.hasChannelsPermissions(); };
-        await this._checkUserRolePermissions(req, organizationId, roleCheck);
+        var channel = await ChannelDao.findById(channelId);
+        await this._checkUserRolePermissions(req, channel.organizationId, roleCheck);
     }
 
     async checkUserPermissions(req, organizationId){

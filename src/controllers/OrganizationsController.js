@@ -71,10 +71,10 @@ class OrganizationsController{
             welcome: req.body.welcome
         };
 
-        //TODO check roles
-
         try{
             var org = req.params.id;
+            await RequestRolePermissions.checkOrganizationPermissions(req, org);
+
             await OrganizationDao.update(data, org);
             logger.info("Organization " + org + " updated");
             sendEmptySuccessResponse(res);
@@ -111,11 +111,12 @@ class OrganizationsController{
     }
 
     async removeUser(req, res){
-        //TODO check roles
         var userId = req.params.userId;
         var organizationId = req.params.id;
 
         try{
+            await RequestRolePermissions.checkUserPermissions(req, organizationId);
+
             await OrganizationService.removeUser(userId, organizationId);
             logger.info(`User ${userId} abandoned organization ${organizationId}`);
             sendEmptySuccessResponse(res);
@@ -145,7 +146,7 @@ class OrganizationsController{
         var role = req.body.role;
 
         try{
-            await RequestRolePermissions.checkAdminPermissions(req);
+            await RequestRolePermissions.checkOrganizationPermissions(req, organizationId);
 
             if (!UserRoleFactory.roles.includes(role)){
                 throw new InvalidUserRoleError();
