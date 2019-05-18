@@ -75,11 +75,18 @@ class UsersController{
     }
 
     async getStatistics(req, res) {
-        const userToken = req.query.userToken;
+        var userToken = req.query.userToken;
+        var userId = req.params.id;
+        var stats;
 
         try{
-            var stats = await UserService.getStatistics(userToken);
-            sendSuccessResponse(res, stats);
+            if (userId){
+                stats = await UserService.getUserStatistics(userId);
+                sendSuccessResponse(res, stats);
+            } else {
+                stats = await UserService.getStatistics(userToken);
+                sendSuccessResponse(res, stats);
+            }
         } catch (err){
             sendErrorResponse(res, err);
         }

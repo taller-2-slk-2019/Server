@@ -48,6 +48,26 @@ describe('"UserService Tests"', () => {
         });
     });
 
+    describe('Get user statistics', () => {
+        var stats;
+
+        beforeEach(async () => {
+            stats = await UserService.getUserStatistics(user.id);
+        });
+
+        it('must return 2 organizations', async () => {
+            expect(stats.organizations.length).to.eq(2);
+        });
+        
+        it('org1 must be in organizations', async () => {
+            expect(stats.organizations).to.include(org1.name);
+        });
+
+        it('must return 10 messages sent', async () => {
+            expect(stats.messagesSent).to.eq(10);
+        });
+    });
+
     describe('Find user organizations', () => {
         var organizations;
 

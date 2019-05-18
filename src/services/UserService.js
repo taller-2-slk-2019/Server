@@ -8,12 +8,12 @@ class UserService {
 
     async getStatistics(userToken) {
         var user = await UserDao.findByToken(userToken);
+        return await this._getStatistics(user);
+    }
 
-        var [orgs, messageCount] = await Promise.all([
-                          user.getOrganizations().map(org => org.name),
-                          MessageStatisticsDao.getMessagesCountByUser(user.id),
-                        ]);
-        return new UserStatistics(orgs, messageCount);
+    async getUserStatistics(userId) {
+        var user = await UserDao.findById(userId);
+        return await this._getStatistics(user);
     }
 
     async findUserOrganizations(userToken){
@@ -31,6 +31,14 @@ class UserService {
             {
                 where: {token: token},
             });
+    }
+
+    async _getStatistics(user){
+        var [orgs, messageCount] = await Promise.all([
+                          user.getOrganizations().map(org => org.name),
+                          MessageStatisticsDao.getMessagesCountByUser(user.id),
+                        ]);
+        return new UserStatistics(orgs, messageCount);
     }
 }
 

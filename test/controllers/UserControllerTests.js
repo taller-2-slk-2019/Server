@@ -20,14 +20,7 @@ var UserService = require('../../src/services/UserService')
 describe('"UsersController Tests"', () => {
 
     describe('Methods without errors', () => {
-        var mock1;
-        var mock2;
-        var mock3;
-        var mock4;
-        var mock5;
-        var mock6;
-        var mock7;
-        var mock8;
+        var mock1, mock2, mock3, mock4, mock5, mock6, mock7, mock8, mock9;
 
         before(async () => {
             mock1 = stub(UserDao, 'create').resolves(userProfileMock);
@@ -38,6 +31,7 @@ describe('"UsersController Tests"', () => {
             mock6 = stub(UserService, 'findUserInvitations').resolves([userOrganizationInvitationMock, userOrganizationInvitationMock]);
             mock7 = stub(UserService, 'deleteUserInvitation').resolves();
             mock8 = stub(UserService, 'getStatistics').resolves(new UserStatistics(['org1'], 2));
+            mock9 = stub(UserService, 'getUserStatistics').resolves(new UserStatistics(['org2'], 4));
         });
 
         after(async () => {
@@ -49,6 +43,7 @@ describe('"UsersController Tests"', () => {
             mock6.restore();
             mock7.restore();
             mock8.restore();
+            mock9.restore();
         });
 
         describe('Register User', () => {
@@ -310,8 +305,9 @@ describe('"UsersController Tests"', () => {
             });
         });
 
-        describe('Get statistics', () => {
+        describe('Get statistics for user token', () => {
             var req = mockRequest();
+            req.params.id = null;
             var res;
 
             beforeEach(async () => {
@@ -328,17 +324,30 @@ describe('"UsersController Tests"', () => {
                 expect(response.messagesSent).to.eq(2);
             });
         });
+
+        describe('Get statistics for user id', () => {
+            var req = mockRequest();
+            req.params.id = 8;
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await UserController.getStatistics(req, res);
+            });
+
+            it('response status must be 200', async () => {
+                expect(res.status).to.have.been.calledWith(200);
+            });
+
+            it('response must have correct stats', async () => {
+                var response = res.send.args[0][0];
+                expect(response.messagesSent).to.eq(4);
+            });
+        });
     });
 
     describe('Methods with errors', () => {
-        var mock1;
-        var mock2;
-        var mock3;
-        var mock4;
-        var mock5;
-        var mock6;
-        var mock7;
-        var mock8;
+        var mock1, mock2, mock3, mock4, mock5, mock6, mock7, mock8, mock9;
 
         before(async () => {
             mock1 = stub(UserDao, 'create').rejects();
@@ -349,6 +358,7 @@ describe('"UsersController Tests"', () => {
             mock6 = stub(UserService, 'findUserInvitations').rejects();
             mock7 = stub(UserService, 'deleteUserInvitation').rejects();
             mock8 = stub(UserService, 'getStatistics').rejects();
+            mock9 = stub(UserService, 'getUserStatistics').rejects();
         });
 
         after(async () => {
@@ -360,6 +370,7 @@ describe('"UsersController Tests"', () => {
             mock6.restore();
             mock7.restore();
             mock8.restore();
+            mock9.restore();
         });
 
 

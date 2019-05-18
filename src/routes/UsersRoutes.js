@@ -3,6 +3,8 @@ var router = express.Router();
 
 var usersController = require('../controllers/UsersController');
 
+router.get('/:id/statistics', usersController.getStatistics);
+
 router.get('/invitations', usersController.getInvitations);
 
 router.get('/statistics', usersController.getStatistics);
