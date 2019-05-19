@@ -97,6 +97,18 @@ class ChannelsController{
         }
     }
 
+    async getChannelNewUsers(req, res){
+        var id = req.params.id;
+
+        try{
+            var users  = await ChannelService.getChannelNewUsers(id);
+            sendSuccessResponse(res, users);
+            
+        } catch (err){
+            sendErrorResponse(res, err);
+        }
+    }
+
     async addUser(req, res){
         var channelId = req.params.id;
         var userId = req.body.userId;

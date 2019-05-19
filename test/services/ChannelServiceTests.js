@@ -42,13 +42,14 @@ describe('"ChannelService Tests"', () => {
         var channel
         var organization;
         var user;
-        var user2;
+        var user2, user3;
         var users;
 
         before(async () => {
             user = await TestDatabaseHelper.createUser();
             user2 = await TestDatabaseHelper.createUser();
-            organization = await TestDatabaseHelper.createOrganization([user, user2]);
+            user3 = await TestDatabaseHelper.createUser();
+            organization = await TestDatabaseHelper.createOrganization([user, user2, user3]);
             channel = await TestDatabaseHelper.createChannel(user, organization);
             await channel.addUser(user2);
             users = await ChannelService.getChannelUsers(channel.id);
@@ -62,8 +63,52 @@ describe('"ChannelService Tests"', () => {
             expect([user.id, user2.id]).to.include(users[0].id);
         });
 
+        it('must not return non channel users', async () => {
+            expect(users.map(user => user.id)).to.not.include(user3.id);
+        });
+
         it('users must belong to channel', async () => {
             var belongs = await channel.hasUser(users[0]);
+            expect(belongs).to.be.true;
+        });
+    });
+
+    describe('Find Channel new Users', () => {
+        var channel
+        var organization;
+        var user;
+        var user2, user3;
+        var users;
+
+        before(async () => {
+            user = await TestDatabaseHelper.createUser();
+            user2 = await TestDatabaseHelper.createUser();
+            user3 = await TestDatabaseHelper.createUser();
+            organization = await TestDatabaseHelper.createOrganization([user, user2, user3]);
+            channel = await TestDatabaseHelper.createChannel(user, organization);
+            await channel.addUser(user2);
+            users = await ChannelService.getChannelNewUsers(channel.id);
+        });
+
+        it('must return 1 users', async () => {
+            expect(users.length).to.eq(1);
+        });
+        
+        it('users must have correct id', async () => {
+            expect(users[0].id).to.eq(user3.id);
+        });
+
+        it('must not return channel users', async () => {
+            expect(users.map(user => user.id)).to.not.include(user.id);
+        });
+
+        it('users must not belong to channel', async () => {
+            var belongs = await channel.hasUser(users[0]);
+            expect(belongs).to.be.false;
+        });
+
+        it('users must belong to organization', async () => {
+            var belongs = await organization.hasUser(users[0]);
             expect(belongs).to.be.true;
         });
     });

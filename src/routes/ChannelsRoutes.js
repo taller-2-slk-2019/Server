@@ -15,6 +15,8 @@ router.delete('/:id', channelsController.delete);
 
 router.get('/:id/users', channelsController.getChannelUsers);
 
+router.get('/:id/new-users', channelsController.getChannelNewUsers);
+
 router.post('/:id/users', channelsController.addUser);
 
 router.delete('/:id/users/:userId', channelsController.removeUser);

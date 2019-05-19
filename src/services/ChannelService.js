@@ -15,6 +15,15 @@ class ChannelService {
         return await channel.getUsers();
     }
 
+    async getChannelNewUsers(id){
+        var channel = await ChannelDao.findById(id);
+        var organization = await channel.getOrganization();
+        var users = await organization.getUsers();
+        return await filter(users, async (user) => {
+            return !(await channel.hasUser(user));
+        });
+    }
+
     async addUser(channelId, userId){
         var user = await UserDao.findById(userId);
         await this._addUserToChannel(channelId, user);
