@@ -2,8 +2,9 @@ var logger = require('logops');
 var UserDao = require('../daos/UserDao');
 var OrganizationService = require('../services/OrganizationService');
 var { sendSuccessResponse, sendErrorResponse, sendEmptySuccessResponse } = require('../helpers/ResponseHelper');
-var { InvalidLocationError } = require('../helpers/Errors');
+var { InvalidLocationError, InvalidUsernameError } = require('../helpers/Errors');
 var Token = require('../helpers/Token');
+var Validator = require('../helpers/Validator');
 const UserService = require ('../services/UserService');
 
 
@@ -23,6 +24,8 @@ class UsersController{
                 var username = data.email.split('@')[0];
                 var exists = await UserDao.usernameExists(username);
                 data.username = exists ? Token.generateRandomUsername(username) : username;
+            } else if (!Validator.validateSingleWord(data.username)){
+                throw new InvalidUsernameError(data.username);
             }
 
             var user = await UserDao.create(data);
@@ -122,6 +125,10 @@ class UsersController{
         };
 
         try{
+            if (!Validator.validateSingleWord(data.username)){
+                throw new InvalidUsernameError(data.username);
+            }
+            
             var token = req.query.userToken;
             await UserDao.update(data, token);
             logger.info("User " + token + " updated");

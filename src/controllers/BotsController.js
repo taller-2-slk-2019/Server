@@ -4,6 +4,7 @@ var TitoBot = require('../services/TitoBotService');
 var RequestRolePermissions = require('../helpers/RequestRolePermissions');
 var { sendSuccessResponse, sendErrorResponse, sendEmptySuccessResponse } = require('../helpers/ResponseHelper');
 var { InvalidBotError } = require('../helpers/Errors');
+var Validator = require('../helpers/Validator');
 
 class BotsController {
 
@@ -29,7 +30,7 @@ class BotsController {
         try{
             await RequestRolePermissions.checkAdminPermissions(req);
 
-            if (data.name.includes(' ') || data.name == TitoBot.titoBotName){
+            if (!Validator.validateSingleWord(data.name) || data.name == TitoBot.titoBotName){
                 throw new InvalidBotError(data.name);
             }
 

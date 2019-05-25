@@ -148,6 +148,13 @@ class InvalidBotError extends Error {
     }
 }
 
+class InvalidUsernameError extends Error {
+    constructor(username) {
+        super(`Username '${username}' is invalid`);
+        this.name = this.constructor.name;
+    }
+}
+
 class InvalidUserRoleError extends Error {
     constructor() {
         super("User role is invalid. Must be one of " + UserRoleFactory.roles);
@@ -185,5 +192,6 @@ module.exports = {
     InvalidForbiddenWordError,
     InvalidBotError,
     ChannelAlreadyExistsError,
-    UnauthorizedUserError
+    UnauthorizedUserError,
+    InvalidUsernameError
 };

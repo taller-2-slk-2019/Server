@@ -3,6 +3,7 @@ var ForbiddenWordDao = require('../daos/ForbiddenWordDao');
 var RequestRolePermissions = require('../helpers/RequestRolePermissions');
 var { sendSuccessResponse, sendErrorResponse, sendEmptySuccessResponse } = require('../helpers/ResponseHelper');
 var { InvalidForbiddenWordError } = require('../helpers/Errors');
+var Validator = require('../helpers/Validator');
 
 class ForbiddenWordsController{
 
@@ -27,7 +28,7 @@ class ForbiddenWordsController{
         try{
             await RequestRolePermissions.checkAdminPermissions(req);
 
-            if (data.word.includes(' ')){
+            if (!Validator.validateSingleWord(data.word)){
                 throw new InvalidForbiddenWordError(data.word);
             }
 

@@ -209,7 +209,7 @@ describe('"UsersController Tests"', () => {
         });
 
         describe('Update Profile', () => {
-            var changes = {name: "Pepe", surname: "Rodriguez", email:"pepe_rodriguez@gmail.com", picture: 'default'}
+            var changes = {name: "Pepe", username: "Rodriguez", email:"pepe_rodriguez@gmail.com"}
             var req = mockRequest({ body: changes });
             var res;
 
@@ -376,7 +376,7 @@ describe('"UsersController Tests"', () => {
 
         describe('Register User with error', () => {
 
-            var data = {name: "Pepe"};
+            var data = {username: "Pepe"};
             var req = mockRequest({ body: data });
             var res;
 
@@ -392,6 +392,26 @@ describe('"UsersController Tests"', () => {
             it('response must have an error', async () => {
                 var response = res.send.args[0][0];
                 expect(response).to.have.property('error');
+            });
+
+            describe('Invalid username', () => {
+                var data = {username: "Pepe perez"};
+                var req = mockRequest({ body: data });
+                var res;
+
+                beforeEach(async () => {
+                    res = mockResponse();
+                    await UserController.register(req, res);
+                });
+
+                it('response status must be 400', async () => {
+                    expect(res.status).to.have.been.calledWith(400);
+                });
+
+                it('response must have an error', async () => {
+                    var response = res.send.args[0][0];
+                    expect(response).to.have.property('error');
+                });
             });
         });
     
@@ -460,9 +480,9 @@ describe('"UsersController Tests"', () => {
 
         describe('Update Profile with error', () => {
 
-            var req = mockRequest();
+            var data = {username: "Pepe"};
+            var req = mockRequest({ body: data });
             var res;
-            req.params.id = 9999999;
 
             beforeEach(async () => {
                 res = mockResponse();
@@ -476,6 +496,26 @@ describe('"UsersController Tests"', () => {
             it('response must have an error', async () => {
                 var response = res.send.args[0][0];
                 expect(response).to.have.property('error');
+            });
+
+            describe('Invalid username', () => {
+                var data = {username: "Pepe perez"};
+                var req = mockRequest({ body: data });
+                var res;
+
+                beforeEach(async () => {
+                    res = mockResponse();
+                    await UserController.updateProfile(req, res);
+                });
+
+                it('response status must be 400', async () => {
+                    expect(res.status).to.have.been.calledWith(400);
+                });
+
+                it('response must have an error', async () => {
+                    var response = res.send.args[0][0];
+                    expect(response).to.have.property('error');
+                });
             });
         });
 
