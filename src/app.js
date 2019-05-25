@@ -31,7 +31,7 @@ var messagesRouter = require('./routes/MessagesRoutes');
 app.use('/messages', messagesRouter);
 
 var forbiddenWordsRouter = require('./routes/ForbiddenWordsRoutes');
-app.use('/forbiddenWords', forbiddenWordsRouter);
+app.use('/forbidden-words', forbiddenWordsRouter);
 
 var botsRouter = require('./routes/BotsRoutes');
 app.use('/bots', botsRouter);

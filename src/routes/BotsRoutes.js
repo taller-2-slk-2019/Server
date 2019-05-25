@@ -4,9 +4,9 @@ var router = express.Router();
 var messagesController = require('../controllers/MessagesController');
 var botsController = require('../controllers/BotsController');
 
-router.post('/messages', messagesController.createBotMessage);
-
 router.get('/', botsController.get);
+
+router.post('/messages', messagesController.createBotMessage);
 
 router.post('/', botsController.create);
 
