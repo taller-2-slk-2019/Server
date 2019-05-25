@@ -34,7 +34,7 @@ class ForbiddenWordsController{
 
             var forbiddenWord = await ForbiddenWordDao.create(data);
             logger.info(`Forbidden word '${data.word}' added to organization ${data.organizationId}`);
-            Response.sendSuccessResponse(res, forbiddenWord);
+            Response.sendSuccessCreatedResponse(res, forbiddenWord);
 
         } catch (err){
             Response.sendErrorResponse(res, err);

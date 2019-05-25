@@ -32,7 +32,7 @@ class MessagesController{
             } else {
                 throw new InvalidQueryError();
             }
-            Response.sendEmptySuccessResponse(res);
+            Response.sendSuccessCreatedResponse(res);
             
         } catch (err){
             Response.sendErrorResponse(res, err);
@@ -75,7 +75,7 @@ class MessagesController{
             logger.info(`Received message from bot ${data.bot} in 
                 ${data.channelId ? 'channel ' + data.channelId : 'conversation ' + data.conversationId}`);
             logger.info(data);
-            Response.sendEmptySuccessResponse(res);
+            Response.sendSuccessCreatedResponse(res);
             
         } catch (err) {
             Response.sendErrorResponse(res, err);

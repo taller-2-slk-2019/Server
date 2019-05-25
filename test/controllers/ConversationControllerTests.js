@@ -29,7 +29,7 @@ describe('"ConversationsController Tests"', () => {
             mock2.restore();
         });
 
-        describe('Create channel', () => {
+        describe('Create conversation', () => {
             var req = mockRequest();
             var res;
 
@@ -38,8 +38,8 @@ describe('"ConversationsController Tests"', () => {
                 await ConversationsController.create(req, res);
             });
 
-            it('response status must be 200', async () => {
-                expect(res.status).to.have.been.calledWith(200);
+            it('response status must be 201', async () => {
+                expect(res.status).to.have.been.calledWith(201);
             });
 
             it('conversation must not be null', async () => {

@@ -54,7 +54,7 @@ class OrganizationsController{
 
             var org = await OrganizationDao.create(data);
             logger.info("Organization created: " + org.id);
-            Response.sendSuccessResponse(res, org);
+            Response.sendSuccessCreatedResponse(res, org);
             
         } catch (err){
             Response.sendErrorResponse(res, err);

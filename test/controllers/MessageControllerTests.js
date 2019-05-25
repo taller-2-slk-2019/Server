@@ -50,8 +50,8 @@ describe('"MessagesController Tests"', () => {
                 await MessagesController.create(req, res);
             });
 
-            it('response status must be 204', async () => {
-                expect(res.status).to.have.been.calledWith(204);
+            it('response status must be 201', async () => {
+                expect(res.status).to.have.been.calledWith(201);
             });
 
             it('response body must be null', async () => {
@@ -71,8 +71,8 @@ describe('"MessagesController Tests"', () => {
                 await MessagesController.create(req, res);
             });
 
-            it('response status must be 204', async () => {
-                expect(res.status).to.have.been.calledWith(204);
+            it('response status must be 201', async () => {
+                expect(res.status).to.have.been.calledWith(201);
             });
 
             it('response body must be null', async () => {
@@ -91,8 +91,8 @@ describe('"MessagesController Tests"', () => {
                 await MessagesController.createBotMessage(req, res);
             });
 
-            it('response status must be 204', async () => {
-                expect(res.status).to.have.been.calledWith(204);
+            it('response status must be 201', async () => {
+                expect(res.status).to.have.been.calledWith(201);
             });
 
             it('response body must be null', async () => {
@@ -111,8 +111,8 @@ describe('"MessagesController Tests"', () => {
                 await MessagesController.createBotMessage(req, res);
             });
 
-            it('response status must be 204', async () => {
-                expect(res.status).to.have.been.calledWith(204);
+            it('response status must be 201', async () => {
+                expect(res.status).to.have.been.calledWith(201);
             });
 
             it('response body must be null', async () => {

@@ -57,8 +57,8 @@ describe('"UsersController Tests"', () => {
                 await UserController.register(req, res);
             });
 
-            it('response status must be 200', async () => {
-                expect(res.status).to.have.been.calledWith(200);
+            it('response status must be 201', async () => {
+                expect(res.status).to.have.been.calledWith(201);
             });
 
             it('user must not be null', async () => {
@@ -96,9 +96,9 @@ describe('"UsersController Tests"', () => {
                 res = mockResponse();
             });
 
-            it('response status must be 200', async () => {
+            it('response status must be 201', async () => {
                 await UserController.register(req, res);
-                expect(res.status).to.have.been.calledWith(200);
+                expect(res.status).to.have.been.calledWith(201);
             });
 
             it('user must not be null', async () => {
@@ -110,7 +110,7 @@ describe('"UsersController Tests"', () => {
             it('must not fail if generated username not exists', async () => {
                 await UserController.register(req, res);
                 var response = res.send.args[0][0];
-                expect(res.status).to.have.been.calledWith(200);
+                expect(res.status).to.have.been.calledWith(201);
             });
 
             it('must not fail if generated username exists', async () => {
@@ -118,7 +118,7 @@ describe('"UsersController Tests"', () => {
                 mock = stub(UserDao, 'usernameExists').resolves(true);
                 await UserController.register(req, res);
                 var response = res.send.args[0][0];
-                expect(res.status).to.have.been.calledWith(200);
+                expect(res.status).to.have.been.calledWith(201);
             });
         });
 

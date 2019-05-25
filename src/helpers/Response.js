@@ -13,6 +13,10 @@ class Response {
         res.status(200).send(data);
     }
 
+    sendSuccessCreatedResponse(res, data){
+        res.status(201).send(data);
+    }
+
     sendEmptySuccessResponse(res){
         res.status(204).send();
     }

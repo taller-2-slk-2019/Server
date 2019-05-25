@@ -23,7 +23,7 @@ class ChannelsController{
             
             var channel  = await ChannelDao.create(data);
             logger.info(`Channel created (${channel.id}) in organization ${data.organizationId} by user ${data.creatorToken}`);
-            Response.sendSuccessResponse(res, channel);
+            Response.sendSuccessCreatedResponse(res, channel);
             
         } catch (err){
             Response.sendErrorResponse(res, err);

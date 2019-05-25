@@ -13,7 +13,7 @@ class ConversationsController{
             var conversation  = await ConversationDao.create(organizationId, userId, userToken);
             logger.info(`Conversation created (${conversation.id}) in organization ${organizationId} by user ${userToken} with user ${userId}`);
 
-            Response.sendSuccessResponse(res, conversation);
+            Response.sendSuccessCreatedResponse(res, conversation);
             
         } catch (err){
             Response.sendErrorResponse(res, err);

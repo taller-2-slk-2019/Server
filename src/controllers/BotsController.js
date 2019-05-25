@@ -36,7 +36,7 @@ class BotsController {
 
             var bot = await BotDao.create(data);
             logger.info(`Bot '${data.name}' added to organization ${data.organizationId}`);
-            Response.sendSuccessResponse(res, bot);
+            Response.sendSuccessCreatedResponse(res, bot);
 
         } catch (err){
             Response.sendErrorResponse(res, err);

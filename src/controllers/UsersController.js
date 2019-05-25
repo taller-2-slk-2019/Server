@@ -30,7 +30,7 @@ class UsersController{
 
             var user = await UserDao.create(data);
             logger.info("User created: " + user.id);
-            Response.sendSuccessResponse(res, user);
+            Response.sendSuccessCreatedResponse(res, user);
 
         } catch (err){
             Response.sendErrorResponse(res, err);

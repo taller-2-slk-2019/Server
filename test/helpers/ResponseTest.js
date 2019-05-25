@@ -32,6 +32,25 @@ describe('"Response Tests"', () => {
         });
     });
 
+    describe('Send success created response', () => {
+        var res;
+        var data = {user: "pepe"};
+
+        beforeEach(async () => {
+            res = mockResponse();
+            Response.sendSuccessCreatedResponse(res, data);
+        });
+
+        it('should have status 201', async () => {
+            expect(res.status).to.have.been.calledWith(201);
+        });
+
+        it('should have correct data', async () => {
+            var response = res.send.args[0][0];
+            expect(response).to.eq(data);
+        });
+    });
+
     describe('Send empty success response', () => {
         var res;
 
