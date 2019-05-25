@@ -16,6 +16,12 @@ describe('"App Tests"', () => {
                                 .get('/invalid')
             
             expect(response.status).to.eq(404);
+        });
+
+        it('should return invalid message', async () => {
+            var response = await request(app)
+                                .get('/invalid')
+            
             expect(response.text).to.eq('Invalid Api');
         });
     });
