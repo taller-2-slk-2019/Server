@@ -11,6 +11,7 @@ var BotsController = require('../../src/controllers/BotsController');
 var BotDao = require('../../src/daos/BotDao');
 var TestPermissionsMock = require('../TestPermissionsMock');
 const botMock = require('../mocks/botMock');
+var TestException = require('../TestException');
 
 describe('"BotsController Tests"', () => {
 
@@ -107,9 +108,9 @@ describe('"BotsController Tests"', () => {
 
         before(async () => {
             TestPermissionsMock.allowPermissions();
-            mock1 = stub(BotDao, 'create').rejects();
-            mock2 = stub(BotDao, 'delete').rejects();
-            mock3 = stub(BotDao, 'get').rejects();
+            mock1 = stub(BotDao, 'create').rejects(TestException);
+            mock2 = stub(BotDao, 'delete').rejects(TestException);
+            mock3 = stub(BotDao, 'get').rejects(TestException);
         });
 
         after(async () => {
@@ -129,8 +130,8 @@ describe('"BotsController Tests"', () => {
                 await BotsController.create(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {
@@ -188,8 +189,8 @@ describe('"BotsController Tests"', () => {
                 await BotsController.delete(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {
@@ -207,8 +208,8 @@ describe('"BotsController Tests"', () => {
                 await BotsController.get(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {
@@ -242,8 +243,8 @@ describe('"BotsController Tests"', () => {
                 await BotsController.create(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be 401', async () => {
+                expect(res.status).to.have.been.calledWith(401);
             });
 
             it('response must have an error', async () => {
@@ -261,8 +262,8 @@ describe('"BotsController Tests"', () => {
                 await BotsController.delete(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be 401', async () => {
+                expect(res.status).to.have.been.calledWith(401);
             });
 
             it('response must have an error', async () => {

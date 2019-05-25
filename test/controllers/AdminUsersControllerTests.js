@@ -11,6 +11,7 @@ const adminMock = require('../mocks/adminMock');
 
 var AdminUsersController = require('../../src/controllers/AdminUsersController');
 var AdminUserDao = require('../../src/daos/AdminUserDao');
+var TestException = require('../TestException');
 
 describe('"AdminUsersController Tests"', () => {
     var data = {
@@ -68,7 +69,7 @@ describe('"AdminUsersController Tests"', () => {
         var mock1;
 
         before(async () => {
-            mock1 = stub(AdminUserDao, 'login').rejects();
+            mock1 = stub(AdminUserDao, 'login').rejects(TestException);
         });
 
         after(async () => {
@@ -85,8 +86,8 @@ describe('"AdminUsersController Tests"', () => {
                 await AdminUsersController.login(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {

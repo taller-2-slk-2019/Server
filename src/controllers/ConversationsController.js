@@ -1,6 +1,6 @@
 var logger = require('logops');
 var ConversationDao = require('../daos/ConversationDao');
-var { sendSuccessResponse, sendErrorResponse } = require('../helpers/ResponseHelper');
+var Response = require('../helpers/Response');
 
 class ConversationsController{
 
@@ -13,10 +13,10 @@ class ConversationsController{
             var conversation  = await ConversationDao.create(organizationId, userId, userToken);
             logger.info(`Conversation created (${conversation.id}) in organization ${organizationId} by user ${userToken} with user ${userId}`);
 
-            sendSuccessResponse(res, conversation);
+            Response.sendSuccessResponse(res, conversation);
             
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 
@@ -26,10 +26,10 @@ class ConversationsController{
 
         try{
             var conversations  = await ConversationDao.get(userToken, organizationId);
-            sendSuccessResponse(res, conversations);
+            Response.sendSuccessResponse(res, conversations);
             
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 }

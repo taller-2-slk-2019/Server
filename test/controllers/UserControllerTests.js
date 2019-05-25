@@ -14,8 +14,9 @@ const { userCreateData } = require('../data/userData');
 var UserController = require('../../src/controllers/UsersController');
 var UserDao = require('../../src/daos/UserDao');
 var OrganizationService = require('../../src/services/OrganizationService');
-var UserStatistics = require('../../src/models/statistics/UserStatistics')
-var UserService = require('../../src/services/UserService')
+var UserStatistics = require('../../src/models/statistics/UserStatistics');
+var UserService = require('../../src/services/UserService');
+var TestException = require('../TestException');
 
 describe('"UsersController Tests"', () => {
 
@@ -350,15 +351,15 @@ describe('"UsersController Tests"', () => {
         var mock1, mock2, mock3, mock4, mock5, mock6, mock7, mock8, mock9;
 
         before(async () => {
-            mock1 = stub(UserDao, 'create').rejects();
-            mock2 = stub(UserDao, 'update').rejects();
-            mock3 = stub(UserDao, 'findById').rejects();
-            mock4 = stub(OrganizationService, 'findOrganizationUsers').rejects();
-            mock5 = stub(UserDao, 'findByToken').rejects();
-            mock6 = stub(UserService, 'findUserInvitations').rejects();
-            mock7 = stub(UserService, 'deleteUserInvitation').rejects();
-            mock8 = stub(UserService, 'getStatistics').rejects();
-            mock9 = stub(UserService, 'getUserStatistics').rejects();
+            mock1 = stub(UserDao, 'create').rejects(TestException);
+            mock2 = stub(UserDao, 'update').rejects(TestException);
+            mock3 = stub(UserDao, 'findById').rejects(TestException);
+            mock4 = stub(OrganizationService, 'findOrganizationUsers').rejects(TestException);
+            mock5 = stub(UserDao, 'findByToken').rejects(TestException);
+            mock6 = stub(UserService, 'findUserInvitations').rejects(TestException);
+            mock7 = stub(UserService, 'deleteUserInvitation').rejects(TestException);
+            mock8 = stub(UserService, 'getStatistics').rejects(TestException);
+            mock9 = stub(UserService, 'getUserStatistics').rejects(TestException);
         });
 
         after(async () => {
@@ -385,8 +386,8 @@ describe('"UsersController Tests"', () => {
                 await UserController.register(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {
@@ -426,8 +427,8 @@ describe('"UsersController Tests"', () => {
                 await UserController.getProfile(req, res);
             });
 
-            it('response status must be 400', async () => { 
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
             
             it('response must have an error', async () => {
@@ -447,8 +448,8 @@ describe('"UsersController Tests"', () => {
                 await UserController.getUser(req, res);
             });
 
-            it('response status must be 400', async () => { 
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
             
             it('response must have an error', async () => {
@@ -467,8 +468,8 @@ describe('"UsersController Tests"', () => {
                 await UserController.get(req, res);
             });
 
-            it('response status must be 400', async () => { 
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
             
             it('response must have an error', async () => {
@@ -489,8 +490,8 @@ describe('"UsersController Tests"', () => {
                 await UserController.updateProfile(req, res);
             });
 
-            it('response status must be 400', async () => { 
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
             
             it('response must have an error', async () => {
@@ -610,8 +611,8 @@ describe('"UsersController Tests"', () => {
                     await UserController.updateLocation(req, res);
                 });
 
-                it('can not update location', async () => {
-                    expect(res.status).to.have.been.calledWith(400);
+                it('response status must be correct', async () => {
+                    expect(res.status).to.have.been.calledWith(TestException.errorCode);
                 });
 
                 it('response must have an error', async () => {
@@ -631,8 +632,8 @@ describe('"UsersController Tests"', () => {
                 await UserController.getInvitations(req, res);
             });
 
-            it('response status must be 400', async () => { 
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
             
             it('response must have an error', async () => {
@@ -651,8 +652,8 @@ describe('"UsersController Tests"', () => {
                 await UserController.deleteInvitation(req, res);
             });
 
-            it('response status must be 400', async () => { 
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
             
             it('response must have an error', async () => {
@@ -671,8 +672,8 @@ describe('"UsersController Tests"', () => {
                 await UserController.getStatistics(req, res);
             });
 
-            it('response status must be 400', async () => { 
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
             
             it('response must have an error', async () => {

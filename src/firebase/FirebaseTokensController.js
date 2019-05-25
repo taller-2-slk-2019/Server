@@ -1,6 +1,6 @@
 var logger = require('logops');
 var FirebaseTokensDao = require('./FirebaseTokensDao');
-var { sendErrorResponse, sendEmptySuccessResponse } = require('../helpers/ResponseHelper');
+var Response = require('../helpers/Response');
 
 class FirebaseTokensController{
     async addToken(req, res){
@@ -10,9 +10,9 @@ class FirebaseTokensController{
         try{
             await FirebaseTokensDao.addToken(userToken, token);
             logger.info(`FCM token '${token}' associated to user '${userToken}'`);
-            sendEmptySuccessResponse(res);
+            Response.sendEmptySuccessResponse(res);
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 
@@ -22,9 +22,9 @@ class FirebaseTokensController{
         try{
             await FirebaseTokensDao.removeToken(token);
             logger.info(`FCM token '${token}' deleted`);
-            sendEmptySuccessResponse(res);
+            Response.sendEmptySuccessResponse(res);
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 }

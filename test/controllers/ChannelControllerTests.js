@@ -15,6 +15,7 @@ var ChannelsController = require('../../src/controllers/ChannelsController');
 var ChannelDao = require('../../src/daos/ChannelDao');
 var ChannelService = require('../../src/services/ChannelService');
 const TestPermissionsMock = require('../TestPermissionsMock');
+var TestException = require('../TestException');
 
 describe('"ChannelsController Tests"', () => {
 
@@ -370,19 +371,19 @@ describe('"ChannelsController Tests"', () => {
 
         before(async () => {
             TestPermissionsMock.allowPermissions();
-            mock1 = stub(ChannelDao, 'create').rejects();
-            mock2 = stub(ChannelService, 'addUser').rejects();
-            mock3 = stub(ChannelService, 'removeUser').rejects();
-            mock4 = stub(ChannelService, 'get').rejects();
-            mock5 = stub(ChannelService, 'getForUser').rejects();
-            mock6 = stub(ChannelDao, 'findById').rejects();
-            mock7 = stub(ChannelService, 'getChannelUsers').rejects();
-            mock8 = stub(ChannelService, 'getStatistics').rejects();
-            mock9 = stub(ChannelDao, 'delete').rejects();
-            mock10 = stub(ChannelDao, 'update').rejects();
-            mock11 = stub(ChannelService, 'joinUser').rejects();
-            mock12 = stub(ChannelService, 'abandonUser').rejects();
-            mock13 = stub(ChannelService, 'getChannelNewUsers').rejects();
+            mock1 = stub(ChannelDao, 'create').rejects(TestException);
+            mock2 = stub(ChannelService, 'addUser').rejects(TestException);
+            mock3 = stub(ChannelService, 'removeUser').rejects(TestException);
+            mock4 = stub(ChannelService, 'get').rejects(TestException);
+            mock5 = stub(ChannelService, 'getForUser').rejects(TestException);
+            mock6 = stub(ChannelDao, 'findById').rejects(TestException);
+            mock7 = stub(ChannelService, 'getChannelUsers').rejects(TestException);
+            mock8 = stub(ChannelService, 'getStatistics').rejects(TestException);
+            mock9 = stub(ChannelDao, 'delete').rejects(TestException);
+            mock10 = stub(ChannelDao, 'update').rejects(TestException);
+            mock11 = stub(ChannelService, 'joinUser').rejects(TestException);
+            mock12 = stub(ChannelService, 'abandonUser').rejects(TestException);
+            mock13 = stub(ChannelService, 'getChannelNewUsers').rejects(TestException);
         });
 
         after(async () => {
@@ -413,8 +414,8 @@ describe('"ChannelsController Tests"', () => {
                 await ChannelsController.create(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {
@@ -432,8 +433,8 @@ describe('"ChannelsController Tests"', () => {
                 await ChannelsController.updateChannel(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {
@@ -451,8 +452,8 @@ describe('"ChannelsController Tests"', () => {
                 await ChannelsController.getChannelUsers(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {
@@ -470,8 +471,8 @@ describe('"ChannelsController Tests"', () => {
                 await ChannelsController.getChannelNewUsers(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {
@@ -489,8 +490,8 @@ describe('"ChannelsController Tests"', () => {
                 await ChannelsController.addUser(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {
@@ -508,8 +509,8 @@ describe('"ChannelsController Tests"', () => {
                 await ChannelsController.removeUser(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {
@@ -527,8 +528,8 @@ describe('"ChannelsController Tests"', () => {
                 await ChannelsController.delete(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {
@@ -546,8 +547,8 @@ describe('"ChannelsController Tests"', () => {
                 await ChannelsController.get(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {
@@ -565,8 +566,8 @@ describe('"ChannelsController Tests"', () => {
                 await ChannelsController.getChannel(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {
@@ -584,8 +585,8 @@ describe('"ChannelsController Tests"', () => {
                 await ChannelsController.getStatistics(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {
@@ -614,8 +615,8 @@ describe('"ChannelsController Tests"', () => {
                 await ChannelsController.delete(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be 401', async () => {
+                expect(res.status).to.have.been.calledWith(401);
             });
 
             it('response must have an error', async () => {
@@ -634,8 +635,8 @@ describe('"ChannelsController Tests"', () => {
                 await ChannelsController.create(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be 401', async () => {
+                expect(res.status).to.have.been.calledWith(401);
             });
 
             it('response must have an error', async () => {
@@ -653,8 +654,8 @@ describe('"ChannelsController Tests"', () => {
                 await ChannelsController.updateChannel(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be 401', async () => {
+                expect(res.status).to.have.been.calledWith(401);
             });
 
             it('response must have an error', async () => {
@@ -673,8 +674,8 @@ describe('"ChannelsController Tests"', () => {
                 await ChannelsController.addUser(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be 401', async () => {
+                expect(res.status).to.have.been.calledWith(401);
             });
 
             it('response must have an error', async () => {
@@ -693,8 +694,8 @@ describe('"ChannelsController Tests"', () => {
                 await ChannelsController.removeUser(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be 401', async () => {
+                expect(res.status).to.have.been.calledWith(401);
             });
 
             it('response must have an error', async () => {

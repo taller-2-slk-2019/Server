@@ -1,7 +1,7 @@
 var sha1 = require('sha1');
 var logger = require('logops');
 var AdminUserDao = require('../daos/AdminUserDao');
-var { sendSuccessResponse, sendErrorResponse } = require('../helpers/ResponseHelper');
+var Response = require('../helpers/Response');
 
 class AdminUsersController{
 
@@ -12,10 +12,10 @@ class AdminUsersController{
         try{
             var admin = await AdminUserDao.login(username, password);
             logger.info(`Admin logged in: ${username}`);
-            sendSuccessResponse(res, admin);
+            Response.sendSuccessResponse(res, admin);
 
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 

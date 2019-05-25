@@ -1,7 +1,7 @@
 var logger = require('logops');
 var ForbiddenWordDao = require('../daos/ForbiddenWordDao');
 var RequestRolePermissions = require('../helpers/RequestRolePermissions');
-var { sendSuccessResponse, sendErrorResponse, sendEmptySuccessResponse } = require('../helpers/ResponseHelper');
+var Response = require('../helpers/Response');
 var { InvalidForbiddenWordError } = require('../helpers/Errors');
 var Validator = require('../helpers/Validator');
 
@@ -12,10 +12,10 @@ class ForbiddenWordsController{
 
         try{
             var words  = await ForbiddenWordDao.get(organizationId);
-            sendSuccessResponse(res, words);
+            Response.sendSuccessResponse(res, words);
             
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 
@@ -34,10 +34,10 @@ class ForbiddenWordsController{
 
             var forbiddenWord = await ForbiddenWordDao.create(data);
             logger.info(`Forbidden word '${data.word}' added to organization ${data.organizationId}`);
-            sendSuccessResponse(res, forbiddenWord);
+            Response.sendSuccessResponse(res, forbiddenWord);
 
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 
@@ -49,10 +49,10 @@ class ForbiddenWordsController{
             
             await ForbiddenWordDao.delete(wordId);
             logger.info(`Forbidden word '${wordId}' deleted`);
-            sendEmptySuccessResponse(res);
+            Response.sendEmptySuccessResponse(res);
 
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 

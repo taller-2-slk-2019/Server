@@ -1,175 +1,160 @@
 var Config = require('./Config');
 var UserRoleFactory = require('../factories/UserRoleFactory');
 
-class InvalidQueryError extends Error {
-    constructor() {
-        super("Invalid Query");
+class HypechatError extends Error {
+    constructor(message, errorCode) {
+        super(message);
+        this.errorCode = errorCode;
         this.name = this.constructor.name;
     }
 }
 
-class UserNotFoundError extends Error {
+class InvalidQueryError extends HypechatError {
+    constructor() {
+        super("Invalid Query", 400);
+    }
+}
+
+class UserNotFoundError extends HypechatError {
     constructor(userId) {
-        super("User not found: " + userId);
-        this.name = this.constructor.name;
+        super("User not found: " + userId, 404);
     }
 }
 
-class AdminUserNotFoundError extends Error {
+class AdminUserNotFoundError extends HypechatError {
     constructor(user) {
-        super("Admin not found: " + user);
-        this.name = this.constructor.name;
+        super("Admin not found: " + user, 404);
     }
 }
 
-class OrganizationNotFoundError extends Error {
+class OrganizationNotFoundError extends HypechatError {
     constructor(organizationId) {
-        super("Organization not found: " + organizationId);
-        this.name = this.constructor.name;
+        super("Organization not found: " + organizationId, 404);
     }
 }
 
-class ChannelNotFoundError extends Error {
+class ChannelNotFoundError extends HypechatError {
     constructor(channelId) {
-        super("Channel not found: " + channelId);
-        this.name = this.constructor.name;
+        super("Channel not found: " + channelId, 404);
     }
 }
 
-class ChannelAlreadyExistsError extends Error {
+class ChannelAlreadyExistsError extends HypechatError {
     constructor(channelName, orgId) {
-        super(`Channel ${channelName} already exists in organization ${orgId}`);
-        this.name = this.constructor.name;
+        super(`Channel ${channelName} already exists in organization ${orgId}`, 400);
     }
 }
 
-class MessageNotFoundError extends Error {
+class MessageNotFoundError extends HypechatError {
     constructor(msgId) {
-        super("Message not found: " + msgId);
-        this.name = this.constructor.name;
+        super("Message not found: " + msgId, 404);
     }
 }
 
-class ConversationNotFoundError extends Error {
+class ConversationNotFoundError extends HypechatError {
     constructor(conversationId) {
-        super("Conversation not found: " + conversationId);
-        this.name = this.constructor.name;
+        super("Conversation not found: " + conversationId, 404);
     }
 }
 
-class UserNotBelongsToOrganizationError extends Error {
+class UserNotBelongsToOrganizationError extends HypechatError {
     constructor(organizationId, userId) {
-        super(`User ${userId} does not belong to organization ${organizationId}`);
-        this.name = this.constructor.name;
+        super(`User ${userId} does not belong to organization ${organizationId}`, 400);
     }
 }
 
-class UserAlreadyInChannelError extends Error {
+class UserAlreadyInChannelError extends HypechatError {
     constructor(channelId, userId) {
-        super(`User ${userId} already belongs to channel ${channelId}`);
-        this.name = this.constructor.name;
+        super(`User ${userId} already belongs to channel ${channelId}`, 400); 
     }
 }
 
-class UserNotBelongsToChannelError extends Error {
+class UserNotBelongsToChannelError extends HypechatError {
     constructor(channelId, userId) {
-        super(`User ${userId} does not belong to channel ${channelId}`);
-        this.name = this.constructor.name;
+        super(`User ${userId} does not belong to channel ${channelId}`, 400);
     }
 }
 
-class UserNotBelongsToConversationError extends Error {
+class UserNotBelongsToConversationError extends HypechatError {
     constructor(conversationId, userId) {
-        super(`User ${userId} does not belong to conversation ${conversationId}`);
-        this.name = this.constructor.name;
+        super(`User ${userId} does not belong to conversation ${conversationId}`, 400);
     }
 }
 
-class InvalidOrganizationInvitationTokenError extends Error {
+class InvalidOrganizationInvitationTokenError extends HypechatError {
     constructor(token) {
-        super("Invalid token to be invited to an organization: " + token);
-        this.name = this.constructor.name;
+        super("Invalid token to be invited to an organization: " + token, 400);
     }
 }
 
-class InvalidLocationError extends Error {
+class InvalidLocationError extends HypechatError {
     constructor() {
-        super("Location must have a latitude and a longitude");
-        this.name = this.constructor.name;
+        super("Location must have a latitude and a longitude", 400);
     }
 }
 
-class InvalidConversationError extends Error {
+class InvalidConversationError extends HypechatError {
     constructor() {
-        super("Conversation must have two different users");
-        this.name = this.constructor.name;
+        super("Conversation must have two different users", 400);
     }
 }
 
-class InvalidMessageTypeError extends Error {
+class InvalidMessageTypeError extends HypechatError {
     constructor() {
-        super("Message type is invalid. Must be one of " + Config.messageTypes);
-        this.name = this.constructor.name;
+        super("Message type is invalid. Must be one of " + Config.messageTypes, 400);
     }
 }
 
-class InvalidMessageDataError extends Error {
+class InvalidMessageDataError extends HypechatError {
     constructor() {
-        super("Message must hava data");
-        this.name = this.constructor.name;
+        super("Message must hava data", 400); 
     }
 }
 
-class ForbiddenWordAlreadyExistsError extends Error {
+class ForbiddenWordAlreadyExistsError extends HypechatError {
     constructor(word, organizationId) {
-        super(`Forbidden word '${word}' already exists in organization ${organizationId}`);
-        this.name = this.constructor.name;
+        super(`Forbidden word '${word}' already exists in organization ${organizationId}`, 400);
     }
 }
 
-class InvalidForbiddenWordError extends Error {
+class InvalidForbiddenWordError extends HypechatError {
     constructor(word) {
-        super(`Forbidden word '${word}' is invalid`);
-        this.name = this.constructor.name;
+        super(`Forbidden word '${word}' is invalid`, 400); 
     }
 }
 
-class BotAlreadyExistsError extends Error {
+class BotAlreadyExistsError extends HypechatError {
     constructor(bot, organizationId) {
-        super(`Bot '${bot}' already exists in organization ${organizationId}`);
-        this.name = this.constructor.name;
+        super(`Bot '${bot}' already exists in organization ${organizationId}`, 400);
     }
 }
 
-class InvalidBotError extends Error {
+class InvalidBotError extends HypechatError {
     constructor(bot) {
-        super(`Bot name '${bot}' is invalid`);
-        this.name = this.constructor.name;
+        super(`Bot name '${bot}' is invalid`, 400);
     }
 }
 
-class InvalidUsernameError extends Error {
+class InvalidUsernameError extends HypechatError {
     constructor(username) {
-        super(`Username '${username}' is invalid`);
-        this.name = this.constructor.name;
+        super(`Username '${username}' is invalid`, 400);
     }
 }
 
-class InvalidUserRoleError extends Error {
+class InvalidUserRoleError extends HypechatError {
     constructor() {
-        super("User role is invalid. Must be one of " + UserRoleFactory.roles);
-        this.name = this.constructor.name;
+        super("User role is invalid. Must be one of " + UserRoleFactory.roles, 400);
     }
 }
 
-class UnauthorizedUserError extends Error {
+class UnauthorizedUserError extends HypechatError {
     constructor() {
-        super("User is not authorized");
-        this.name = this.constructor.name;
+        super("User is not authorized", 401);
     }
 }
 
 module.exports = {
+    HypechatError,
     UserNotFoundError,
     AdminUserNotFoundError,
     OrganizationNotFoundError,

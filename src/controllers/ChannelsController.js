@@ -1,7 +1,7 @@
 var logger = require('logops');
 var ChannelDao = require('../daos/ChannelDao');
 var ChannelService = require('../services/ChannelService');
-var { sendSuccessResponse, sendErrorResponse, sendEmptySuccessResponse } = require('../helpers/ResponseHelper');
+var Response = require('../helpers/Response');
 var RequestRolePermissions = require('../helpers/RequestRolePermissions');
 
 class ChannelsController{
@@ -23,10 +23,10 @@ class ChannelsController{
             
             var channel  = await ChannelDao.create(data);
             logger.info(`Channel created (${channel.id}) in organization ${data.organizationId} by user ${data.creatorToken}`);
-            sendSuccessResponse(res, channel);
+            Response.sendSuccessResponse(res, channel);
             
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 
@@ -44,10 +44,10 @@ class ChannelsController{
 
             await ChannelDao.update(data, channel);
             logger.info("Channel " + channel + " updated");
-            sendEmptySuccessResponse(res);
+            Response.sendEmptySuccessResponse(res);
 
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 
@@ -66,10 +66,10 @@ class ChannelsController{
             } else {
                 channels  = await ChannelService.get(organizationId);
             }
-            sendSuccessResponse(res, channels);
+            Response.sendSuccessResponse(res, channels);
             
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 
@@ -78,10 +78,10 @@ class ChannelsController{
 
         try{
             var channel  = await ChannelDao.findById(id);
-            sendSuccessResponse(res, channel);
+            Response.sendSuccessResponse(res, channel);
             
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 
@@ -90,10 +90,10 @@ class ChannelsController{
 
         try{
             var users  = await ChannelService.getChannelUsers(id);
-            sendSuccessResponse(res, users);
+            Response.sendSuccessResponse(res, users);
             
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 
@@ -102,10 +102,10 @@ class ChannelsController{
 
         try{
             var users  = await ChannelService.getChannelNewUsers(id);
-            sendSuccessResponse(res, users);
+            Response.sendSuccessResponse(res, users);
             
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 
@@ -123,10 +123,10 @@ class ChannelsController{
                 logger.info(`User ${userToken} joined channel ${channelId}`);
             }
 
-            sendEmptySuccessResponse(res);
+            Response.sendEmptySuccessResponse(res);
 
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 
@@ -145,9 +145,9 @@ class ChannelsController{
                 logger.info(`User ${userToken} abandoned channel ${channelId}`);
             }
 
-            sendEmptySuccessResponse(res);
+            Response.sendEmptySuccessResponse(res);
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 
@@ -156,9 +156,9 @@ class ChannelsController{
 
         try{
             var stats = await ChannelService.getStatistics(channelId);
-            sendSuccessResponse(res, stats);
+            Response.sendSuccessResponse(res, stats);
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 
@@ -170,9 +170,9 @@ class ChannelsController{
             
             await ChannelDao.delete(channelId);
             logger.info(`Channel ${channelId} deleted`);
-            sendEmptySuccessResponse(res);
+            Response.sendEmptySuccessResponse(res);
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 

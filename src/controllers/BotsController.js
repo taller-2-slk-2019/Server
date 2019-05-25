@@ -2,7 +2,7 @@ var logger = require('logops');
 var BotDao = require('../daos/BotDao');
 var TitoBot = require('../services/TitoBotService');
 var RequestRolePermissions = require('../helpers/RequestRolePermissions');
-var { sendSuccessResponse, sendErrorResponse, sendEmptySuccessResponse } = require('../helpers/ResponseHelper');
+var Response = require('../helpers/Response');
 var { InvalidBotError } = require('../helpers/Errors');
 var Validator = require('../helpers/Validator');
 
@@ -13,10 +13,10 @@ class BotsController {
 
         try{
             var bots  = await BotDao.get(organizationId);
-            sendSuccessResponse(res, bots);
+            Response.sendSuccessResponse(res, bots);
             
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 
@@ -36,10 +36,10 @@ class BotsController {
 
             var bot = await BotDao.create(data);
             logger.info(`Bot '${data.name}' added to organization ${data.organizationId}`);
-            sendSuccessResponse(res, bot);
+            Response.sendSuccessResponse(res, bot);
 
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 
@@ -51,10 +51,10 @@ class BotsController {
             
             await BotDao.delete(botId);
             logger.info(`Bot '${botId}' deleted`);
-            sendEmptySuccessResponse(res);
+            Response.sendEmptySuccessResponse(res);
 
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 }

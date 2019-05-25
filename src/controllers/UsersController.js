@@ -1,7 +1,7 @@
 var logger = require('logops');
 var UserDao = require('../daos/UserDao');
 var OrganizationService = require('../services/OrganizationService');
-var { sendSuccessResponse, sendErrorResponse, sendEmptySuccessResponse } = require('../helpers/ResponseHelper');
+var Response = require('../helpers/Response');
 var { InvalidLocationError, InvalidUsernameError } = require('../helpers/Errors');
 var Token = require('../helpers/Token');
 var Validator = require('../helpers/Validator');
@@ -30,10 +30,10 @@ class UsersController{
 
             var user = await UserDao.create(data);
             logger.info("User created: " + user.id);
-            sendSuccessResponse(res, user);
+            Response.sendSuccessResponse(res, user);
 
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 
@@ -42,9 +42,9 @@ class UsersController{
 
         try{
             var user = await UserDao.findByToken(token);
-            sendSuccessResponse(res, user);
+            Response.sendSuccessResponse(res, user);
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 
@@ -53,9 +53,9 @@ class UsersController{
 
         try{
             var user = await UserDao.findById(id);
-            sendSuccessResponse(res, user);
+            Response.sendSuccessResponse(res, user);
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 
@@ -71,9 +71,9 @@ class UsersController{
                        };
             });
 
-            sendSuccessResponse(res, result);
+            Response.sendSuccessResponse(res, result);
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 
@@ -85,13 +85,13 @@ class UsersController{
         try{
             if (userId){
                 stats = await UserService.getUserStatistics(userId);
-                sendSuccessResponse(res, stats);
+                Response.sendSuccessResponse(res, stats);
             } else {
                 stats = await UserService.getStatistics(userToken);
-                sendSuccessResponse(res, stats);
+                Response.sendSuccessResponse(res, stats);
             }
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 
@@ -100,9 +100,9 @@ class UsersController{
 
         try{
             await UserService.deleteUserInvitation(token);
-            sendEmptySuccessResponse(res);
+            Response.sendEmptySuccessResponse(res);
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 
@@ -111,9 +111,9 @@ class UsersController{
 
         try{
             var users = await OrganizationService.findOrganizationUsers(organizationId);
-            sendSuccessResponse(res, users);
+            Response.sendSuccessResponse(res, users);
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 
@@ -132,10 +132,10 @@ class UsersController{
             var token = req.query.userToken;
             await UserDao.update(data, token);
             logger.info("User " + token + " updated");
-            sendEmptySuccessResponse(res);
+            Response.sendEmptySuccessResponse(res);
 
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 
@@ -153,10 +153,10 @@ class UsersController{
             var token = req.query.userToken;
             await UserDao.update(data, token);
             logger.info("Location from user " + token + " updated");
-            sendEmptySuccessResponse(res);
+            Response.sendEmptySuccessResponse(res);
 
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 

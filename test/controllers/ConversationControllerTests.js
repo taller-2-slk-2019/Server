@@ -11,6 +11,7 @@ const { conversationCreateData } = require('../data/conversationData');
 
 var ConversationsController = require('../../src/controllers/ConversationsController');
 var ConversationDao = require('../../src/daos/ConversationDao');
+var TestException = require('../TestException');
 
 describe('"ConversationsController Tests"', () => {
 
@@ -83,8 +84,8 @@ describe('"ConversationsController Tests"', () => {
         var mock2;
 
         before(async () => {
-            mock1 = stub(ConversationDao, 'get').rejects();
-            mock2 = stub(ConversationDao, 'create').rejects();
+            mock1 = stub(ConversationDao, 'get').rejects(TestException);
+            mock2 = stub(ConversationDao, 'create').rejects(TestException);
         });
 
         after(async () => {
@@ -102,8 +103,8 @@ describe('"ConversationsController Tests"', () => {
                 await ConversationsController.create(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {
@@ -121,8 +122,8 @@ describe('"ConversationsController Tests"', () => {
                 await ConversationsController.get(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {

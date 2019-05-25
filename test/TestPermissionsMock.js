@@ -1,5 +1,6 @@
 const { stub } = require('sinon');
 var RequestRolePermissions = require('../src/helpers/RequestRolePermissions');
+var { UnauthorizedUserError } = require('../src/helpers/Errors');
 
 class TestPermissionsMock {
     constructor(){
@@ -16,10 +17,11 @@ class TestPermissionsMock {
 
     rejectPermissions(){
         this.restore();
-        this.mocks.push(stub(RequestRolePermissions, 'checkAdminPermissions').rejects());
-        this.mocks.push(stub(RequestRolePermissions, 'checkOrganizationPermissions').rejects());
-        this.mocks.push(stub(RequestRolePermissions, 'checkChannelPermissions').rejects());
-        this.mocks.push(stub(RequestRolePermissions, 'checkUserPermissions').rejects());
+        var exception = new UnauthorizedUserError();
+        this.mocks.push(stub(RequestRolePermissions, 'checkAdminPermissions').rejects(exception));
+        this.mocks.push(stub(RequestRolePermissions, 'checkOrganizationPermissions').rejects(exception));
+        this.mocks.push(stub(RequestRolePermissions, 'checkChannelPermissions').rejects(exception));
+        this.mocks.push(stub(RequestRolePermissions, 'checkUserPermissions').rejects(exception));
     }
 
     restore(){

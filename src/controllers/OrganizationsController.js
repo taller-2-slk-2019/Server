@@ -4,7 +4,7 @@ var UserRoleDao = require('../daos/UserRoleDao');
 var OrganizationService = require('../services/OrganizationService');
 var UserService = require('../services/UserService');
 var UserRoleFactory = require('../factories/UserRoleFactory');
-var { sendSuccessResponse, sendEmptySuccessResponse, sendErrorResponse } = require('../helpers/ResponseHelper');
+var Response = require('../helpers/Response');
 var RequestRolePermissions = require('../helpers/RequestRolePermissions');
 var { InvalidUserRoleError } = require('../helpers/Errors');
 
@@ -14,9 +14,9 @@ class OrganizationsController{
         var id = req.params.id;
         try {
             var org = await OrganizationDao.findById(id);
-            sendSuccessResponse(res, org);
+            Response.sendSuccessResponse(res, org);
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 
@@ -30,9 +30,9 @@ class OrganizationsController{
             } else {
                 orgs = await OrganizationDao.get();
             }
-            sendSuccessResponse(res, orgs);
+            Response.sendSuccessResponse(res, orgs);
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 
@@ -54,10 +54,10 @@ class OrganizationsController{
 
             var org = await OrganizationDao.create(data);
             logger.info("Organization created: " + org.id);
-            sendSuccessResponse(res, org);
+            Response.sendSuccessResponse(res, org);
             
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 
@@ -77,10 +77,10 @@ class OrganizationsController{
 
             await OrganizationDao.update(data, org);
             logger.info("Organization " + org + " updated");
-            sendEmptySuccessResponse(res);
+            Response.sendEmptySuccessResponse(res);
 
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 
@@ -93,10 +93,10 @@ class OrganizationsController{
 
             var mails = await OrganizationService.inviteUsers(organizationId, userEmails);
 
-            sendSuccessResponse(res, mails);
+            Response.sendSuccessResponse(res, mails);
 
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 
@@ -105,9 +105,9 @@ class OrganizationsController{
 
         try{
             await OrganizationService.acceptUserInvitation(token);
-            sendEmptySuccessResponse(res);
+            Response.sendEmptySuccessResponse(res);
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 
@@ -126,9 +126,9 @@ class OrganizationsController{
                 logger.info(`User ${userId} abandoned organization ${organizationId}`);
             }
             
-            sendEmptySuccessResponse(res);
+            Response.sendEmptySuccessResponse(res);
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 
@@ -140,9 +140,9 @@ class OrganizationsController{
             
             await OrganizationDao.delete(organizationId);
             logger.info(`Organization ${organizationId} deleted`);
-            sendEmptySuccessResponse(res);
+            Response.sendEmptySuccessResponse(res);
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 
@@ -160,9 +160,9 @@ class OrganizationsController{
             
             await UserRoleDao.updateUserRole(organizationId, userId, role);
             logger.info(`User ${userId} role updated to '${role}' in organization ${organizationId} `);
-            sendEmptySuccessResponse(res);
+            Response.sendEmptySuccessResponse(res);
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 
@@ -171,9 +171,9 @@ class OrganizationsController{
 
         try{      
             var stats = await OrganizationService.getStatistics(organizationId);
-            sendSuccessResponse(res, stats);
+            Response.sendSuccessResponse(res, stats);
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 

@@ -20,6 +20,7 @@ var UserService = require('../../src/services/UserService');
 var organizationMessageCountMock = require('../mocks/messageCountByOrganizationMock');
 var organizationUserCountMock = require('../mocks/userRolesCountByOrganizationMock');
 var OrganizationStatistics = require('../../src/models/statistics/OrganizationStatistics');
+var TestException = require('../TestException');
 
 describe('"OrganizationsController Tests"', () => {
 
@@ -340,17 +341,17 @@ describe('"OrganizationsController Tests"', () => {
 
         before(async () => {
             TestPermissionsMock.allowPermissions();
-            mock1 = stub(OrganizationDao, 'findById').rejects();
-            mock2 = stub(OrganizationDao, 'create').rejects();
-            mock3 = stub(OrganizationService, 'inviteUsers').rejects();
-            mock4 = stub(UserService, 'findUserOrganizations').rejects();
-            mock5 = stub(OrganizationService, 'acceptUserInvitation').rejects();
-            mock6 = stub(OrganizationService, 'removeUser').rejects();
-            mock7 = stub(OrganizationDao, 'get').rejects();
-            mock8 = stub(OrganizationDao, 'delete').rejects();
-            mock9 = stub(OrganizationService, 'getStatistics').rejects();
-            mock10 = stub(UserRoleDao, 'updateUserRole').rejects();
-            mock11 = stub(OrganizationDao, 'update').rejects();
+            mock1 = stub(OrganizationDao, 'findById').rejects(TestException);
+            mock2 = stub(OrganizationDao, 'create').rejects(TestException);
+            mock3 = stub(OrganizationService, 'inviteUsers').rejects(TestException);
+            mock4 = stub(UserService, 'findUserOrganizations').rejects(TestException);
+            mock5 = stub(OrganizationService, 'acceptUserInvitation').rejects(TestException);
+            mock6 = stub(OrganizationService, 'removeUser').rejects(TestException);
+            mock7 = stub(OrganizationDao, 'get').rejects(TestException);
+            mock8 = stub(OrganizationDao, 'delete').rejects(TestException);
+            mock9 = stub(OrganizationService, 'getStatistics').rejects(TestException);
+            mock10 = stub(UserRoleDao, 'updateUserRole').rejects(TestException);
+            mock11 = stub(OrganizationDao, 'update').rejects(TestException);
         });
 
         after(async () => {
@@ -379,8 +380,8 @@ describe('"OrganizationsController Tests"', () => {
                 await OrganizationsController.getProfile(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {
@@ -400,8 +401,8 @@ describe('"OrganizationsController Tests"', () => {
                 await OrganizationsController.get(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {
@@ -421,8 +422,8 @@ describe('"OrganizationsController Tests"', () => {
                 await OrganizationsController.get(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {
@@ -441,8 +442,8 @@ describe('"OrganizationsController Tests"', () => {
                 await OrganizationsController.create(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {
@@ -460,8 +461,8 @@ describe('"OrganizationsController Tests"', () => {
                 await OrganizationsController.updateProfile(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {
@@ -479,8 +480,8 @@ describe('"OrganizationsController Tests"', () => {
                 await OrganizationsController.inviteUsers(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must be an array', async () => {
@@ -499,8 +500,8 @@ describe('"OrganizationsController Tests"', () => {
                 await OrganizationsController.addUser(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {
@@ -511,6 +512,7 @@ describe('"OrganizationsController Tests"', () => {
 
         describe('Remove user', () => {
             var req = mockRequest();
+            req.params.userId = -1;
             var res;
 
             beforeEach(async () => {
@@ -518,8 +520,8 @@ describe('"OrganizationsController Tests"', () => {
                 await OrganizationsController.removeUser(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {
@@ -528,7 +530,7 @@ describe('"OrganizationsController Tests"', () => {
             });
         });
 
-        describe('Remove user', () => {
+        describe('Update user', () => {
             var req = mockRequest({body: {role: 'member'}});
             var res;
 
@@ -537,8 +539,8 @@ describe('"OrganizationsController Tests"', () => {
                 await OrganizationsController.updateUser(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {
@@ -576,8 +578,8 @@ describe('"OrganizationsController Tests"', () => {
                 await OrganizationsController.delete(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {
@@ -595,8 +597,8 @@ describe('"OrganizationsController Tests"', () => {
                 await OrganizationsController.getStatistics(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {
@@ -626,8 +628,8 @@ describe('"OrganizationsController Tests"', () => {
                 await OrganizationsController.delete(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be 401', async () => {
+                expect(res.status).to.have.been.calledWith(401);
             });
 
             it('response must have an error', async () => {
@@ -641,13 +643,13 @@ describe('"OrganizationsController Tests"', () => {
             var res;
 
             beforeEach(async () => {
-                req.params.id = -1;
+                req.params.userId = -1;
                 res = mockResponse();
                 await OrganizationsController.removeUser(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be 401', async () => {
+                expect(res.status).to.have.been.calledWith(401);
             });
 
             it('response must have an error', async () => {
@@ -666,8 +668,8 @@ describe('"OrganizationsController Tests"', () => {
                 await OrganizationsController.updateUser(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be 401', async () => {
+                expect(res.status).to.have.been.calledWith(401);
             });
 
             it('response must have an error', async () => {
@@ -685,8 +687,8 @@ describe('"OrganizationsController Tests"', () => {
                 await OrganizationsController.updateProfile(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be 401', async () => {
+                expect(res.status).to.have.been.calledWith(401);
             });
 
             it('response must have an error', async () => {
@@ -705,8 +707,8 @@ describe('"OrganizationsController Tests"', () => {
                 await OrganizationsController.create(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be 401', async () => {
+                expect(res.status).to.have.been.calledWith(401);
             });
 
             it('response must have an error', async () => {
@@ -724,8 +726,8 @@ describe('"OrganizationsController Tests"', () => {
                 await OrganizationsController.inviteUsers(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be 401', async () => {
+                expect(res.status).to.have.been.calledWith(401);
             });
 
             it('response must have an error', async () => {

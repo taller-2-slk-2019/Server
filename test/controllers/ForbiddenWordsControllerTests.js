@@ -12,6 +12,7 @@ const adminMock = require('../mocks/adminMock');
 var ForbiddenWordsController = require('../../src/controllers/ForbiddenWordsController');
 var ForbiddenWordDao = require('../../src/daos/ForbiddenWordDao');
 var TestPermissionsMock = require('../TestPermissionsMock');
+var TestException = require('../TestException');
 
 describe('"ForbiddenWordsController Tests"', () => {
 
@@ -111,9 +112,9 @@ describe('"ForbiddenWordsController Tests"', () => {
 
         before(async () => {
             TestPermissionsMock.allowPermissions();
-            mock1 = stub(ForbiddenWordDao, 'get').rejects();
-            mock2 = stub(ForbiddenWordDao, 'create').rejects();
-            mock3 = stub(ForbiddenWordDao, 'delete').rejects();
+            mock1 = stub(ForbiddenWordDao, 'get').rejects(TestException);
+            mock2 = stub(ForbiddenWordDao, 'create').rejects(TestException);
+            mock3 = stub(ForbiddenWordDao, 'delete').rejects(TestException);
         });
 
         after(async () => {
@@ -134,8 +135,8 @@ describe('"ForbiddenWordsController Tests"', () => {
                 await ForbiddenWordsController.add(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {
@@ -170,8 +171,8 @@ describe('"ForbiddenWordsController Tests"', () => {
                 await ForbiddenWordsController.delete(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {
@@ -189,8 +190,8 @@ describe('"ForbiddenWordsController Tests"', () => {
                 await ForbiddenWordsController.get(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {
@@ -229,8 +230,8 @@ describe('"ForbiddenWordsController Tests"', () => {
                 await ForbiddenWordsController.add(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be 401', async () => {
+                expect(res.status).to.have.been.calledWith(401);
             });
 
             it('response must have an error', async () => {
@@ -248,8 +249,8 @@ describe('"ForbiddenWordsController Tests"', () => {
                 await ForbiddenWordsController.delete(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be 401', async () => {
+                expect(res.status).to.have.been.calledWith(401);
             });
 
             it('response must have an error', async () => {

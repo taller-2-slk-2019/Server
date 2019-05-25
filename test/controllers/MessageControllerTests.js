@@ -11,6 +11,7 @@ const messageMock = require('../mocks/messageMock');
 
 var MessagesController = require('../../src/controllers/MessagesController');
 var MessageDao = require('../../src/daos/MessageDao');
+var TestException = require('../TestException');
 
 describe('"MessagesController Tests"', () => {
     var messageData = Object.create(messageCreateData);
@@ -183,11 +184,11 @@ describe('"MessagesController Tests"', () => {
         var mock5;
 
         before(async () => {
-            mock1 = stub(MessageDao, 'createForChannel').rejects();
-            mock2 = stub(MessageDao, 'getForChannel').rejects();
-            mock3 = stub(MessageDao, 'createForConversation').rejects();
-            mock4 = stub(MessageDao, 'getForConversation').rejects();
-            mock5 = stub(MessageDao, 'createForBot').rejects();
+            mock1 = stub(MessageDao, 'createForChannel').rejects(TestException);
+            mock2 = stub(MessageDao, 'getForChannel').rejects(TestException);
+            mock3 = stub(MessageDao, 'createForConversation').rejects(TestException);
+            mock4 = stub(MessageDao, 'getForConversation').rejects(TestException);
+            mock5 = stub(MessageDao, 'createForBot').rejects(TestException);
         });
 
         after(async () => {
@@ -210,8 +211,8 @@ describe('"MessagesController Tests"', () => {
                 await MessagesController.create(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {
@@ -231,8 +232,8 @@ describe('"MessagesController Tests"', () => {
                 await MessagesController.create(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {
@@ -271,8 +272,8 @@ describe('"MessagesController Tests"', () => {
                 await MessagesController.createBotMessage(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {
@@ -313,8 +314,8 @@ describe('"MessagesController Tests"', () => {
                 await MessagesController.get(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {
@@ -334,8 +335,8 @@ describe('"MessagesController Tests"', () => {
                 await MessagesController.get(req, res);
             });
 
-            it('response status must be 400', async () => {
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
 
             it('response must have an error', async () => {

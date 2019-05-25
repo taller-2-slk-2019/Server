@@ -1,6 +1,6 @@
 var logger = require('logops');
 var MessageDao = require('../daos/MessageDao');
-var { sendErrorResponse, sendEmptySuccessResponse, sendSuccessResponse } = require('../helpers/ResponseHelper');
+var Response = require('../helpers/Response');
 var { InvalidMessageTypeError, InvalidMessageDataError, InvalidQueryError } = require('../helpers/Errors');
 var Config = require('../helpers/Config');
 
@@ -32,10 +32,10 @@ class MessagesController{
             } else {
                 throw new InvalidQueryError();
             }
-            sendEmptySuccessResponse(res);
+            Response.sendEmptySuccessResponse(res);
             
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 
@@ -54,10 +54,10 @@ class MessagesController{
                 throw new InvalidQueryError();
             }
             
-            sendSuccessResponse(res, messages);
+            Response.sendSuccessResponse(res, messages);
 
         } catch (err){
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 
@@ -75,10 +75,10 @@ class MessagesController{
             logger.info(`Received message from bot ${data.bot} in 
                 ${data.channelId ? 'channel ' + data.channelId : 'conversation ' + data.conversationId}`);
             logger.info(data);
-            sendEmptySuccessResponse(res);
+            Response.sendEmptySuccessResponse(res);
             
         } catch (err) {
-            sendErrorResponse(res, err);
+            Response.sendErrorResponse(res, err);
         }
     }
 

@@ -9,6 +9,7 @@ const { mockRequest, mockResponse } = require('mock-req-res');
 
 var FirebaseTokensController = require('../../src/firebase/FirebaseTokensController');
 var FirebaseTokensDao = require('../../src/firebase/FirebaseTokensDao');
+var TestException = require('../TestException');
 
 describe('"FirebaseTokensController Tests"', () => {
 
@@ -70,8 +71,8 @@ describe('"FirebaseTokensController Tests"', () => {
         var mock2;
 
         before(async () => {
-            mock1 = stub(FirebaseTokensDao, 'addToken').rejects();
-            mock2 = stub(FirebaseTokensDao, 'removeToken').rejects();
+            mock1 = stub(FirebaseTokensDao, 'addToken').rejects(TestException);
+            mock2 = stub(FirebaseTokensDao, 'removeToken').rejects(TestException);
         });
 
         after(async () => {
@@ -88,8 +89,8 @@ describe('"FirebaseTokensController Tests"', () => {
                 await FirebaseTokensController.addToken(req, res);
             });
 
-            it('response status must be 400', async () => { 
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
             
             it('response must have an error', async () => {
@@ -107,8 +108,8 @@ describe('"FirebaseTokensController Tests"', () => {
                 await FirebaseTokensController.removeToken(req, res);
             });
 
-            it('response status must be 400', async () => { 
-                expect(res.status).to.have.been.calledWith(400);
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
             });
             
             it('response must have an error', async () => {
