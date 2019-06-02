@@ -35,7 +35,7 @@ describe('"User Integration Tests"', () => {
             user2.username = user.username;
             var response = await request(app).post('/users').send(user2);
             expect(response.status).to.eq(400);
-            expect(response.body.error).to.not.be.empty;
+            expect(response.body.error).to.not.eq('');
         });
     });
 
