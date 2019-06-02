@@ -80,7 +80,7 @@ describe('"UserService Tests"', () => {
         });
         
         it('organizations must have correct id', async () => {
-            expect(organizations[0]).to.have.property('id', org1.id);
+            expect([org1.id, org2.id]).to.include(organizations[0].id);
         });
 
         it('organization must have user', async () => {

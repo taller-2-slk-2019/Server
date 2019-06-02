@@ -73,7 +73,7 @@ describe('"UsersController Tests"', () => {
 
             it('user email must be pepe@gmail.com', async () => {
                 var response = res.send.args[0][0];
-                expect(response).to.have.property('email', req.body.email);
+                expect(response).to.have.property('email', 'pepe@gmail.com');
             });
         });
 

@@ -39,7 +39,7 @@ describe('"UserDao Tests"', () => {
         });
 
         it('user email must be pepe@gmail.com', async () => {
-            expect(user.email).to.eq("pepe@gmail.com");
+            expect(user.email).to.eq(data.email);
         });
 
         it('register with same token does not update user', async () => {
