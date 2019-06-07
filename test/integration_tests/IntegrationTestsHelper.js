@@ -6,6 +6,8 @@ const app = require('../../src/app');
 var { userCreateData } = require('../data/userData');
 var { organizationCreateData } = require('../data/organizationData');
 var { channelCreateData } = require('../data/channelData');
+var models = require('../../src/database/sequelize');
+var Admin = models.adminUser;
 
 class IntegrationTestsHelper {
 
@@ -42,6 +44,14 @@ class IntegrationTestsHelper {
         var response = await request(app).post(`/channels?userToken=${user.token}`).send(channel);
         expect(response.status).to.eq(201);
         return response.body;
+    }
+
+    async createAdmin(){
+        return await Admin.create({
+            username: 'admin',
+            password: 'admin',
+            token: 'admin'
+        });
     }
 }
 
