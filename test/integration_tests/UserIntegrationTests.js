@@ -8,8 +8,16 @@ chai.use(sinonChai);
 const request = require('supertest');
 const app = require('../../src/app');
 var { userCreateData } = require('../data/userData');
+var IntegrationTestsHelper = require('./IntegrationTestsHelper');
 
 describe('"User Integration Tests"', () => {
+    var user, id, userToken;
+
+    beforeEach(async () => {
+        user = await IntegrationTestsHelper.createUser();
+        id = user.id;
+        userToken = user.token;
+    });
 
     describe('User register', () => {
         it('should return user data', async () => {
@@ -26,11 +34,7 @@ describe('"User Integration Tests"', () => {
         });
 
         it('register with existing username fails', async () => {
-            var user = userCreateData();
             var user2 = userCreateData();
-
-            var response = await request(app).post('/users').send(user);
-            expect(response.status).to.eq(201);
 
             user2.username = user.username;
             var response = await request(app).post('/users').send(user2);
@@ -41,11 +45,6 @@ describe('"User Integration Tests"', () => {
 
     describe('User profile', () => {
         it('should update user data', async () => {
-            var user = userCreateData();
-            var response = await request(app).post('/users').send(user);
-            expect(response.status).to.eq(201);
-            var userToken = response.body.token;
-
             var updatedName = 'updated user name';
             user.name = updatedName;
             var response = await request(app).put(`/users?userToken=${userToken}`).send(user);
@@ -57,11 +56,6 @@ describe('"User Integration Tests"', () => {
         });
 
         it('should update user location', async () => {
-            var user = userCreateData();
-            var response = await request(app).post('/users').send(user);
-            expect(response.status).to.eq(201);
-            var userToken = response.body.token;
-
             var location = { latitude: 1.231235, longitude: 8.4828492 };
             var response = await request(app).put(`/users/location?userToken=${userToken}`).send(location);
             expect(response.status).to.eq(204);

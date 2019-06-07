@@ -7,16 +7,21 @@ const sinonChai = require('sinon-chai');
 chai.use(sinonChai);
 const request = require('supertest');
 const app = require('../../src/app');
-var { userCreateData } = require('../data/userData');
+var IntegrationTestsHelper = require('./IntegrationTestsHelper');
 var { organizationCreateData } = require('../data/organizationData');
 
 describe('"Organization Integration Tests"', () => {
+    var user, organization, userToken, id;
+
+    beforeEach(async () => {
+        user = await IntegrationTestsHelper.createUser();
+        organization = await IntegrationTestsHelper.createOrganization(user);
+        userToken = user.token;
+        id = organization.id;
+    });
 
     describe('Organization Creation', () => {
         it('should return organization data', async () => {
-            var user = await createUser();
-            var userToken = user.token;
-
             var organization = organizationCreateData;
             var response = await request(app).post(`/organizations?userToken=${userToken}`).send(organization);
             expect(response.status).to.eq(201);
@@ -33,14 +38,6 @@ describe('"Organization Integration Tests"', () => {
 
     describe('Organization Update Profile', () => {
         it('should update organization data', async () => {
-            var user = await createUser();
-            var userToken = user.token;
-
-            var organization = organizationCreateData;
-            var response = await request(app).post(`/organizations?userToken=${userToken}`).send(organization);
-            expect(response.status).to.eq(201);
-            var id = response.body.id;
-
             var updatedWelcome = 'new welcome for the organization test';
             organization.welcome = updatedWelcome;
 
@@ -60,24 +57,17 @@ describe('"Organization Integration Tests"', () => {
             var usersNumber = 10;
             var users = [];
             for (i = 0; i < usersNumber; i++){
-                users.push(await createUser());
+                users.push(await IntegrationTestsHelper.createUser());
             }
-            var userCreatorToken = users[0].token;
-
-            // Create organization
-            var organization = organizationCreateData;
-            var response = await request(app).post(`/organizations?userToken=${userCreatorToken}`).send(organization);
-            expect(response.status).to.eq(201);
-            var id = response.body.id;
 
             // Invite users
-            var emails = users.map((user) => user.email).slice(1);
-            var response = await request(app).post(`/organizations/${id}/invitations?userToken=${userCreatorToken}`).send({userEmails: emails});
+            var emails = users.map((user) => user.email);
+            var response = await request(app).post(`/organizations/${id}/invitations?userToken=${userToken}`).send({userEmails: emails});
             expect(response.status).to.eq(200);
             expect(response.body.length).to.eq(0);
 
             // Accept user invitations
-            for (i = 1; i < usersNumber; i++){
+            for (i = 0; i < usersNumber; i++){
                 var response = await request(app).get(`/users/invitations?userToken=${users[i].token}`);
                 expect(response.status).to.eq(200);
 
@@ -89,36 +79,31 @@ describe('"Organization Integration Tests"', () => {
             }
 
             // Change role of second user
-            var response = await request(app).put(`/organizations/${id}/users/${users[1].id}?userToken=${userCreatorToken}`).send({role: 'moderator'});
+            var response = await request(app).put(`/organizations/${id}/users/${users[0].id}?userToken=${userToken}`).send({role: 'moderator'});
             expect(response.status).to.eq(204);
 
             // Get organization users
             var response = await request(app).get(`/users?organizationId=${id}`);
             expect(response.status).to.eq(200);
-            expect(response.body.length).to.eq(usersNumber);
+            expect(response.body.length).to.eq(usersNumber + 1);
 
             for (i = 0; i < usersNumber; i++){
-                var user = response.body.filter((usr) => usr.id == users[i].id)[0];
-                var expectedRole = i == 0 ? 'creator' : i == 1 ? 'moderator' : 'member';
-                expect(user.userOrganizations.role).to.eq(expectedRole);
+                var usr = response.body.filter((usr) => usr.id == users[i].id)[0];
+                var expectedRole = i == 0 ? 'moderator' : 'member';
+                expect(usr.userOrganizations.role).to.eq(expectedRole);
             }
+
+            var usr = response.body.filter((usr) => usr.id == user.id)[0];
+            expect(usr.userOrganizations.role).to.eq('creator');
         });
     });
 
     describe('Reject user invitation', () => {
         it('user should not belong to organization', async () => {
-            var user = await createUser();
-            var user2 = await createUser();
-            var userCreatorToken = user.token;
-
-            // Create organization
-            var organization = organizationCreateData;
-            var response = await request(app).post(`/organizations?userToken=${userCreatorToken}`).send(organization);
-            expect(response.status).to.eq(201);
-            var id = response.body.id;
+            var user2 = await IntegrationTestsHelper.createUser();
 
             // Invite user2
-            var response = await request(app).post(`/organizations/${id}/invitations?userToken=${userCreatorToken}`).send({userEmails: [user2.email]});
+            var response = await request(app).post(`/organizations/${id}/invitations?userToken=${userToken}`).send({userEmails: [user2.email]});
             expect(response.status).to.eq(200);
             expect(response.body.length).to.eq(0);
 
@@ -145,33 +130,11 @@ describe('"Organization Integration Tests"', () => {
 
     describe('Remove user from organization', () => {
         it('should not belong to organization', async () => {
-            var user = await createUser();
-            var user2 = await createUser();
-            var userCreatorToken = user.token;
-
-            // Create organization
-            var organization = organizationCreateData;
-            var response = await request(app).post(`/organizations?userToken=${userCreatorToken}`).send(organization);
-            expect(response.status).to.eq(201);
-            var id = response.body.id;
-
-            // Invite user2
-            var response = await request(app).post(`/organizations/${id}/invitations?userToken=${userCreatorToken}`).send({userEmails: [user2.email]});
-            expect(response.status).to.eq(200);
-            expect(response.body.length).to.eq(0);
-
-            // Accept user2 invitation
-            var response = await request(app).get(`/users/invitations?userToken=${user2.token}`);
-            expect(response.status).to.eq(200);
-
-            var invitation = response.body[0];
-            expect(invitation.organization.id).to.eq(id);
-
-            var response = await request(app).post(`/organizations/users`).send({token: invitation.token});
-            expect(response.status).to.eq(204);
+            var user2 = await IntegrationTestsHelper.createUser();
+            await IntegrationTestsHelper.addUserToOrganization(organization, user2, userToken);
 
             // Remove user
-            var response = await request(app).delete(`/organizations/${id}/users/${user2.id}?userToken=${userCreatorToken}`);
+            var response = await request(app).delete(`/organizations/${id}/users/${user2.id}?userToken=${userToken}`);
             expect(response.status).to.eq(204);
 
             // Get organization users
@@ -181,36 +144,23 @@ describe('"Organization Integration Tests"', () => {
         });
     });
 
-    describe('Get all organization', () => {
+    describe('Get all organizations', () => {
         it('should return organizations data', async () => {
-            var user = await createUser();
-            var userCreatorToken = user.token;
-
-            // Create organization
+            // Create organizations
             var organizationsNumber = 10;
             var organizations = [];
             for (i = 0; i < organizationsNumber; i++){
-                var organization = organizationCreateData;
-                var response = await request(app).post(`/organizations?userToken=${userCreatorToken}`).send(organization);
-                expect(response.status).to.eq(201);
-                organizations.push(response.body);
+                organizations.push(await IntegrationTestsHelper.createOrganization(user));
             }
 
             // Delete last organization
-            var response = await request(app).delete(`/organizations/${organizations[organizationsNumber - 1].id}?userToken=${userCreatorToken}`);
+            var response = await request(app).delete(`/organizations/${organizations[organizationsNumber - 1].id}?userToken=${userToken}`);
             expect(response.status).to.eq(204);
 
             // Get organizations
-            var response = await request(app).get(`/organizations?userToken=${userCreatorToken}`);
+            var response = await request(app).get(`/organizations?userToken=${userToken}`);
             expect(response.status).to.eq(200);
-            expect(response.body.length).to.eq(organizationsNumber - 1);
+            expect(response.body.length).to.eq(organizationsNumber);
         });
     });
 });
-
-async function createUser(){
-    var user = userCreateData();
-    var response = await request(app).post('/users').send(user);
-    expect(response.status).to.eq(201);
-    return response.body;
-}

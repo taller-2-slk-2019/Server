@@ -7,9 +7,7 @@ const sinonChai = require('sinon-chai');
 chai.use(sinonChai);
 const request = require('supertest');
 const app = require('../../src/app');
-var { userCreateData } = require('../data/userData');
-var { organizationCreateData } = require('../data/organizationData');
-var { channelCreateData } = require('../data/channelData');
+var IntegrationTestsHelper = require('./IntegrationTestsHelper');
 var Firebase = require('../../src/firebase/FirebaseService');
 
 describe('"Message Integration Tests"', () => {
@@ -25,9 +23,9 @@ describe('"Message Integration Tests"', () => {
     });
 
     beforeEach(async () => {
-        user = await createUser();
-        organization = await createOrganization(user);
-        channel = await createChannel(organization, user);
+        user = await IntegrationTestsHelper.createUser();
+        organization = await IntegrationTestsHelper.createOrganization(user);
+        channel = await IntegrationTestsHelper.createChannel(organization, user);
 
         message = {
             data: "message",
@@ -89,38 +87,3 @@ describe('"Message Integration Tests"', () => {
         });
     });
 });
-
-async function createUser(){
-    var user = userCreateData();
-    var response = await request(app).post('/users').send(user);
-    expect(response.status).to.eq(201);
-    return response.body;
-}
-
-async function createOrganization(user){
-    var organization = organizationCreateData;
-    var response = await request(app).post(`/organizations?userToken=${user.token}`).send(organization);
-    expect(response.status).to.eq(201);
-    return response.body;
-}
-
-async function addUserToOrganization(organization, user, token){
-    var response = await request(app).post(`/organizations/${organization.id}/invitations?userToken=${token}`)
-                                     .send({userEmails: [user.email]});
-    expect(response.status).to.eq(200);
-
-    var response = await request(app).get(`/users/invitations?userToken=${user.token}`);
-    expect(response.status).to.eq(200);
-    var invitation = response.body[0];
-
-    var response = await request(app).post(`/organizations/users`).send({token: invitation.token});
-    expect(response.status).to.eq(204);
-}
-
-async function createChannel(organization, user){
-    var channel = channelCreateData();
-    channel.organizationId = organization.id;
-    var response = await request(app).post(`/channels?userToken=${user.token}`).send(channel);
-    expect(response.status).to.eq(201);
-    return response.body;
-}

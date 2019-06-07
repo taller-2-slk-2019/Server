@@ -7,17 +7,22 @@ const sinonChai = require('sinon-chai');
 chai.use(sinonChai);
 const request = require('supertest');
 const app = require('../../src/app');
-var { userCreateData } = require('../data/userData');
-var { organizationCreateData } = require('../data/organizationData');
+var IntegrationTestsHelper = require('./IntegrationTestsHelper');
 var { channelCreateData } = require('../data/channelData');
 
 describe('"Channel Integration Tests"', () => {
+    var user, organization, channel, userToken, id;
+
+    beforeEach(async () => {
+        user = await IntegrationTestsHelper.createUser();
+        organization = await IntegrationTestsHelper.createOrganization(user);
+        channel = await IntegrationTestsHelper.createChannel(organization, user);
+        id = channel.id;
+        userToken = user.token;
+    });
 
     describe('Channel Creation', () => {
         it('should return channel data', async () => {
-            var user = await createUser();
-            var organization = await createOrganization(user);
-
             var channel = channelCreateData();
             channel.organizationId = organization.id;
             var response = await request(app).post(`/channels?userToken=${user.token}`).send(channel);
@@ -31,14 +36,6 @@ describe('"Channel Integration Tests"', () => {
         });
 
         it('should fail if channel name exists', async () => {
-            var user = await createUser();
-            var organization = await createOrganization(user);
-
-            var channel = channelCreateData();
-            channel.organizationId = organization.id;
-            var response = await request(app).post(`/channels?userToken=${user.token}`).send(channel);
-            expect(response.status).to.eq(201);
-
             var response = await request(app).post(`/channels?userToken=${user.token}`).send(channel);
             expect(response.status).to.eq(400);
             expect(response.body.error).to.not.eq('');
@@ -47,15 +44,6 @@ describe('"Channel Integration Tests"', () => {
 
     describe('Channel Update', () => {
         it('should return channel data', async () => {
-            var user = await createUser();
-            var organization = await createOrganization(user);
-
-            var channel = channelCreateData();
-            channel.organizationId = organization.id;
-            var response = await request(app).post(`/channels?userToken=${user.token}`).send(channel);
-            expect(response.status).to.eq(201);
-            var id = response.body.id;
-
             var updatedName = "new channel name";
             channel.name = updatedName;
             var response = await request(app).put(`/channels/${id}?userToken=${user.token}`).send(channel);
@@ -68,19 +56,7 @@ describe('"Channel Integration Tests"', () => {
         });
 
         it('should fail if channel name exists', async () => {
-            var user = await createUser();
-            var organization = await createOrganization(user);
-
-            var channel = channelCreateData();
-            channel.organizationId = organization.id;
-            var response = await request(app).post(`/channels?userToken=${user.token}`).send(channel);
-            expect(response.status).to.eq(201);
-            var id = response.body.id;
-
-            var channel2 = channelCreateData();
-            channel2.organizationId = organization.id;
-            var response = await request(app).post(`/channels?userToken=${user.token}`).send(channel2);
-            expect(response.status).to.eq(201);
+            var channel2 = await IntegrationTestsHelper.createChannel(organization, user);
 
             channel.name = channel2.name;
             var response = await request(app).put(`/channels/${id}?userToken=${user.token}`).send(channel);
@@ -92,36 +68,19 @@ describe('"Channel Integration Tests"', () => {
     describe('Channel Users', () => {
         it('should add users, remove and return them', async () => {
             var usersNumber = 10;
+
             var users = [];
             for (i = 0; i < usersNumber; i++){
-                users.push(await createUser());
+                users.push(await IntegrationTestsHelper.createUser());
             }
-            var userToken = users[0].token;
-            var organization = await createOrganization(users[0]);
 
             // Add users to organization
-            for (i = 1; i < usersNumber; i++){
-                var response = await request(app).post(`/organizations/${organization.id}/invitations?userToken=${userToken}`)
-                                                 .send({userEmails: [users[i].email]});
-                expect(response.status).to.eq(200);
-
-                var response = await request(app).get(`/users/invitations?userToken=${users[i].token}`);
-                expect(response.status).to.eq(200);
-                var invitation = response.body[0];
-
-                var response = await request(app).post(`/organizations/users`).send({token: invitation.token});
-                expect(response.status).to.eq(204);
+            for (i = 0; i < usersNumber; i++){
+                await IntegrationTestsHelper.addUserToOrganization(organization, users[i], userToken);
             }
 
-            // Create channel
-            var channel = channelCreateData();
-            channel.organizationId = organization.id;
-            var response = await request(app).post(`/channels?userToken=${userToken}`).send(channel);
-            expect(response.status).to.eq(201);
-            var id = response.body.id;
-
-            // Add users
-            for (i = 1; i < usersNumber; i++){
+            // Add users to channel
+            for (i = 0; i < usersNumber; i++){
                 var response = await request(app).post(`/channels/${id}/users?userToken=${userToken}`).send({userId: users[i].id});
                 expect(response.status).to.eq(204);
             }
@@ -133,7 +92,7 @@ describe('"Channel Integration Tests"', () => {
             // Get channel users
             var response = await request(app).get(`/channels/${id}/users`);
             expect(response.status).to.eq(200);
-            expect(response.body.length).to.eq(usersNumber - 1);
+            expect(response.body.length).to.eq(usersNumber);
 
             for (i = 0; i < usersNumber - 1; i++){
                 var user = response.body.filter((usr) => usr.id == users[i].id)[0];
@@ -145,17 +104,3 @@ describe('"Channel Integration Tests"', () => {
         });
     });
 });
-
-async function createUser(){
-    var user = userCreateData();
-    var response = await request(app).post('/users').send(user);
-    expect(response.status).to.eq(201);
-    return response.body;
-}
-
-async function createOrganization(user){
-    var organization = organizationCreateData;
-    var response = await request(app).post(`/organizations?userToken=${user.token}`).send(organization);
-    expect(response.status).to.eq(201);
-    return response.body;
-}

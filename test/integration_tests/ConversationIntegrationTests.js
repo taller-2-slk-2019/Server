@@ -7,17 +7,16 @@ const sinonChai = require('sinon-chai');
 chai.use(sinonChai);
 const request = require('supertest');
 const app = require('../../src/app');
-var { userCreateData } = require('../data/userData');
-var { organizationCreateData } = require('../data/organizationData');
+var IntegrationTestsHelper = require('./IntegrationTestsHelper');
 
 describe('"Conversation Integration Tests"', () => {
     var user, user2, organization;
 
     beforeEach(async () => {
-        user = await createUser();
-        user2 = await createUser();
-        organization = await createOrganization(user);
-        await addUserToOrganization(organization, user2, user.token);
+        user = await IntegrationTestsHelper.createUser();
+        user2 = await IntegrationTestsHelper.createUser();
+        organization = await IntegrationTestsHelper.createOrganization(user);
+        await IntegrationTestsHelper.addUserToOrganization(organization, user2, user.token);
     });
 
     describe('Conversation Creation', () => {
@@ -53,9 +52,9 @@ describe('"Conversation Integration Tests"', () => {
             var usersNumber = 10;
             var users = [];
             for (i = 0; i < usersNumber; i++){
-                var usr = await createUser();
+                var usr = await IntegrationTestsHelper.createUser();
                 users.push(usr);
-                await addUserToOrganization(organization, usr, user.token);
+                await IntegrationTestsHelper.addUserToOrganization(organization, usr, user.token);
             }
 
             // Create conversation with users
@@ -82,30 +81,3 @@ describe('"Conversation Integration Tests"', () => {
         });
     });
 });
-
-async function createUser(){
-    var user = userCreateData();
-    var response = await request(app).post('/users').send(user);
-    expect(response.status).to.eq(201);
-    return response.body;
-}
-
-async function createOrganization(user){
-    var organization = organizationCreateData;
-    var response = await request(app).post(`/organizations?userToken=${user.token}`).send(organization);
-    expect(response.status).to.eq(201);
-    return response.body;
-}
-
-async function addUserToOrganization(organization, user, token){
-    var response = await request(app).post(`/organizations/${organization.id}/invitations?userToken=${token}`)
-                                     .send({userEmails: [user.email]});
-    expect(response.status).to.eq(200);
-
-    var response = await request(app).get(`/users/invitations?userToken=${user.token}`);
-    expect(response.status).to.eq(200);
-    var invitation = response.body[0];
-
-    var response = await request(app).post(`/organizations/users`).send({token: invitation.token});
-    expect(response.status).to.eq(204);
-}
