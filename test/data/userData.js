@@ -5,7 +5,7 @@ var userCreateData = function() {
         name: "Pepe",
         username: "pepe" + randtoken.generate(20),
         token: randtoken.generate(20),
-        email: "pepe@gmail.com",
+        email: "pepe@gmail.com" + randtoken.generate(20),
         picture: "default.jpg",
     }
 };
