@@ -3,6 +3,7 @@ var MessageDao = require('../daos/MessageDao');
 var Response = require('../helpers/Response');
 var { InvalidMessageTypeError, InvalidMessageDataError, InvalidQueryError } = require('../helpers/Errors');
 var Config = require('../helpers/Config');
+var RequestRolePermissions = require('../helpers/RequestRolePermissions');
 
 class MessagesController{
 
@@ -71,6 +72,7 @@ class MessagesController{
         };
 
         try {
+            await RequestRolePermissions.checkBotPermissions(req);
             await MessageDao.createForBot(data);
             logger.info(`Received message from bot ${data.bot} in 
                 ${data.channelId ? 'channel ' + data.channelId : 'conversation ' + data.conversationId}`);

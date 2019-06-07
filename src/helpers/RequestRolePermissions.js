@@ -4,6 +4,7 @@ var UserDao = require('../daos/UserDao');
 var UserRoleDao = require('../daos/UserRoleDao');
 var ChannelDao = require('../daos/ChannelDao');
 var { UnauthorizedUserError } = require('../helpers/Errors');
+var Config = require('../helpers/Config');
 
 class RequestRolePermissions {
 
@@ -57,6 +58,12 @@ class RequestRolePermissions {
     async checkUserPermissions(req, organizationId){
         var roleCheck = (role) => { return role.hasUserPermissions(); };
         await this._checkUserRolePermissions(req, organizationId, roleCheck);
+    }
+
+    async checkBotPermissions(req){
+        if (req.header('botToken') != Config.botToken){
+            throw new UnauthorizedUserError();
+        }
     }
 
 }

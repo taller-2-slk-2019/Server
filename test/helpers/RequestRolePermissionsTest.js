@@ -15,6 +15,7 @@ var UserRoleDao = require('../../src/daos/UserRoleDao');
 var ChannelDao = require('../../src/daos/ChannelDao');
 var userMock = require('../mocks/userProfileMock');
 var channelMock = Object.create(require('../mocks/channelDataMock'));
+var Config = require('../../src/helpers/Config');
 
 describe('"RequestRolePermissions Tests"', () => {
     var mockAdmin, mockUser, mockRole, mockChannel;
@@ -119,6 +120,20 @@ describe('"RequestRolePermissions Tests"', () => {
         it('should reject if user does not exist', async () => {
             var req = mockRequest({ query: {userToken: " invalidtoken"} });
             await expect(RequestRolePermissions.checkUserPermissions(req)).to.eventually.be.rejectedWith(UnauthorizedUserError);
+        });
+    });
+
+    describe('Bot permissions', () => {
+        it('should resolve if header is correct', async () => {
+            const req = {};
+            req.header = stub().returns(Config.botToken);
+            await expect(RequestRolePermissions.checkBotPermissions(req)).to.eventually.be.fulfilled;
+        });
+
+        it('should reject if header is incorrect', async () => {
+            const req = {};
+            req.header = stub().returns('invalid token');
+            await expect(RequestRolePermissions.checkBotPermissions(req)).to.eventually.be.rejectedWith(UnauthorizedUserError);
         });
     });
 });

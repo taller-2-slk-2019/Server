@@ -8,6 +8,8 @@ chai.use(sinonChai);
 const { mockRequest, mockResponse } = require('mock-req-res');
 const { messageCreateData } = require('../data/messageData');
 const messageMock = require('../mocks/messageMock');
+const TestPermissionsMock = require('../TestPermissionsMock');
+var TestException = require('../TestException');
 
 var MessagesController = require('../../src/controllers/MessagesController');
 var MessageDao = require('../../src/daos/MessageDao');
@@ -29,6 +31,7 @@ describe('"MessagesController Tests"', () => {
             mock3 = stub(MessageDao, 'createForConversation').resolves();
             mock4 = stub(MessageDao, 'getForConversation').resolves([messageMock, messageMock, messageMock]);
             mock5 = stub(MessageDao, 'createForBot').resolves();
+            TestPermissionsMock.allowPermissions();
         });
 
         after(async () => {
@@ -37,6 +40,7 @@ describe('"MessagesController Tests"', () => {
             mock3.restore();
             mock4.restore();
             mock5.restore();
+            TestPermissionsMock.restore();
         });
 
         describe('Create Message for channel', () => {
@@ -189,6 +193,7 @@ describe('"MessagesController Tests"', () => {
             mock3 = stub(MessageDao, 'createForConversation').rejects(TestException);
             mock4 = stub(MessageDao, 'getForConversation').rejects(TestException);
             mock5 = stub(MessageDao, 'createForBot').rejects(TestException);
+            TestPermissionsMock.allowPermissions();
         });
 
         after(async () => {
@@ -197,6 +202,7 @@ describe('"MessagesController Tests"', () => {
             mock3.restore();
             mock4.restore();
             mock5.restore();
+            TestPermissionsMock.restore();
         });
 
 
@@ -379,6 +385,35 @@ describe('"MessagesController Tests"', () => {
 
             it('response status must be 400', async () => {
                 expect(res.status).to.have.been.calledWith(400);
+            });
+
+            it('response must have an error', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('error');
+            });
+        });
+    });
+
+    describe('Methods with permission errors', () => {
+        before(async () => {
+            TestPermissionsMock.rejectPermissions();
+        });
+
+        after(async () => {
+            TestPermissionsMock.restore();
+        });
+
+        describe('Create message for bot with permission error', () => {
+            var req = mockRequest();
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await MessagesController.createBotMessage(req, res);
+            });
+
+            it('response status must be 401', async () => {
+                expect(res.status).to.have.been.calledWith(401);
             });
 
             it('response must have an error', async () => {

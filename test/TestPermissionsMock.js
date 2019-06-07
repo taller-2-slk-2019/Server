@@ -13,6 +13,7 @@ class TestPermissionsMock {
         this.mocks.push(stub(RequestRolePermissions, 'checkOrganizationPermissions').resolves());
         this.mocks.push(stub(RequestRolePermissions, 'checkChannelPermissions').resolves());
         this.mocks.push(stub(RequestRolePermissions, 'checkUserPermissions').resolves());
+        this.mocks.push(stub(RequestRolePermissions, 'checkBotPermissions').resolves());
     }
 
     rejectPermissions(){
@@ -22,6 +23,7 @@ class TestPermissionsMock {
         this.mocks.push(stub(RequestRolePermissions, 'checkOrganizationPermissions').rejects(exception));
         this.mocks.push(stub(RequestRolePermissions, 'checkChannelPermissions').rejects(exception));
         this.mocks.push(stub(RequestRolePermissions, 'checkUserPermissions').rejects(exception));
+        this.mocks.push(stub(RequestRolePermissions, 'checkBotPermissions').rejects(exception));
     }
 
     restore(){

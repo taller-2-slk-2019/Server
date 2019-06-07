@@ -15,6 +15,8 @@ class Config{
 
     static get mentionAllUsers() { return 'all'; }
 
+    static get botToken() { return 'dfe53812-8ce9-41db-a57e-79456936dfb3'; }
+
 }
 
 module.exports = Config;
