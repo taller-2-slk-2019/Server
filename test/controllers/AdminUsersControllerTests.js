@@ -11,7 +11,10 @@ const adminMock = require('../mocks/adminMock');
 
 var AdminUsersController = require('../../src/controllers/AdminUsersController');
 var AdminUserDao = require('../../src/daos/AdminUserDao');
+var RequestStatsDao = require('../../src/daos/RequestStatsDao');
 var TestException = require('../TestException');
+const TestPermissionsMock = require('../TestPermissionsMock');
+var { requestStatsData } = require('../data/requestStatsData');
 
 describe('"AdminUsersController Tests"', () => {
     var data = {
@@ -20,14 +23,18 @@ describe('"AdminUsersController Tests"', () => {
     };
 
     describe('Methods without errors', () => {
-        var mock1;
+        var mock1, mock2;
 
         before(async () => {
+            TestPermissionsMock.allowPermissions();
             mock1 = stub(AdminUserDao, 'login').resolves(adminMock);
+            mock2 = stub(RequestStatsDao, 'get').resolves(requestStatsData);
         });
 
         after(async () => {
+            TestPermissionsMock.restore();
             mock1.restore();
+            mock2.restore();
         });
 
         describe('Login', () => {
@@ -63,17 +70,45 @@ describe('"AdminUsersController Tests"', () => {
                 expect(args).to.eq(sha1(data.password));
             });
         });
+
+        describe('Get Request Stats', () => {
+            var req = mockRequest();
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await AdminUsersController.getRequestStats(req, res);
+            });
+
+            it('response status must be 200', async () => {
+                expect(res.status).to.have.been.calledWith(200);
+            });
+
+            it('stats must not be null', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.not.be.null;
+            });
+
+            it('returned stats must have correct data', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.eq(requestStatsData);
+            });
+        });
     });
 
     describe('Methods with errors', () => {
-        var mock1;
+        var mock1, mock2;
 
         before(async () => {
+            TestPermissionsMock.allowPermissions();
             mock1 = stub(AdminUserDao, 'login').rejects(TestException);
+            mock2 = stub(RequestStatsDao, 'get').rejects(TestException);
         });
 
         after(async () => {
+            TestPermissionsMock.restore();
             mock1.restore();
+            mock2.restore();
         });
 
 
@@ -88,6 +123,55 @@ describe('"AdminUsersController Tests"', () => {
 
             it('response status must be correct', async () => {
                 expect(res.status).to.have.been.calledWith(TestException.errorCode);
+            });
+
+            it('response must have an error', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('error');
+            });
+        });
+
+        describe('Get request stats with error', () => {
+            var req = mockRequest({body: data});
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await AdminUsersController.getRequestStats(req, res);
+            });
+
+            it('response status must be correct', async () => {
+                expect(res.status).to.have.been.calledWith(TestException.errorCode);
+            });
+
+            it('response must have an error', async () => {
+                var response = res.send.args[0][0];
+                expect(response).to.have.property('error');
+            });
+        });
+    });
+
+    describe('Methods with permission errors', () => {
+
+        before(async () => {
+            TestPermissionsMock.rejectPermissions();
+        });
+
+        after(async () => {
+            TestPermissionsMock.restore();
+        });
+
+        describe('Get request stats with permission error', () => {
+            var req = mockRequest();
+            var res;
+
+            beforeEach(async () => {
+                res = mockResponse();
+                await AdminUsersController.getRequestStats(req, res);
+            });
+
+            it('response status must be 401', async () => {
+                expect(res.status).to.have.been.calledWith(401);
             });
 
             it('response must have an error', async () => {

@@ -5,4 +5,6 @@ var adminUsersController = require('../controllers/AdminUsersController');
 
 router.post('/login', adminUsersController.login);
 
+router.get('/request-stats', adminUsersController.getRequestStats);
+
 module.exports = router;

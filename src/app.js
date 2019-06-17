@@ -13,6 +13,9 @@ app.use(bodyParser.json());
 var boolParser = require('express-query-boolean');
 app.use(boolParser());
 
+var requestStatsMiddleware = require('./middlewares/RequestStatsMiddleware');
+app.use(requestStatsMiddleware);
+
 
 //Set routers
 var usersRouter = require('./routes/UsersRoutes');
