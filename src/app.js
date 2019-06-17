@@ -14,7 +14,7 @@ var boolParser = require('express-query-boolean');
 app.use(boolParser());
 
 var requestStatsMiddleware = require('./middlewares/RequestStatsMiddleware');
-app.use(requestStatsMiddleware)
+app.use(requestStatsMiddleware);
 
 
 //Set routers
