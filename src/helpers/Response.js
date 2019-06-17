@@ -6,6 +6,7 @@ class Response {
     sendErrorResponse(res, err){
         logger.error(err);
         var response = { error : err.message };
+        res.error = err;
         res.status(this._getStatusCode(err)).send(response);
     }
 
