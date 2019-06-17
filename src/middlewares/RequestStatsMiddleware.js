@@ -9,7 +9,7 @@ var middleware = async (req, res, next) => {
         var requestData = {
             method: req.method,
             statusCode: res.statusCode,
-            resource: res.statusCode == 404 ? 'unknown' : req.originalUrl.split('/')[1].split('?')[0],
+            resource: req.originalUrl.split('/')[1].split('?')[0],
             isAdmin: req.originalUrl.includes('adminToken=') && res.statusCode != 401,
             responseTime: end - start,
             error: res.error ? res.error.name : null
