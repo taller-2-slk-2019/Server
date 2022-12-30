@@ -47,7 +47,7 @@
     "chai-as-promised": "^7.1.1",
     "coveralls": "^3.0.3",
     "eslint": "^5.15.3",
-    "mocha": "^6.1.4",
+    "mocha": "^10.2.0",
     "mock-req-res": "^1.0.4",
     "nyc": "^13.3.0",
     "sinon": "^7.2.7",
